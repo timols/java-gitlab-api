@@ -11,6 +11,12 @@
     <name>Gitlab Java API Wrapper</name>
     <description>A Java wrapper for the Gitlab Git Hosting Server API</description>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <developers>
         <developer>
             <id>timols</id>
