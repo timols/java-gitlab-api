@@ -8,6 +8,7 @@ public class GitlabNamespace {
     private Integer _id;
     private String _name;
     private String _path;
+    private String _description;
 
     @JsonProperty("created_at")
     private Date _createdAt;
@@ -64,5 +65,13 @@ public class GitlabNamespace {
 
     public void setPath(String path) {
         _path = path;
+    }
+
+    public String getDescription() {
+        return _description;
+    }
+
+    public void setDescription(String description) {
+        _description = description;
     }
 }

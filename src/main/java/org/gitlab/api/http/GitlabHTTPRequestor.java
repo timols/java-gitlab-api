@@ -11,10 +11,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.GitlabAPI;
@@ -120,6 +122,102 @@ public class GitlabHTTPRequestor {
         }
 
         return null;
+    }
+
+
+    public <T> Iterator<T> asIterator(final String tailApiUrl, final Class<T> type) {
+        method("GET"); // Ensure we only use iterators for GET requests
+
+        // Ensure that we don't submit any data and alert the user
+        if (!_data.isEmpty()) {
+            throw new IllegalStateException();
+        }
+
+        return new Iterator<T>() {
+            T _next;
+            URL _url;
+
+            {
+                try {
+                    _url = _root.getAPIUrl(tailApiUrl);
+                } catch (IOException e) {
+                    throw new Error(e);
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                fetch();
+                if (_next.getClass().isArray()) {
+                    Object[] arr = (Object[]) _next;
+                    return arr.length != 0;
+                } else {
+                    return _next != null;
+                }
+            }
+
+            @Override
+            public T next() {
+                fetch();
+                T record = _next;
+
+                if (record == null) {
+                    throw new NoSuchElementException();
+                }
+
+                _next = null;
+                return record;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private void fetch() {
+                if (_next != null) {
+                    return;
+                }
+
+                if (_url == null) {
+                    return;
+                }
+
+                try {
+                    HttpURLConnection connection = setupConnection(_url);
+                    try {
+                        _next = parse(connection, type, null);
+                        assert _next != null;
+                        findNextUrl(connection);
+                    } catch (IOException e) {
+                        handleAPIError(e, connection);
+                    }
+                } catch (IOException e) {
+                    throw new Error(e);
+                }
+            }
+
+            private void findNextUrl(HttpURLConnection connection) throws MalformedURLException {
+                String url = _url.toString();
+
+                _url = null;
+                /* Increment the page number for the url if a "page" property exists,
+                 * otherwise, add the page property and increment it.
+                 * The Gitlab API is not a compliant hypermedia REST api, so we use
+                 * a naive implementation.
+                 */
+                Pattern pattern = Pattern.compile("([&|?])page=(\\d+)");
+                Matcher matcher = pattern.matcher(url);
+
+                if (matcher.find()) {
+                    Integer page = Integer.parseInt(matcher.group(2)) + 1;
+                    _url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
+                } else {
+                    // Since the page query was not present, its safe to assume that we just
+                    // currently used the first page, so we can default to page 2
+                    _url = new URL(url + "&page=2");
+                }
+            }
+        };
     }
 
     private void submitData(HttpURLConnection connection) throws IOException {

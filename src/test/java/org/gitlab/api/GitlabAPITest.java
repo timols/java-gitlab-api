@@ -1,10 +1,10 @@
 package org.gitlab.api;
 
-import java.io.IOException;
-import java.net.URL;
-import org.gitlab.api.models.GitlabProject;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 
