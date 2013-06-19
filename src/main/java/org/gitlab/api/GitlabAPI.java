@@ -155,6 +155,26 @@ public class GitlabAPI {
         return Arrays.asList(notes);
     }
 
+    public List<GitlabNote> getAllNotes(GitlabMergeRequest mergeRequest) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
+                GitlabNote.URL;
+
+        List<GitlabNote> results = new ArrayList<GitlabNote>();
+        Iterator<GitlabNote[]> iterator = retrieve().asIterator(tailUrl, GitlabNote[].class);
+
+        while (iterator.hasNext()) {
+            GitlabNote[] projects = iterator.next();
+
+            if (projects.length > 0) {
+                results.addAll(Arrays.asList(projects));
+            }
+        }
+
+        return results;
+
+    }
+
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 "/repository" + GitlabCommit.URL + "?ref_name=" + mergeRequest.getSourceBranch();
