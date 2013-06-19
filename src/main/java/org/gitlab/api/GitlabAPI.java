@@ -104,7 +104,8 @@ public class GitlabAPI {
         List<GitlabMergeRequest> openMergeRequests = new ArrayList<GitlabMergeRequest>();
 
         for (GitlabMergeRequest mergeRequest : allMergeRequests) {
-            if (mergeRequest.isClosed()) {
+            boolean closedState = (mergeRequest.getState() != null && mergeRequest.getState().equals("closed"));
+            if (closedState || mergeRequest.isClosed()) {
                 continue;
             }
 
