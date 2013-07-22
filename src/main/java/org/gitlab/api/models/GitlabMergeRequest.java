@@ -100,5 +100,9 @@ public class GitlabMergeRequest {
 
     public void setState(String state) {
         _state = state;
+        if(state != null) {
+            _closed = state.equals("closed");
+            _merged = state.equals("merged");
+        }
     }
 }
