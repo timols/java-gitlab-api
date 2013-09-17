@@ -113,6 +113,10 @@ public class GitlabHTTPRequestor {
 
         if (hasOutput()) {
             submitData(connection);
+        } else if( "PUT".equals(_method) ) {
+        	// PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
+        	connection.setDoOutput(true);
+        	connection.setFixedLengthStreamingMode(0);
         }
 
         try {

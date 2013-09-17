@@ -187,6 +187,16 @@ public class GitlabAPI {
 
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
+    
+    public void protectBranch(GitlabProject project, String branchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/branches" + "/" + branchName + "/protect";
+        retrieve().method("PUT").to(tailUrl, Void.class);
+    }
+    
+    public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/branches" + "/" + branchName + "/unprotect";
+        retrieve().method("PUT").to(tailUrl, Void.class);
+    }
 
     private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
         GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
