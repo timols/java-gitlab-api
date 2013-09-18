@@ -3,6 +3,7 @@ package org.gitlab.api;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
@@ -188,13 +189,25 @@ public class GitlabAPI {
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
     
+    public List<GitlabBranch> getBranches(GitlabProject project) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL;
+        GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
+        return Arrays.asList(branches);
+    }
+    
+    public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName;
+        GitlabBranch branch = retrieve().to(tailUrl, GitlabBranch.class);
+        return branch;
+    }
+    
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/branches" + "/" + branchName + "/protect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/protect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
     
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/branches" + "/" + branchName + "/unprotect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
