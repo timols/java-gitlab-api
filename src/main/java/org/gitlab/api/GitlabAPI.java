@@ -8,9 +8,11 @@ import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -209,6 +211,33 @@ public class GitlabAPI {
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
+    }
+    
+    public List<GitlabProjectHook> getProjectHooks(GitlabProject project) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL;
+    	GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
+        return Arrays.asList(hooks);
+    }
+    
+    public GitlabProjectHook getProjectHook(GitlabProject project, String hookId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
+    	GitlabProjectHook hook = retrieve().to(tailUrl, GitlabProjectHook.class);
+        return hook;
+    }
+    
+    public GitlabProjectHook addProjectHook(GitlabProject project, String url) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "?url=" + URLEncoder.encode(url, "UTF-8");
+    	return dispatch().to(tailUrl, GitlabProjectHook.class);
+    }
+    
+    public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + "?url=" + URLEncoder.encode(url, "UTF-8");
+    	return retrieve().method("PUT").to(tailUrl, GitlabProjectHook.class);
+    }
+    
+    public void deleteProjectHook(GitlabProject project, String hookId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
+    	retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
