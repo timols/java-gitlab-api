@@ -6,6 +6,7 @@ public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
 
     private Integer _id;
+    private Integer _iid;
     private String _title;
     private String _state;
     private boolean _closed;
@@ -28,6 +29,14 @@ public class GitlabMergeRequest {
 
     public void setId(Integer id) {
         _id = id;
+    }
+
+    public Integer getIid() {
+        return _iid;
+    }
+
+    public void setIid(Integer iid) {
+        _iid = iid;
     }
 
     public String getTargetBranch() {
