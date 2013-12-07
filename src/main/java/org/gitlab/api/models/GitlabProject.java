@@ -36,6 +36,9 @@ public class GitlabProject {
     @JsonProperty("created_at")
     private Date _createdAt;
 
+    @JsonProperty("ssh_url_to_repo")
+    private String _sshUrl;
+
     private GitlabNamespace _namespace;
 
     public Integer getId() {
@@ -132,6 +135,14 @@ public class GitlabProject {
 
     public void setCreatedAt(Date createdAt) {
         _createdAt = createdAt;
+    }
+
+    public String getSshUrl() {
+        return _sshUrl;
+    }
+
+    public void setSshUrl(String sshUrl) {
+        _sshUrl = sshUrl;
     }
 
     public GitlabNamespace getNamespace() {

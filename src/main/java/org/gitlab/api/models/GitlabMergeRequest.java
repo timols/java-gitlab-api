@@ -22,6 +22,9 @@ public class GitlabMergeRequest {
     @JsonProperty("project_id")
     private Integer _projectId;
 
+    @JsonProperty("source_project_id")
+    private Integer _sourceProjectId;
+
     public Integer getId() {
         return _id;
     }
@@ -52,6 +55,14 @@ public class GitlabMergeRequest {
 
     public void setProjectId(Integer projectId) {
         _projectId = projectId;
+    }
+
+    public Integer getSourceProjectId() {
+        return _sourceProjectId;
+    }
+
+    public void setSourceProjectId(Integer sourceProjectId) {
+        _sourceProjectId = sourceProjectId;
     }
 
     public String getTitle() {
