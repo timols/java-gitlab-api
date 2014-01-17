@@ -72,16 +72,32 @@ public class GitlabAPI {
         return new URL(_hostUrl + tailAPIUrl);
     }
 
+    private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
+        GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
+        return Arrays.asList(mergeRequests);
+    }
+
+    /*
+    Project APIs
+    http://api.gitlab.org/projects.html
+    */
+
+    // Get single project
+    // GET /projects/:id
     public GitlabProject getProject(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId;
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
+    // List projects
+    // GET /projects
     public List<GitlabProject> getProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabProject[].class));
     }
 
+    // List all projects
+    // GET /projects
     public List<GitlabProject> getAllProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
         List<GitlabProject> results = new ArrayList<GitlabProject>();
@@ -99,6 +115,13 @@ public class GitlabAPI {
 
     }
 
+    /*
+    Merge Request APIs
+    http://api.gitlab.org/merge_requests.html
+    */
+
+    // List all open merge requests for a project id
+    // GET /projects/:id/merge_requests
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
         List<GitlabMergeRequest> allMergeRequests = getAllMergeRequests(project);
         List<GitlabMergeRequest> openMergeRequests = new ArrayList<GitlabMergeRequest>();
@@ -113,16 +136,22 @@ public class GitlabAPI {
         return openMergeRequests;
     }
 
+    // List merge requests for a project id
+    // GET /projects/:id/merge_requests
     public List<GitlabMergeRequest> getMergeRequests(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMergeRequest.URL;
         return fetchMergeRequests(tailUrl);
     }
 
+    // List merge requests for a project
+    // GET /projects/:id/merge_requests
     public List<GitlabMergeRequest> getMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
         return fetchMergeRequests(tailUrl);
     }
 
+    // List all merge requests for a project
+    // GET /projects/:id/merge_requests
     public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
         List<GitlabMergeRequest> results = new ArrayList<GitlabMergeRequest>();
@@ -139,11 +168,20 @@ public class GitlabAPI {
         return results;
     }
 
+    // Get single merge request
+    // GET /projects/:id/merge_request/:merge_request_id
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
+    /*
+    Notes API
+    http://api.gitlab.org/notes.html
+    */
+
+    // List merge request notes
+    // GET /projects/:id/merge_requests/:merge_request_id/notes
     public List<GitlabNote> getNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
@@ -153,6 +191,8 @@ public class GitlabAPI {
         return Arrays.asList(notes);
     }
 
+    // List all merge request notes
+    // GET /projects/:id/merge_requests/:merge_request_id/notes
     public List<GitlabNote> getAllNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
@@ -170,17 +210,10 @@ public class GitlabAPI {
         }
 
         return results;
-
     }
 
-    public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                "/repository" + GitlabCommit.URL + "?ref_name=" + mergeRequest.getSourceBranch();
-
-        GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
-        return Arrays.asList(commits);
-    }
-
+    // Create new merge request note
+    // POST /projects/:id/merge_requests/:merge_request_id/notes
     public GitlabNote createNote(GitlabMergeRequest mergeRequest, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() + GitlabNote.URL;
@@ -188,8 +221,18 @@ public class GitlabAPI {
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
 
-    private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
-        GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
-        return Arrays.asList(mergeRequests);
+    /*
+    Repository APIs
+    http://api.gitlab.org/repositories.html
+    */
+
+    // List repository commits for a merge request
+    // GET /projects/:id/repository/commits
+    public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                "/repository" + GitlabCommit.URL + "?ref_name=" + mergeRequest.getSourceBranch();
+
+        GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
+        return Arrays.asList(commits);
     }
 }
