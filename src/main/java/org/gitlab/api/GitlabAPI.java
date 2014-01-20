@@ -252,6 +252,7 @@ public class GitlabAPI {
     }
 
     // List all users
+    // GET /users
     public List<GitlabUser> getAllUsers() throws IOException {
         String tailUrl = GitlabUser.URL;
 
@@ -267,5 +268,13 @@ public class GitlabAPI {
         }
 
         return results;
+    }
+
+    // Gets currently authenticated user
+    // GET /user
+    public GitlabUser getLoggedInUser() throws IOException {
+        String tailUrl = "/user";
+        GitlabUser user = retrieve().to(tailUrl, GitlabUser.class);
+        return user;
     }
 }
