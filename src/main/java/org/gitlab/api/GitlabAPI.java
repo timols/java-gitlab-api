@@ -7,6 +7,7 @@ import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabUser;
 
 import java.io.IOException;
 import java.net.URL;
@@ -234,5 +235,37 @@ public class GitlabAPI {
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
         return Arrays.asList(commits);
+    }
+
+    /*
+    User APIs
+    http://api.gitlab.org/users.html
+    */
+
+    // List of users
+    // GET /users
+    public List<GitlabUser> getUsers() throws IOException {
+        String tailUrl = GitlabUser.URL;
+
+        GitlabUser[] users = retrieve().to(tailUrl, GitlabUser[].class);
+        return Arrays.asList(users);
+    }
+
+    // List all users
+    public List<GitlabUser> getAllUsers() throws IOException {
+        String tailUrl = GitlabUser.URL;
+
+        List<GitlabUser> results = new ArrayList<GitlabUser>();
+        Iterator<GitlabUser[]> iterator = retrieve().asIterator(tailUrl, GitlabUser[].class);
+
+        while (iterator.hasNext()) {
+            GitlabUser[] users = iterator.next();
+
+            if (users.length > 0) {
+                results.addAll(Arrays.asList(users));
+            }
+        }
+
+        return results;
     }
 }
