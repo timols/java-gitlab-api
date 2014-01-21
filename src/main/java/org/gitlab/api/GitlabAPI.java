@@ -227,6 +227,14 @@ public class GitlabAPI {
     http://api.gitlab.org/repositories.html
     */
 
+    // Get a specific commit identified by the commit hash or name of a branch or tag
+    // GET /projects/:id/repository/commits/:sha
+    public GitlabCommit getCommit(String projectId, String commitHash) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/commits/" + commitHash;
+        GitlabCommit commit = retrieve().to(tailUrl, GitlabCommit.class);
+        return commit;
+    }
+
     // List repository commits for a merge request
     // GET /projects/:id/repository/commits
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
