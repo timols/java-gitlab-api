@@ -1,6 +1,7 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
+import java.util.List;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabCommit {
@@ -21,6 +22,9 @@ public class GitlabCommit {
 
     @JsonProperty("created_at")
     private Date _createdAt;
+
+    @JsonProperty("parent_ids")
+    private List<String> _parentIds;
 
     public String getId() {
         return _id;
@@ -68,5 +72,13 @@ public class GitlabCommit {
 
     public void setCreatedAt(Date createdAt) {
         _createdAt = createdAt;
+    }
+
+    public List<String> getParentIds() {
+        return _parentIds;
+    }
+
+    public void setParentIds(List<String> parentIds) {
+        _parentIds = parentIds;
     }
 }

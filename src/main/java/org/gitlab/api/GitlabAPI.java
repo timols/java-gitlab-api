@@ -4,6 +4,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabCommitDiff;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
@@ -243,6 +244,14 @@ public class GitlabAPI {
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
         return Arrays.asList(commits);
+    }
+
+    // List commit diffs for a project ID and commit hash
+    // GET /projects/:id/repository/commits/:sha/diff
+    public List<GitlabCommitDiff> getCommitDiffs(String projectId, String commitHash) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/commits/" + commitHash + GitlabCommitDiff.URL;
+        GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
+        return Arrays.asList(diffs);
     }
 
     /*
