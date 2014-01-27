@@ -23,6 +23,12 @@ public class GitlabCommit {
     @JsonProperty("created_at")
     private Date _createdAt;
 
+    @JsonProperty("committed_date")
+    private Date _committedDate;
+
+    @JsonProperty("authored_date")
+    private Date _authoredDate;
+
     @JsonProperty("parent_ids")
     private List<String> _parentIds;
 

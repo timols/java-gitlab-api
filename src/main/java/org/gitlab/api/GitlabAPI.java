@@ -5,6 +5,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabCommitDiff;
+import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
@@ -252,6 +253,14 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/commits/" + commitHash + GitlabCommitDiff.URL;
         GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
         return Arrays.asList(diffs);
+    }
+
+    // Get a list of repository branches from a project, sorted by name alphabetically.
+    // GET /projects/:id/repository/branches
+    public List<GitlabBranch> getBranches(String projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository" + GitlabBranch.URL;
+        GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
+        return Arrays.asList(branches);
     }
 
     /*
