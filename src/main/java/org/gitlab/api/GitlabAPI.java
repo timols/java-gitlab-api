@@ -9,6 +9,7 @@ import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
 import org.gitlab.api.models.GitlabUser;
 
 import java.io.IOException;
@@ -50,6 +51,10 @@ public class GitlabAPI {
 
     public GitlabHTTPRequestor dispatch() {
         return new GitlabHTTPRequestor(this).method("POST");
+    }
+
+    public GitlabHTTPRequestor delete() {
+        return new GitlabHTTPRequestor(this).method("DELETE");
     }
 
     public boolean isIgnoreCertificateErrors() {
@@ -115,7 +120,35 @@ public class GitlabAPI {
         }
 
         return results;
+    }
 
+    // Get list of project hooks for a project
+    // GET /projects/:id/hooks
+    public List<GitlabProjectHook> getProjectHooks(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectHook.URL;
+
+        GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
+        return Arrays.asList(hooks);
+    }
+
+    // Create a new project hook
+    // POST /projects/:id/hooks
+    public GitlabProjectHook createProjectHook(Integer projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectHook.URL;
+
+        return dispatch()
+            .with("url", url)
+            .with("push_events", pushEvents ? "true" : "false")
+            .with("issues_events", issuesEvents ? "true" : "false")
+            .with("merge_requests_events", mergeRequestEvents ? "true" : "false")
+            .to(tailUrl, GitlabProjectHook.class);
+    }
+
+    // Removes a hook from project
+    // DELETE /projects/:id/hooks/:hook_id
+    public void deleteProjectHook(GitlabProjectHook hook) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + hook.getProjectId() + GitlabProjectHook.URL + "/" + hook.getId();
+        delete().to(tailUrl, GitlabProjectHook.class);
     }
 
     /*
