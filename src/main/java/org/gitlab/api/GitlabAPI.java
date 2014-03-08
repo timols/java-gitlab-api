@@ -5,10 +5,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabIssue;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
+import org.gitlab.api.models.GitlabSession;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,6 +35,13 @@ public class GitlabAPI {
     private GitlabAPI(String hostUrl, String apiToken) {
         _hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
         _apiToken = apiToken;
+    }
+    
+    public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
+    	String tailUrl = GitlabSession.URL;
+    	GitlabAPI api = connect(hostUrl, null);
+    	return api.dispatch().with("login", username).with("password", password)
+    			.to(tailUrl, GitlabSession.class);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken) {
@@ -243,5 +252,16 @@ public class GitlabAPI {
     private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
         GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
         return Arrays.asList(mergeRequests);
+    }
+    
+    public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabIssue.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabIssue[].class));
+    }
+    
+    public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
+    			+ issue.getId() + GitlabNote.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
     }
 }

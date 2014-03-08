@@ -149,7 +149,6 @@ public class GitlabHTTPRequestor {
                 }
             }
 
-            @Override
             public boolean hasNext() {
                 fetch();
                 if (_next.getClass().isArray()) {
@@ -160,7 +159,6 @@ public class GitlabHTTPRequestor {
                 }
             }
 
-            @Override
             public T next() {
                 fetch();
                 T record = _next;
