@@ -259,9 +259,42 @@ public class GitlabAPI {
     	return Arrays.asList(retrieve().to(tailUrl, GitlabIssue[].class));
     }
     
+    public GitlabIssue getIssue(Integer projectId, Integer issueId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
+    	return retrieve().to(tailUrl, GitlabIssue.class);
+    }
+    
+    public GitlabIssue createIssue(int projectId, int assigneeId, int milestoneId, String labels, 
+    		String description, String title) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
+    	GitlabHTTPRequestor requestor = dispatch().with("title", title)
+    			.with("description", description)
+    			.with("labels", labels);
+    	
+    	if(assigneeId != 0) {
+    		requestor.with("assignee_id", assigneeId);
+    	}
+    	
+    	if(milestoneId != 0) {
+    		requestor.with("milestone_id", milestoneId);
+    	}
+    	
+    	return requestor.to(tailUrl, GitlabIssue.class);
+    }
+    
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
     			+ issue.getId() + GitlabNote.URL;
     	return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
+    }
+    
+    public GitlabNote createNote(Integer projectId, Integer issueId, String message) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL
+    			+ "/" + issueId + GitlabNote.URL;
+    	return dispatch().with("body", message).to(tailUrl, GitlabNote.class);
+    }
+    
+    public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
+    	return createNote(issue.getProjectId(), issue.getId(), message);
     }
 }
