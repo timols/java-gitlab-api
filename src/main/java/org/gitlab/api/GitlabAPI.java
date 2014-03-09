@@ -282,6 +282,28 @@ public class GitlabAPI {
     	return requestor.to(tailUrl, GitlabIssue.class);
     }
     
+    public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
+    		String description, String title, GitlabIssue.Action action) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
+    	GitlabHTTPRequestor requestor = retrieve().method("PUT").with("title", title)
+    			.with("description", description)
+    			.with("labels", labels);
+    	
+    	if(assigneeId != 0) {
+    		requestor.with("assignee_id", assigneeId);
+    	}
+    	
+    	if(milestoneId != 0) {
+    		requestor.with("milestone_id", milestoneId);
+    	}
+    	
+    	if(action != GitlabIssue.Action.LEAVE) {
+    		requestor.with("state_event", action.toString().toLowerCase());
+    	}
+    	
+    	return requestor.to(tailUrl, GitlabIssue.class);
+    }
+    
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
     			+ issue.getId() + GitlabNote.URL;

@@ -5,6 +5,10 @@ import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabIssue {
+	public enum Action {
+		LEAVE, CLOSE, REOPEN
+	}
+
 	public static final String URL = "/issues";
 	
 	private int _id;
