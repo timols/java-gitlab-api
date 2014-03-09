@@ -1,10 +1,5 @@
 package org.gitlab.api.http;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,10 +9,23 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.GitlabAPI;
 
@@ -128,6 +136,19 @@ public class GitlabHTTPRequestor {
         return null;
     }
 
+    public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
+    	List<T> results = new ArrayList<T>();
+    	Iterator<T[]> iterator = asIterator(tailUrl, type);
+
+        while (iterator.hasNext()) {
+            T[] requests = iterator.next();
+
+            if (requests.length > 0) {
+                results.addAll(Arrays.asList(requests));
+            }
+        }
+        return results;
+    }
 
     public <T> Iterator<T> asIterator(final String tailApiUrl, final Class<T> type) {
         method("GET"); // Ensure we only use iterators for GET requests

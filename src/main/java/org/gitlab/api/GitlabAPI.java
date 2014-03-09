@@ -1,5 +1,12 @@
 package org.gitlab.api;
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
@@ -11,14 +18,6 @@ import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
 import org.gitlab.api.models.GitlabSession;
-
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Gitlab API Wrapper class
@@ -96,19 +95,7 @@ public class GitlabAPI {
 
     public List<GitlabProject> getAllProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
-        List<GitlabProject> results = new ArrayList<GitlabProject>();
-        Iterator<GitlabProject[]> iterator = retrieve().asIterator(tailUrl, GitlabProject[].class);
-
-        while (iterator.hasNext()) {
-            GitlabProject[] projects = iterator.next();
-
-            if (projects.length > 0) {
-                results.addAll(Arrays.asList(projects));
-            }
-        }
-
-        return results;
-
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
@@ -137,18 +124,7 @@ public class GitlabAPI {
 
     public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
-        List<GitlabMergeRequest> results = new ArrayList<GitlabMergeRequest>();
-        Iterator<GitlabMergeRequest[]> iterator = retrieve().asIterator(tailUrl, GitlabMergeRequest[].class);
-
-        while (iterator.hasNext()) {
-            GitlabMergeRequest[] requests = iterator.next();
-
-            if (requests.length > 0) {
-                results.addAll(Arrays.asList(requests));
-            }
-        }
-
-        return results;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
@@ -169,19 +145,8 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
                 GitlabNote.URL;
-
-        List<GitlabNote> results = new ArrayList<GitlabNote>();
-        Iterator<GitlabNote[]> iterator = retrieve().asIterator(tailUrl, GitlabNote[].class);
-
-        while (iterator.hasNext()) {
-            GitlabNote[] projects = iterator.next();
-
-            if (projects.length > 0) {
-                results.addAll(Arrays.asList(projects));
-            }
-        }
-
-        return results;
+        
+        return retrieve().getAll(tailUrl, GitlabNote[].class);
 
     }
 
@@ -256,7 +221,7 @@ public class GitlabAPI {
     
     public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabIssue.URL;
-    	return Arrays.asList(retrieve().to(tailUrl, GitlabIssue[].class));
+    	return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
     
     public GitlabIssue getIssue(Integer projectId, Integer issueId) throws IOException {
@@ -269,16 +234,10 @@ public class GitlabAPI {
     	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
     	GitlabHTTPRequestor requestor = dispatch().with("title", title)
     			.with("description", description)
-    			.with("labels", labels);
-    	
-    	if(assigneeId != 0) {
-    		requestor.with("assignee_id", assigneeId);
-    	}
-    	
-    	if(milestoneId != 0) {
-    		requestor.with("milestone_id", milestoneId);
-    	}
-    	
+    			.with("labels", labels)
+    			.with("assignee_id", assigneeId)
+    			.with("milestone_id", milestoneId);
+
     	return requestor.to(tailUrl, GitlabIssue.class);
     }
     
@@ -287,18 +246,12 @@ public class GitlabAPI {
     	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
     	GitlabHTTPRequestor requestor = retrieve().method("PUT").with("title", title)
     			.with("description", description)
-    			.with("labels", labels);
-    	
-    	if(assigneeId != 0) {
-    		requestor.with("assignee_id", assigneeId);
-    	}
-    	
-    	if(milestoneId != 0) {
-    		requestor.with("milestone_id", milestoneId);
-    	}
+    			.with("labels", labels)
+    			.with("assignee_id", assigneeId)
+    			.with("milestone_id", milestoneId);
     	
     	if(action != GitlabIssue.Action.LEAVE) {
-    		requestor.with("state_event", action.toString().toLowerCase());
+    			requestor.with("state_event", action.toString().toLowerCase());
     	}
     	
     	return requestor.to(tailUrl, GitlabIssue.class);
