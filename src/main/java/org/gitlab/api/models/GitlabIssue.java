@@ -8,6 +8,9 @@ public class GitlabIssue {
 	public enum Action {
 		LEAVE, CLOSE, REOPEN
 	}
+	
+	public static final String StateClosed = "closed";
+	public static final String StateOpened = "opened";
 
 	public static final String URL = "/issues";
 	
