@@ -232,11 +232,8 @@ public class GitlabAPI {
     public GitlabIssue createIssue(int projectId, int assigneeId, int milestoneId, String labels, 
     		String description, String title) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
-    	GitlabHTTPRequestor requestor = dispatch().with("title", title)
-    			.with("description", description)
-    			.with("labels", labels)
-    			.with("assignee_id", assigneeId)
-    			.with("milestone_id", milestoneId);
+    	GitlabHTTPRequestor requestor = dispatch();
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
 
     	return requestor.to(tailUrl, GitlabIssue.class);
     }
@@ -244,11 +241,8 @@ public class GitlabAPI {
     public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
     		String description, String title, GitlabIssue.Action action) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
-    	GitlabHTTPRequestor requestor = retrieve().method("PUT").with("title", title)
-    			.with("description", description)
-    			.with("labels", labels)
-    			.with("assignee_id", assigneeId)
-    			.with("milestone_id", milestoneId);
+    	GitlabHTTPRequestor requestor = retrieve().method("PUT");
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
     	
     	if(action != GitlabIssue.Action.LEAVE) {
     			requestor.with("state_event", action.toString().toLowerCase());
@@ -256,6 +250,23 @@ public class GitlabAPI {
     	
     	return requestor.to(tailUrl, GitlabIssue.class);
     }
+    
+	private void applyIssue(GitlabHTTPRequestor requestor, int projectId,
+			int assigneeId, int milestoneId, String labels, String description,
+			String title) {
+		
+		requestor.with("title", title)
+				.with("description", description)
+				.with("labels", labels);
+
+		if (assigneeId != 0) {
+			requestor.with("assignee_id", assigneeId);
+		}
+
+		if (milestoneId != 0) {
+			requestor.with("milestone_id", milestoneId);
+		}
+	}
     
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
