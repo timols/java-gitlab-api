@@ -14,10 +14,12 @@ import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabIssue;
 import org.gitlab.api.models.GitlabMergeRequest;
+import org.gitlab.api.models.GitlabMilestone;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
 import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabProjectMember;
 
 /**
  * Gitlab API Wrapper class
@@ -257,14 +259,11 @@ public class GitlabAPI {
 		
 		requestor.with("title", title)
 				.with("description", description)
-				.with("labels", labels);
-
-		if (assigneeId != 0) {
-			requestor.with("assignee_id", assigneeId);
-		}
-
-		if (milestoneId != 0) {
-			requestor.with("milestone_id", milestoneId);
+				.with("labels", labels)
+				.with("milestone_id", milestoneId);
+		
+		if(assigneeId != 0) {
+			requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
 		}
 	}
     
@@ -282,5 +281,23 @@ public class GitlabAPI {
     
     public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
     	return createNote(issue.getProjectId(), issue.getId(), message);
+    }
+    
+    public List<GitlabMilestone> getMilestones(GitlabProject project) throws IOException {
+    	return getMilestones(project.getId());
+    }
+    
+    public List<GitlabMilestone> getMilestones(Integer projectId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMilestone.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
+    }
+    
+    public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
+    	return getProjectMembers(project.getId());
+    }
+    
+    public List<GitlabProjectMember> getProjectMembers(Integer projectId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 }

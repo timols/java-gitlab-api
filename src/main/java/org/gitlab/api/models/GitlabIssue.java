@@ -23,7 +23,7 @@ public class GitlabIssue {
 	private String _title;
 	private String _description;
 	private String[] _labels;
-	private String _milestone;
+	private GitlabMilestone _milestone;
 	
 	private GitlabUser _assignee;
 	private GitlabUser _author;
@@ -84,11 +84,11 @@ public class GitlabIssue {
 		_labels = labels;
 	}
 
-	public String getMilestone() {
+	public GitlabMilestone getMilestone() {
 		return _milestone;
 	}
 
-	public void setMilestone(String milestone) {
+	public void setMilestone(GitlabMilestone milestone) {
 		_milestone = milestone;
 	}
 
