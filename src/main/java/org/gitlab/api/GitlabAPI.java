@@ -1,22 +1,25 @@
 package org.gitlab.api;
 
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.models.GitlabBranch;
-import org.gitlab.api.models.GitlabCommit;
-import org.gitlab.api.models.GitlabMergeRequest;
-import org.gitlab.api.models.GitlabNote;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabProjectHook;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabIssue;
+import org.gitlab.api.models.GitlabMergeRequest;
+import org.gitlab.api.models.GitlabMilestone;
+import org.gitlab.api.models.GitlabNote;
+import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
+import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabProjectMember;
 
 /**
  * Gitlab API Wrapper class
@@ -33,6 +36,13 @@ public class GitlabAPI {
     private GitlabAPI(String hostUrl, String apiToken) {
         _hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
         _apiToken = apiToken;
+    }
+    
+    public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
+    	String tailUrl = GitlabSession.URL;
+    	GitlabAPI api = connect(hostUrl, null);
+    	return api.dispatch().with("login", username).with("password", password)
+    			.to(tailUrl, GitlabSession.class);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken) {
@@ -87,19 +97,7 @@ public class GitlabAPI {
 
     public List<GitlabProject> getAllProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
-        List<GitlabProject> results = new ArrayList<GitlabProject>();
-        Iterator<GitlabProject[]> iterator = retrieve().asIterator(tailUrl, GitlabProject[].class);
-
-        while (iterator.hasNext()) {
-            GitlabProject[] projects = iterator.next();
-
-            if (projects.length > 0) {
-                results.addAll(Arrays.asList(projects));
-            }
-        }
-
-        return results;
-
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
@@ -128,18 +126,7 @@ public class GitlabAPI {
 
     public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
-        List<GitlabMergeRequest> results = new ArrayList<GitlabMergeRequest>();
-        Iterator<GitlabMergeRequest[]> iterator = retrieve().asIterator(tailUrl, GitlabMergeRequest[].class);
-
-        while (iterator.hasNext()) {
-            GitlabMergeRequest[] requests = iterator.next();
-
-            if (requests.length > 0) {
-                results.addAll(Arrays.asList(requests));
-            }
-        }
-
-        return results;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
@@ -160,19 +147,8 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
                 GitlabNote.URL;
-
-        List<GitlabNote> results = new ArrayList<GitlabNote>();
-        Iterator<GitlabNote[]> iterator = retrieve().asIterator(tailUrl, GitlabNote[].class);
-
-        while (iterator.hasNext()) {
-            GitlabNote[] projects = iterator.next();
-
-            if (projects.length > 0) {
-                results.addAll(Arrays.asList(projects));
-            }
-        }
-
-        return results;
+        
+        return retrieve().getAll(tailUrl, GitlabNote[].class);
 
     }
 
@@ -243,5 +219,85 @@ public class GitlabAPI {
     private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
         GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
         return Arrays.asList(mergeRequests);
+    }
+    
+    public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabIssue.URL;
+    	return retrieve().getAll(tailUrl, GitlabIssue[].class);
+    }
+    
+    public GitlabIssue getIssue(Integer projectId, Integer issueId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
+    	return retrieve().to(tailUrl, GitlabIssue.class);
+    }
+    
+    public GitlabIssue createIssue(int projectId, int assigneeId, int milestoneId, String labels, 
+    		String description, String title) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
+    	GitlabHTTPRequestor requestor = dispatch();
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
+
+    	return requestor.to(tailUrl, GitlabIssue.class);
+    }
+    
+    public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
+    		String description, String title, GitlabIssue.Action action) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
+    	GitlabHTTPRequestor requestor = retrieve().method("PUT");
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
+    	
+    	if(action != GitlabIssue.Action.LEAVE) {
+    			requestor.with("state_event", action.toString().toLowerCase());
+    	}
+    	
+    	return requestor.to(tailUrl, GitlabIssue.class);
+    }
+    
+	private void applyIssue(GitlabHTTPRequestor requestor, int projectId,
+			int assigneeId, int milestoneId, String labels, String description,
+			String title) {
+		
+		requestor.with("title", title)
+				.with("description", description)
+				.with("labels", labels)
+				.with("milestone_id", milestoneId);
+		
+		if(assigneeId != 0) {
+			requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
+		}
+	}
+    
+    public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
+    			+ issue.getId() + GitlabNote.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
+    }
+    
+    public GitlabNote createNote(Integer projectId, Integer issueId, String message) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL
+    			+ "/" + issueId + GitlabNote.URL;
+    	return dispatch().with("body", message).to(tailUrl, GitlabNote.class);
+    }
+    
+    public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
+    	return createNote(issue.getProjectId(), issue.getId(), message);
+    }
+    
+    public List<GitlabMilestone> getMilestones(GitlabProject project) throws IOException {
+    	return getMilestones(project.getId());
+    }
+    
+    public List<GitlabMilestone> getMilestones(Integer projectId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMilestone.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
+    }
+    
+    public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
+    	return getProjectMembers(project.getId());
+    }
+    
+    public List<GitlabProjectMember> getProjectMembers(Integer projectId) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 }
