@@ -15,6 +15,7 @@ import org.gitlab.api.models.GitlabCommit;
 import org.gitlab.api.models.GitlabIssue;
 import org.gitlab.api.models.GitlabMergeRequest;
 import org.gitlab.api.models.GitlabMilestone;
+import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
@@ -298,6 +299,27 @@ public class GitlabAPI {
     
     public List<GitlabProjectMember> getProjectMembers(Integer projectId) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    }
+    
+    /**
+     * This will fail, if the given namespace is a user and not a group
+     * @param namespace
+     * @return
+     * @throws IOException
+     */
+    public List<GitlabProjectMember> getNamespaceMembers(GitlabNamespace namespace) throws IOException {
+    	return getNamespaceMembers(namespace.getId());
+    }
+    
+    /**
+     * This will fail, if the given namespace is a user and not a group
+     * @param namespaceId
+     * @return
+     * @throws IOException
+     */
+    public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
+    	String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
     	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 }
