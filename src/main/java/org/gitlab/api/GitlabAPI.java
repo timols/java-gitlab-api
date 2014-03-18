@@ -19,8 +19,8 @@ import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabNote;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
-import org.gitlab.api.models.GitlabSession;
 import org.gitlab.api.models.GitlabProjectMember;
+import org.gitlab.api.models.GitlabSession;
 
 /**
  * Gitlab API Wrapper class
@@ -321,5 +321,10 @@ public class GitlabAPI {
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
     	String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
     	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    }
+    
+    public GitlabSession getCurrentSession() throws IOException {
+    	String tailUrl = "/user";
+    	return retrieve().to(tailUrl, GitlabSession.class);
     }
 }
