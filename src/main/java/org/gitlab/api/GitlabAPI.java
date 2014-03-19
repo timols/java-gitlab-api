@@ -93,7 +93,7 @@ public class GitlabAPI {
 
     public List<GitlabProject> getProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabProject[].class));
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
     public List<GitlabProject> getAllProjects() throws IOException {
