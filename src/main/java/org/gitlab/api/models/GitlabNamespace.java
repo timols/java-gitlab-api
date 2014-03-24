@@ -4,7 +4,8 @@ import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabNamespace {
-
+	public static final String URL = "/groups";
+	
     private Integer _id;
     private String _name;
     private String _path;
