@@ -154,7 +154,11 @@ public class GitlabAPI {
     }
 
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+        Integer projectId = mergeRequest.getSourceProjectId();
+        if (projectId == null) {
+            projectId = mergeRequest.getProjectId();
+        }
+        String tailUrl = GitlabProject.URL + "/" + projectId +
                 "/repository" + GitlabCommit.URL + "?ref_name=" + mergeRequest.getSourceBranch();
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
