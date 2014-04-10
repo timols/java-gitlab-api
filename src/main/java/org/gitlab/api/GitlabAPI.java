@@ -10,17 +10,7 @@ import java.util.List;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.models.GitlabBranch;
-import org.gitlab.api.models.GitlabCommit;
-import org.gitlab.api.models.GitlabIssue;
-import org.gitlab.api.models.GitlabMergeRequest;
-import org.gitlab.api.models.GitlabMilestone;
-import org.gitlab.api.models.GitlabNamespace;
-import org.gitlab.api.models.GitlabNote;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabProjectHook;
-import org.gitlab.api.models.GitlabProjectMember;
-import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.*;
 
 /**
  * Gitlab API Wrapper class
@@ -84,6 +74,11 @@ public class GitlabAPI {
         }
 
         return new URL(_hostUrl + tailAPIUrl);
+    }
+
+    public GitlabGroup getGroup(Integer groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId;
+        return retrieve().to(tailUrl, GitlabGroup.class);
     }
 
     public GitlabProject getProject(Integer projectId) throws IOException {
