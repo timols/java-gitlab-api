@@ -87,6 +87,54 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabGroup[].class);
     }
 
+    /**
+     * Creates a Group
+     *
+     * @param name The name of the group. The
+     *             name will also be used as the path
+     *             of the group.
+     *
+     * @return The GitLab Group
+     */
+    public GitlabGroup createGroup(String name) throws IOException {
+        return createGroup(name, name);
+    }
+
+    /**
+     * Creates a Group
+     *
+     * @param name The name of the group
+     * @param path The path for the group
+     *
+     * @return The GitLab Group
+     */
+    public GitlabGroup createGroup(String name, String path) throws IOException {
+        return createGroup(name, path, null, null);
+    }
+
+    /**
+     * Creates a Group
+     *
+     * @param name The name of the group
+     * @param path The path for the group
+     * @param ldapCn LDAP Group Name to sync with, null otherwise
+     * @param ldapAccess Access level for LDAP group members, null otherwise
+     *
+     * @return The GitLab Group
+     */
+    public GitlabGroup createGroup(String name, String path, String ldapCn, Integer ldapAccess) throws IOException {
+
+        Query query = new Query()
+                .append("name", name)
+                .append("path", path)
+                .appendIf("ldap_cn", ldapCn)
+                .appendIf("ldap_access", ldapAccess);
+
+        String tailUrl = GitlabGroup.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+
     public GitlabProject getProject(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId;
         return retrieve().to(tailUrl, GitlabProject.class);
