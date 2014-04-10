@@ -81,6 +81,11 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabGroup.class);
     }
 
+    public List<GitlabGroup> getGroups() throws IOException {
+        String tailUrl = GitlabGroup.URL;
+        return retrieve().getAll(tailUrl, GitlabGroup[].class);
+    }
+
     public GitlabProject getProject(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId;
         return retrieve().to(tailUrl, GitlabProject.class);
