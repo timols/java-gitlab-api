@@ -27,6 +27,9 @@ public class GitlabProject {
     @JsonProperty("merge_requests_enabled")
     private boolean _mergeRequestsEnabled;
 
+    @JsonProperty("snippets_enabled")
+    private boolean _snippetsEnabled;
+
     @JsonProperty("wall_enabled")
     private boolean _wallEnabled;
 
@@ -114,6 +117,14 @@ public class GitlabProject {
 
     public void setMergeRequestsEnabled(boolean mergeRequestsEnabled) {
         _mergeRequestsEnabled = mergeRequestsEnabled;
+    }
+
+    public boolean isSnippetsEnabled() {
+        return _snippetsEnabled;
+    }
+
+    public void setSnippetsEnabled(boolean snippetsEnabled) {
+        this._snippetsEnabled = snippetsEnabled;
     }
 
     public boolean isWallEnabled() {
