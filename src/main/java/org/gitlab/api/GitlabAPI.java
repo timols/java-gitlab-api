@@ -10,6 +10,7 @@ import java.util.List;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
 
 /**
@@ -158,8 +159,12 @@ public class GitlabAPI {
         if (projectId == null) {
             projectId = mergeRequest.getProjectId();
         }
+
+        Query query = new Query()
+            .append("ref_name", mergeRequest.getSourceBranch());
+
         String tailUrl = GitlabProject.URL + "/" + projectId +
-                "/repository" + GitlabCommit.URL + "?ref_name=" + mergeRequest.getSourceBranch();
+                "/repository" + GitlabCommit.URL + query.toString();
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
         return Arrays.asList(commits);
@@ -207,12 +212,18 @@ public class GitlabAPI {
     }
     
     public GitlabProjectHook addProjectHook(GitlabProject project, String url) throws IOException {
-    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "?url=" + URLEncoder.encode(url, "UTF-8");
+        Query query = new Query()
+            .append("url", url);
+
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + query.toString();
     	return dispatch().to(tailUrl, GitlabProjectHook.class);
     }
     
     public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url) throws IOException {
-    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + "?url=" + URLEncoder.encode(url, "UTF-8");
+        Query query = new Query()
+            .append("url", url);
+
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + query.toString();
     	return retrieve().method("PUT").to(tailUrl, GitlabProjectHook.class);
     }
     
