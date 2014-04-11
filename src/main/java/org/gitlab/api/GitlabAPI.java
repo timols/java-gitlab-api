@@ -88,6 +88,29 @@ public class GitlabAPI {
     }
 
     /**
+     * Gets all members of a Group
+     *
+     * @param group The GitLab Group
+     *
+     * @return The Group Members
+     */
+    public List<GitlabGroupMember> getGroupMembers(GitlabGroup group) throws IOException {
+        return getGroupMembers(group.getId());
+    }
+
+    /**
+     * Gets all members of a Group
+     *
+     * @param groupId The id of the GitLab Group
+     *
+     * @return The Group Members
+     */
+    public List<GitlabGroupMember> getGroupMembers(Integer groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabGroupMember.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabGroupMember[].class));
+    }
+
+    /**
      * Creates a Group
      *
      * @param name The name of the group. The
