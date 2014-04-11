@@ -9,6 +9,10 @@ public class GitlabProject {
 
     private Integer _id;
     private String _name;
+
+    @JsonProperty("name_with_namespace")
+    private String _nameWithNamespace;
+
     private String _description;
 
     @JsonProperty("default_branch")
@@ -64,6 +68,14 @@ public class GitlabProject {
 
     public void setName(String name) {
         _name = name;
+    }
+
+    public String getNameWithNamespace() {
+        return _nameWithNamespace;
+    }
+
+    public void setNameWithNamespace(String nameWithNamespace) {
+        this._nameWithNamespace = nameWithNamespace;
     }
 
     public String getDescription() {
