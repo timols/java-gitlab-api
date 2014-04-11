@@ -158,13 +158,14 @@ public class GitlabAPI {
      * @return The GitLab Project
      */
     public GitlabProject createProject(String name) throws IOException {
-        return createProject(name, null, null, null, null, null, null, null, null);
+        return createProject(name, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
      * Creates a Project
      *
      * @param name The name of the project
+     * @param namespaceId The Namespace for the new project, otherwise null indicates to use the GitLab default (user)
      * @param description A description for the project, null otherwise
      * @param issuesEnabled Whether Issues should be enabled, otherwise null indicates to use GitLab default
      * @param wallEnabled Whether The Wall should be enabled, otherwise null indicates to use GitLab default
@@ -173,12 +174,14 @@ public class GitlabAPI {
      * @param snippetsEnabled Whether Snippets should be enabled, otherwise null indicates to use GitLab default
      * @param publik Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
      * @param visibilityLevel The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param importUrl The Import URL for the project, otherwise null
      *
      * @return the Gitlab Project
      */
-    public GitlabProject createProject(String name, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel) throws IOException {
+    public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
+                .appendIf("namespace_id", namespaceId)
                 .appendIf("description", description)
                 .appendIf("issues_enabled", issuesEnabled)
                 .appendIf("wall_enabled", wallEnabled)
@@ -186,7 +189,8 @@ public class GitlabAPI {
                 .appendIf("wiki_enabled", wikiEnabled)
                 .appendIf("snippets_enabled", snippetsEnabled)
                 .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel);
+                .appendIf("visibility_level", visibilityLevel)
+                .appendIf("import_url", importUrl);
 
         String tailUrl = GitlabProject.URL + query.toString();
 
