@@ -9,12 +9,12 @@ public abstract class GitlabAbstractMember extends GitlabUser {
     @JsonProperty("access_level")
 	private int _accessLevel;
 
-	public int getAccessLevel() {
-		return _accessLevel;
+	public GitlabAccessLevel getAccessLevel() {
+		return GitlabAccessLevel.fromAccessValue(_accessLevel);
 	}
 
-	public void setAccessLevel(int accessLevel) {
-		_accessLevel = accessLevel;
+	public void setAccessLevel(GitlabAccessLevel accessLevel) {
+		_accessLevel = accessLevel.accessValue;
 	}
 
 }
