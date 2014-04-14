@@ -145,7 +145,7 @@ public class GitlabAPI {
      *
      * @return The GitLab Group
      */
-    public GitlabGroup createGroup(String name, String path, String ldapCn, Integer ldapAccess) throws IOException {
+    public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess) throws IOException {
 
         Query query = new Query()
                 .append("name", name)

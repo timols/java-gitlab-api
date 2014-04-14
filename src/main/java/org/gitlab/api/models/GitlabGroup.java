@@ -48,11 +48,11 @@ public class GitlabGroup {
         this._ldapCn = ldapCn;
     }
 
-    public Integer getLdapAccess() {
-        return _ldapAccess;
+    public GitlabAccessLevel getLdapAccess() {
+        return GitlabAccessLevel.fromAccessValue(_ldapAccess);
     }
 
-    public void setLdapAccess(Integer ldapAccess) {
-        this._ldapAccess = ldapAccess;
+    public void setLdapAccess(GitlabAccessLevel ldapGitlabAccessLevel) {
+        this._ldapAccess = ldapGitlabAccessLevel.accessValue;
     }
 }
