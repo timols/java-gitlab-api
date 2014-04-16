@@ -9,6 +9,7 @@ public class GitlabMergeRequest {
     private Integer _iid;
     private String _title;
     private String _state;
+    private String _description;
     private boolean _closed;
     private boolean _merged;
     private GitlabUser _author;
@@ -26,6 +27,10 @@ public class GitlabMergeRequest {
     @JsonProperty("source_project_id")
     private Integer _sourceProjectId;
 
+    @JsonProperty("milestone_id")
+    private Integer _milestone_id;
+
+
     public Integer getId() {
         return _id;
     }
@@ -33,6 +38,9 @@ public class GitlabMergeRequest {
     public void setId(Integer id) {
         _id = id;
     }
+
+    public Integer getMilestoneId(){ return _milestone_id; }
+    public void setMilestoneId(Integer id) { _milestone_id = id; }
 
     public Integer getIid() {
         return _iid;
@@ -81,6 +89,10 @@ public class GitlabMergeRequest {
     public void setTitle(String title) {
         _title = title;
     }
+
+    public String getDescription() { return _description; }
+
+    public void setDescription(String d) { _description = d; }
 
     public boolean isClosed() {
         return _closed;
