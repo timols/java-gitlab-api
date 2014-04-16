@@ -31,7 +31,7 @@ import org.gitlab.api.GitlabAPI;
 
 /**
  * Gitlab HTTP Requestor
- *
+ * <p/>
  * Responsible for handling HTTP requests to the Gitlab API
  *
  * @author @timols
@@ -66,11 +66,11 @@ public class GitlabHTTPRequestor {
 
     /**
      * Sets the HTTP Request method for the request.
-     *
+     * <p/>
      * Has a fluent api for method chaining.
      *
-     * @param   method    The HTTP method
-     * @return  this
+     * @param method The HTTP method
+     * @return this
      */
     public GitlabHTTPRequestor method(String method) {
         try {
@@ -84,12 +84,12 @@ public class GitlabHTTPRequestor {
 
     /**
      * Sets the HTTP Form Post parameters for the request
-     *
+     * <p/>
      * Has a fluent api for method chaining
      *
-     * @param   key
-     * @param   value
-     * @return  this
+     * @param key
+     * @param value
+     * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
         if (value != null && key != null) {
@@ -109,22 +109,23 @@ public class GitlabHTTPRequestor {
     /**
      * Opens the HTTP(S) connection, submits any data and parses the response.
      * Will throw an error
-     * @param tailAPIUrl       The url to open a connection to (after the host and namespace)
-     * @param type             The type of the response to be deserialized from
-     * @param instance         The instance to update from the response
      *
-     * @return                 An object of type T
+     * @param tailAPIUrl The url to open a connection to (after the host and namespace)
+     * @param type       The type of the response to be deserialized from
+     * @param instance   The instance to update from the response
+     * @return An object of type T
      * @throws java.io.IOException
      */
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
+        System.out.println(_root.getAPIUrl(tailAPIUrl));
         HttpURLConnection connection = setupConnection(_root.getAPIUrl(tailAPIUrl));
 
         if (hasOutput()) {
             submitData(connection);
-        } else if( "PUT".equals(_method) ) {
-        	// PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
-        	connection.setDoOutput(true);
-        	connection.setFixedLengthStreamingMode(0);
+        } else if ("PUT".equals(_method)) {
+            // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
+            connection.setDoOutput(true);
+            connection.setFixedLengthStreamingMode(0);
         }
 
         try {
@@ -137,8 +138,8 @@ public class GitlabHTTPRequestor {
     }
 
     public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
-    	List<T> results = new ArrayList<T>();
-    	Iterator<T[]> iterator = asIterator(tailUrl, type);
+        List<T> results = new ArrayList<T>();
+        Iterator<T[]> iterator = asIterator(tailUrl, type);
 
         while (iterator.hasNext()) {
             T[] requests = iterator.next();
@@ -328,17 +329,19 @@ public class GitlabHTTPRequestor {
 
     private void ignoreCertificateErrors() {
         TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
                 }
-                public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-                }
-                public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            }
         };
 
         try {
