@@ -123,7 +123,6 @@ public class GitlabAPI {
     }
 
     public GitlabUser createUser(GitlabUser user, String password) throws IOException {
-
         return dispatch().with("email", user.getEmail())
                 .with("username", user.getUsername())
                 .with("name", user.getName())
@@ -135,7 +134,16 @@ public class GitlabAPI {
                 .with("admin", user.isAdmin())
                 .with("can_create_group", user.isCanCreateGroup())
                 .to(GitlabUser.URL, GitlabUser.class);
+    }
 
+    public void deleteUser(String userName) throws IOException {
+        try {
+            GitlabUser user = getUser(userName);
+            if (user == null) return;
+            delete().to(GitlabUser.URL + "/" + user.getId(), GitlabUser.class);
+        } catch (java.io.FileNotFoundException e) {
+            return;
+        }
     }
 
     public List<GitlabProject> getProjects() throws IOException {

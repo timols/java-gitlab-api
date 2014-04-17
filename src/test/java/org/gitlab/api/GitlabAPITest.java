@@ -33,6 +33,11 @@ public class GitlabAPITest {
     }
 
     @Test
+    public void testDeleteUser() throws Exception {
+        _api.deleteUser("okokokokok");
+    }
+
+    @Test
     public void testCreateProject() throws Exception {
         GitlabProject project = new GitlabProject();
         project.setName("okokokokoko");
