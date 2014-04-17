@@ -1,6 +1,7 @@
 package org.gitlab.api;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -49,6 +50,10 @@ public class GitlabAPI {
         return new GitlabHTTPRequestor(this);
     }
 
+    public GitlabHTTPRequestor delete() {
+        return new GitlabHTTPRequestor(this).method("DELETE");
+    }
+
     public GitlabHTTPRequestor dispatch() {
         return new GitlabHTTPRequestor(this).method("POST");
     }
@@ -81,9 +86,21 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
-    public GitlabProject getProject(String NAMESPACE_PROJECT_NAME) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + NAMESPACE_PROJECT_NAME;
-        return retrieve().to(tailUrl, GitlabProject.class);
+    public GitlabProject getProject(String namespace_project_name) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + urlEncode(namespace_project_name);
+        try {
+            return retrieve().to(tailUrl, GitlabProject.class);
+        } catch (java.io.FileNotFoundException e) {
+            return null;
+        }
+    }
+
+    private String urlEncode(String str) {
+        try {
+            return URLEncoder.encode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public GitlabUser getUser(String username) throws IOException {
@@ -91,6 +108,34 @@ public class GitlabAPI {
         GitlabUser[] arrays = retrieve().to(tailUrl, GitlabUser[].class);
         if (null == arrays || arrays.length == 0) return null;
         return arrays[0];
+    }
+
+    public GitlabProject createProject(GitlabProject project) throws IOException {
+        return dispatch().with("name", project.getName())
+                .with("namespace_id", project.getNamespace())
+                .with("description", project.getDescription())
+                .with("issues_enabled", project.isIssuesEnabled())
+                .with("wall_enabled", project.isWallEnabled())
+                .with("merge_requests_enabled", project.isMergeRequestsEnabled())
+                .with("wiki_enabled", project.isWikiEnabled())
+                .with("public", project.isPublic())
+                .to(GitlabProject.URL, GitlabProject.class);
+    }
+
+    public GitlabUser createUser(GitlabUser user, String password) throws IOException {
+
+        return dispatch().with("email", user.getEmail())
+                .with("username", user.getUsername())
+                .with("name", user.getName())
+                .with("password", password)
+                .with("skype", user.getSkype())
+                .with("linkedin", user.getLinkedin())
+                .with("twitter", user.getTwitter())
+                .with("bio", user.getBio())
+                .with("admin", user.isAdmin())
+                .with("can_create_group", user.isCanCreateGroup())
+                .to(GitlabUser.URL, GitlabUser.class);
+
     }
 
     public List<GitlabProject> getProjects() throws IOException {
@@ -101,6 +146,15 @@ public class GitlabAPI {
     public List<GitlabProject> getAllProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
         return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    public void deleteProject(String namespace_project_name) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + urlEncode(namespace_project_name);
+        try {
+            delete().to(tailUrl, GitlabProject.class);
+        } catch (java.io.FileNotFoundException e) {
+            return;
+        }
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
