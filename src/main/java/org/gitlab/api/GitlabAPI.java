@@ -310,6 +310,14 @@ public class GitlabAPI {
         return Arrays.asList(users);
     }
 
+    // Search users by Email or username
+    // GET /users?search=:email_or_username
+    public List<GitlabUser> searchUsers(String emailOrUsername) throws IOException {
+        String tailUrl = GitlabUser.URL + "?search=" + emailOrUsername;
+        GitlabUser[] users = retrieve().to(tailUrl, GitlabUser[].class);
+        return Arrays.asList(users);
+    }
+
     // List all users
     // GET /users
     public List<GitlabUser> getAllUsers() throws IOException {
