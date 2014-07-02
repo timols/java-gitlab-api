@@ -12,3 +12,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.12'
+}
