@@ -86,6 +86,16 @@ public class GitlabAPI {
         return new URL(_hostUrl + tailAPIUrl);
     }
 
+    public List< GitlabUser > getUsers() throws IOException {
+        String tailUrl = GitlabUser.URL;
+        return retrieve().getAll( tailUrl, GitlabUser[].class );
+    }
+
+    public GitlabUser getUser( Integer userId ) throws IOException {
+        String tailUrl = GitlabUser.URL + "/" + userId;
+        return retrieve().to( tailUrl, GitlabUser.class );
+    }
+
     public GitlabProject getProject(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId;
         return retrieve().to(tailUrl, GitlabProject.class);
