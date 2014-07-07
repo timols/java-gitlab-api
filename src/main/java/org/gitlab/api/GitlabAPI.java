@@ -1,12 +1,5 @@
 package org.gitlab.api;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
@@ -21,6 +14,15 @@ import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
 import org.gitlab.api.models.GitlabProjectMember;
 import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabUser;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Gitlab API Wrapper class
@@ -86,7 +88,7 @@ public class GitlabAPI {
         return new URL(_hostUrl + tailAPIUrl);
     }
 
-    public List< GitlabUser > getUsers() throws IOException {
+    public List<GitlabUser> getUsers() throws IOException {
         String tailUrl = GitlabUser.URL;
         return retrieve().getAll( tailUrl, GitlabUser[].class );
     }
