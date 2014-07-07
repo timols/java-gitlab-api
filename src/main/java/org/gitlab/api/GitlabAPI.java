@@ -1,17 +1,31 @@
 package org.gitlab.api;
 
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.gitlab.api.http.GitlabHTTPRequestor;
+
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabIssue;
+import org.gitlab.api.models.GitlabMergeRequest;
+import org.gitlab.api.models.GitlabMilestone;
+import org.gitlab.api.models.GitlabNamespace;
+import org.gitlab.api.models.GitlabNote;
+import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
+import org.gitlab.api.models.GitlabProjectMember;
+import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabUser;
+
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
+
 
 /**
  * Gitlab API Wrapper class
@@ -75,6 +89,16 @@ public class GitlabAPI {
         }
 
         return new URL(_hostUrl + tailAPIUrl);
+    }
+
+    public List<GitlabUser> getUsers() throws IOException {
+        String tailUrl = GitlabUser.URL;
+        return retrieve().getAll( tailUrl, GitlabUser[].class );
+    }
+
+    public GitlabUser getUser(Integer userId) throws IOException {
+        String tailUrl = GitlabUser.URL + "/" + userId;
+        return retrieve().to(tailUrl, GitlabUser.class);
     }
 
     public GitlabGroup getGroup(Integer groupId) throws IOException {
