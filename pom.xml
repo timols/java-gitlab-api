@@ -4,7 +4,7 @@
 
     <groupId>org.gitlab</groupId>
     <artifactId>java-gitlab-api</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.5-SNAPSHOT</version>
 
     <name>Gitlab Java API Wrapper</name>
     <description>A Java wrapper for the Gitlab Git Hosting Server API</description>
@@ -22,6 +22,13 @@
             <email>tim.olshansky@gmail.com</email>
         </developer>
     </developers>
+    <contributors>
+        <contributor>
+            <name>Adam Retter</name>
+            <email>adam.retter@googlemail.com</email>
+            <organization>Evolved Binary Ltd</organization>
+        </contributor>
+    </contributors>
 
     <licenses>
         <license>
@@ -81,6 +88,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>

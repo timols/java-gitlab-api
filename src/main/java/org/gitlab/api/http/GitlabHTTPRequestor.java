@@ -291,7 +291,7 @@ public class GitlabHTTPRequestor {
                 return null;
             }
         } catch (SSLHandshakeException e) {
-            throw new SSLHandshakeException("You can disable certificate checking by setting ignoreCertificateErrors on GitlabHTTPRequestor");
+            throw new SSLHandshakeException("You can disable certificate checking by setting ignoreCertificateErrors on GitlabHTTPRequestor. SSL Error: " + e.getMessage());
         } finally {
             IOUtils.closeQuietly(reader);
         }
