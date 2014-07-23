@@ -92,8 +92,8 @@ public class GitlabAPI {
 
     // Get single project
     // GET /projects/:id
-    public GitlabProject getProject(Integer projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId;
+    public GitlabProject getProject(String projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
@@ -124,8 +124,8 @@ public class GitlabAPI {
 
     // Get list of project hooks for a project
     // GET /projects/:id/hooks
-    public List<GitlabProjectHook> getProjectHooks(Integer projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectHook.URL;
+    public List<GitlabProjectHook> getProjectHooks(String projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
         GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
         return Arrays.asList(hooks);
@@ -133,8 +133,8 @@ public class GitlabAPI {
 
     // Create a new project hook
     // POST /projects/:id/hooks
-    public GitlabProjectHook createProjectHook(Integer projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectHook.URL;
+    public GitlabProjectHook createProjectHook(String projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
         return dispatch()
             .with("url", url)
@@ -174,8 +174,8 @@ public class GitlabAPI {
 
     // List merge requests for a project id
     // GET /projects/:id/merge_requests
-    public List<GitlabMergeRequest> getMergeRequests(Integer projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMergeRequest.URL;
+    public List<GitlabMergeRequest> getMergeRequests(String projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL;
         return fetchMergeRequests(tailUrl);
     }
 
@@ -265,7 +265,7 @@ public class GitlabAPI {
     // Get a specific commit identified by the commit hash or name of a branch or tag
     // GET /projects/:id/repository/commits/:sha
     public GitlabCommit getCommit(String projectId, String commitHash) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/commits/" + commitHash;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash;
         GitlabCommit commit = retrieve().to(tailUrl, GitlabCommit.class);
         return commit;
     }
@@ -283,7 +283,7 @@ public class GitlabAPI {
     // List commit diffs for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/diff
     public List<GitlabCommitDiff> getCommitDiffs(String projectId, String commitHash) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/commits/" + commitHash + GitlabCommitDiff.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash + GitlabCommitDiff.URL;
         GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
         return Arrays.asList(diffs);
     }
@@ -291,7 +291,7 @@ public class GitlabAPI {
     // Get a list of repository branches from a project, sorted by name alphabetically.
     // GET /projects/:id/repository/branches
     public List<GitlabBranch> getBranches(String projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository" + GitlabBranch.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository" + GitlabBranch.URL;
         GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
         return Arrays.asList(branches);
     }
@@ -343,5 +343,9 @@ public class GitlabAPI {
         String tailUrl = "/user";
         GitlabUser user = retrieve().to(tailUrl, GitlabUser.class);
         return user;
+    }
+
+    private String sanitizeProjectId(String projectId) {
+        return projectId.replace("/","%2F");
     }
 }
