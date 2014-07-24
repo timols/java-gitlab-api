@@ -15,6 +15,7 @@ public class GitlabUser {
     private String _twitter;
     private String _provider;
     private String _state;
+    private String _password;
     private boolean _blocked;
 
     @JsonProperty("created_at")
@@ -195,4 +196,14 @@ public class GitlabUser {
     public void setCanCreateTeam(boolean canCreateTeam) {
         _canCreateTeam = canCreateTeam;
     }
+
+	public String getPassword() {
+		return _password;
+	}
+
+	public void setPassword(String password) {
+		_password = password;
+	}
+    
+    
 }

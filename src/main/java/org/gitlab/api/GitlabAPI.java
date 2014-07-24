@@ -531,4 +531,25 @@ public class GitlabAPI {
     	String tailUrl = "/user";
     	return retrieve().to(tailUrl, GitlabSession.class);
     }
+    
+    /**
+     * There are several circumstances where bad input data WILL fail
+     * in an opaque way with the gitlab api. User password length < 8
+     * is one that got me repeatedly... 404 error. Existing user id
+     * or email will also throw 404. Method returns a GitlabUser.
+     * @param user
+     * @throws IOException
+     */
+    public void createUser(GitlabUser user) throws IOException {
+    	Query query = new Query()
+    		.append("email", user.getEmail())
+    		.append("name", user.getName())
+    		.append("password", user.getPassword())
+    		.append("username", user.getUsername());
+    	//.append("can_create_group", Boolean.FALSE.toString());
+    	if (user.isAdmin())
+    		query.append("admin", Boolean.TRUE.toString());
+    	String tailUrl = GitlabUser.URL + query.toString();
+    	user = dispatch().to(tailUrl, GitlabUser.class); 
+    }
 }
