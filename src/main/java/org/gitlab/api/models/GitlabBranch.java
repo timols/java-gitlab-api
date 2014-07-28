@@ -1,37 +1,40 @@
 package org.gitlab.api.models;
 
-import org.gitlab.api.models.GitlabBranchCommit;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabBranch {
-    public static String URL = "/repository/branches/";
-
+	public final static String URL = "/repository/branches/";
+	
+	@JsonProperty("name")
     private String _name;
-    private GitlabBranchCommit _commit;
-    private boolean _protected;
 
-    public String getName() {
-        return _name;
-    }
+    	@JsonProperty("commit")
+    	private GitlabBranchCommit _commit;
+	
+	@JsonProperty("protected")
+	private boolean _protected;
 
-    public void setName(String name) {
-        _name = name;
-    }
+	public String getName() {
+		return _name;
+	}
 
-    public GitlabBranchCommit getCommit() {
-        return _commit;
-    }
+	public void setName(String name) {
+		this._name = name;
+	}
 
-    public void setCommit(GitlabBranchCommit commit) {
-        _commit = commit;
-    }
+	public GitlabBranchCommit getCommit() {
+		return _commit;
+	}
 
-    public boolean getProtected() {
-        return _protected;
-    }
+	public void setCommit(GitlabBranchCommit commit) {
+		this._commit = commit;
+	}
 
-    public void setProtected(boolean isProtected) {
-        _protected = isProtected;
-    }
+	public boolean isProtected() {
+		return _protected;
+	}
+
+	public void setProtected(boolean isProtected) {
+		this._protected = isProtected;
+	}
 }

@@ -45,10 +45,10 @@ public class GitlabAPI {
     }
     
     public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
-        String tailUrl = GitlabSession.URL;
-        GitlabAPI api = connect(hostUrl, null);
-        return api.dispatch().with("login", username).with("password", password)
-                .to(tailUrl, GitlabSession.class);
+    	String tailUrl = GitlabSession.URL;
+    	GitlabAPI api = connect(hostUrl, null);
+    	return api.dispatch().with("login", username).with("password", password)
+    			.to(tailUrl, GitlabSession.class);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken) {
@@ -389,15 +389,21 @@ public class GitlabAPI {
 
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
+
+    public List<GitlabBranch> getBranches(String projectId) throws IOException {
+       String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
+        GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
+        return Arrays.asList(branches);
+    }
     
     public List<GitlabBranch> getBranches(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL;
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL;
         GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
         return Arrays.asList(branches);
     }
     
     public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName;
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName;
         GitlabBranch branch = retrieve().to(tailUrl, GitlabBranch.class);
         return branch;
     }
@@ -411,16 +417,22 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
+
+    public List<GitlabProjectHook> getProjectHooks(String projectId) throws IOException {
+       String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
+       GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
+       return Arrays.asList(hooks);
+    }
     
     public List<GitlabProjectHook> getProjectHooks(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL;
-        GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL;
+    	GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
         return Arrays.asList(hooks);
     }
     
     public GitlabProjectHook getProjectHook(GitlabProject project, String hookId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
-        GitlabProjectHook hook = retrieve().to(tailUrl, GitlabProjectHook.class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
+    	GitlabProjectHook hook = retrieve().to(tailUrl, GitlabProjectHook.class);
         return hook;
     }
     
@@ -428,21 +440,37 @@ public class GitlabAPI {
         Query query = new Query()
             .append("url", url);
 
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + query.toString();
-        return dispatch().to(tailUrl, GitlabProjectHook.class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + query.toString();
+    	return dispatch().to(tailUrl, GitlabProjectHook.class);
+    }
+
+    public GitlabProjectHook addProjectHook(String projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
+
+        return dispatch()
+                .with("url", url)
+                .with("push_events", pushEvents ? "true" : "false")
+                .with("issues_events", issuesEvents ? "true" : "false")
+                .with("merge_requests_events", mergeRequestEvents ? "true" : "false")
+                .to(tailUrl, GitlabProjectHook.class);
     }
     
     public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url) throws IOException {
         Query query = new Query()
             .append("url", url);
 
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + query.toString();
-        return retrieve().method("PUT").to(tailUrl, GitlabProjectHook.class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + query.toString();
+    	return retrieve().method("PUT").to(tailUrl, GitlabProjectHook.class);
+    }
+
+    public void deleteProjectHook(GitlabProjectHook hook) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + hook.getProjectId() + GitlabProjectHook.URL + "/" + hook.getId();
+    	retrieve().method("DELETE").to(tailUrl, Void.class);
     }
     
     public void deleteProjectHook(GitlabProject project, String hookId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
+    	retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
@@ -451,83 +479,83 @@ public class GitlabAPI {
     }
     
     public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabIssue.URL;
-        return retrieve().getAll(tailUrl, GitlabIssue[].class);
+    	String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabIssue.URL;
+    	return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
     
     public GitlabIssue getIssue(String projectId, Integer issueId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + "/" + issueId;
-        return retrieve().to(tailUrl, GitlabIssue.class);
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + "/" + issueId;
+    	return retrieve().to(tailUrl, GitlabIssue.class);
     }
     
     public GitlabIssue createIssue(int projectId, int assigneeId, int milestoneId, String labels, 
-            String description, String title) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
-        GitlabHTTPRequestor requestor = dispatch();
-        applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
+    		String description, String title) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
+    	GitlabHTTPRequestor requestor = dispatch();
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
 
-        return requestor.to(tailUrl, GitlabIssue.class);
+    	return requestor.to(tailUrl, GitlabIssue.class);
     }
     
     public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
-            String description, String title, GitlabIssue.Action action) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
-        applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
-        
-        if(action != GitlabIssue.Action.LEAVE) {
-                requestor.with("state_event", action.toString().toLowerCase());
-        }
-        
-        return requestor.to(tailUrl, GitlabIssue.class);
+    		String description, String title, GitlabIssue.Action action) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
+    	GitlabHTTPRequestor requestor = retrieve().method("PUT");
+    	applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
+    	
+    	if(action != GitlabIssue.Action.LEAVE) {
+    			requestor.with("state_event", action.toString().toLowerCase());
+    	}
+    	
+    	return requestor.to(tailUrl, GitlabIssue.class);
     }
     
-    private void applyIssue(GitlabHTTPRequestor requestor, int projectId,
-            int assigneeId, int milestoneId, String labels, String description,
-            String title) {
-        
-        requestor.with("title", title)
-                .with("description", description)
-                .with("labels", labels)
-                .with("milestone_id", milestoneId);
-        
-        if(assigneeId != 0) {
-            requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
-        }
-    }
+	private void applyIssue(GitlabHTTPRequestor requestor, int projectId,
+			int assigneeId, int milestoneId, String labels, String description,
+			String title) {
+		
+		requestor.with("title", title)
+				.with("description", description)
+				.with("labels", labels)
+				.with("milestone_id", milestoneId);
+		
+		if(assigneeId != 0) {
+			requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
+		}
+	}
     
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
-                + issue.getId() + GitlabNote.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
+    	String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" 
+    			+ issue.getId() + GitlabNote.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
     }
     
     public GitlabNote createNote(String projectId, Integer issueId, String message) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL
-                + "/" + issueId + GitlabNote.URL;
-        return dispatch().with("body", message).to(tailUrl, GitlabNote.class);
+    	String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL
+    			+ "/" + issueId + GitlabNote.URL;
+    	return dispatch().with("body", message).to(tailUrl, GitlabNote.class);
     }
     
     public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
-        return createNote(issue.getProjectId(), issue.getId(), message);
+    	return createNote(String.valueOf(issue.getProjectId()), issue.getId(), message);
     }
     
     public List<GitlabMilestone> getMilestones(GitlabProject project) throws IOException {
-        return getMilestones(project.getId());
+    	return getMilestones(String.valueOf(project.getId()));
     }
     
     public List<GitlabMilestone> getMilestones(String projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
     }
     
     public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
-        return getProjectMembers(project.getId());
+    	return getProjectMembers(String.valueOf(project.getId()));
     }
     
     public List<GitlabProjectMember> getProjectMembers(String projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
     
     /**
@@ -537,7 +565,7 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProjectMember> getNamespaceMembers(GitlabNamespace namespace) throws IOException {
-        return getNamespaceMembers(namespace.getId());
+    	return getNamespaceMembers(namespace.getId());
     }
     
     /**
@@ -547,16 +575,16 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
-        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    	String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
+    	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
     
     public GitlabSession getCurrentSession() throws IOException {
-        String tailUrl = "/user";
-        return retrieve().to(tailUrl, GitlabSession.class);
+    	String tailUrl = "/user";
+    	return retrieve().to(tailUrl, GitlabSession.class);
     }
 
     private String sanitizeProjectId(String projectId) {
-        return projectId.replace("/","%2F");
+       return projectId.replace("/","%2F");
     }
 }
