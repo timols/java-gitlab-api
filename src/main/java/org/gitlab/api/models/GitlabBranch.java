@@ -5,7 +5,7 @@ import org.gitlab.api.models.GitlabBranchCommit;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabBranch {
-    public static String URL = "/branches";
+    public static String URL = "/repository/branches/";
 
     private String _name;
     private GitlabBranchCommit _commit;

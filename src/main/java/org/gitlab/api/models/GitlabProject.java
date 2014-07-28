@@ -9,6 +9,10 @@ public class GitlabProject {
 
     private Integer _id;
     private String _name;
+
+    @JsonProperty("name_with_namespace")
+    private String _nameWithNamespace;
+
     private String _description;
 
     @JsonProperty("default_branch")
@@ -18,6 +22,9 @@ public class GitlabProject {
     private boolean _public;
     private String _path;
 
+    @JsonProperty("visibility_level")
+    private Integer _visibilityLevel;
+
     @JsonProperty("path_with_namespace")
     private String _pathWithNamespace;
 
@@ -26,6 +33,9 @@ public class GitlabProject {
 
     @JsonProperty("merge_requests_enabled")
     private boolean _mergeRequestsEnabled;
+
+    @JsonProperty("snippets_enabled")
+    private boolean _snippetsEnabled;
 
     @JsonProperty("wall_enabled")
     private boolean _wallEnabled;
@@ -41,6 +51,9 @@ public class GitlabProject {
 
     @JsonProperty("web_url")
     private String _webUrl;
+
+    @JsonProperty("http_url_to_repo")
+    private String _httpUrl;
 
     private GitlabNamespace _namespace;
 
@@ -60,6 +73,14 @@ public class GitlabProject {
         _name = name;
     }
 
+    public String getNameWithNamespace() {
+        return _nameWithNamespace;
+    }
+
+    public void setNameWithNamespace(String nameWithNamespace) {
+        this._nameWithNamespace = nameWithNamespace;
+    }
+
     public String getDescription() {
         return _description;
     }
@@ -74,6 +95,14 @@ public class GitlabProject {
 
     public void setDefaultBranch(String defaultBranch) {
         _defaultBranch = defaultBranch;
+    }
+
+    public Integer getVisibilityLevel() {
+        return _visibilityLevel;
+    }
+
+    public void setVisibilityLevel(Integer visibilityLevel) {
+        this._visibilityLevel = visibilityLevel;
     }
 
     public GitlabUser getOwner() {
@@ -116,6 +145,14 @@ public class GitlabProject {
         _mergeRequestsEnabled = mergeRequestsEnabled;
     }
 
+    public boolean isSnippetsEnabled() {
+        return _snippetsEnabled;
+    }
+
+    public void setSnippetsEnabled(boolean snippetsEnabled) {
+        this._snippetsEnabled = snippetsEnabled;
+    }
+
     public boolean isWallEnabled() {
         return _wallEnabled;
     }
@@ -154,6 +191,14 @@ public class GitlabProject {
 
     public void setWebUrl(String webUrl) {
         _webUrl = webUrl;
+    }
+
+    public String getHttpUrl() {
+        return _httpUrl;
+    }
+
+    public void setHttpUrl(String httpUrl) {
+        _httpUrl = httpUrl;
     }
 
     public GitlabNamespace getNamespace() {
