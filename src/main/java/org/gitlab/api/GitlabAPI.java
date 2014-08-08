@@ -141,14 +141,14 @@ public class GitlabAPI {
                 .appendIf("username", username)
                 .appendIf("name", fullName)
                 .appendIf("skype", skypeId)
-                .appendIf("linkedIn", linkedIn)
+                .appendIf("linkedin", linkedIn)
                 .appendIf("twitter", twitter)
                 .appendIf("website_url", website_url)
                 .appendIf("projects_limit", projects_limit)
                 .appendIf("extern_uid", extern_uid)
-                .appendIf("extern_provider_name", extern_provider_name)
+                .appendIf("provider", extern_provider_name)
                 .appendIf("bio",bio)
-                .appendIf("isAdmin",bio)
+                .appendIf("admin",bio)
                 .appendIf("can_create_group",can_create_group);
 
         String tailUrl = GitlabUser.USERS_URL + query.toString();
@@ -192,14 +192,14 @@ public class GitlabAPI {
                 .appendIf("username", username)
                 .appendIf("name", fullName)
                 .appendIf("skype", skypeId)
-                .appendIf("linkedIn", linkedIn)
+                .appendIf("linkedin", linkedIn)
                 .appendIf("twitter", twitter)
                 .appendIf("website_url", website_url)
                 .appendIf("projects_limit", projects_limit)
                 .appendIf("extern_uid", extern_uid)
-                .appendIf("extern_provider_name", extern_provider_name)
+                .appendIf("provider", extern_provider_name)
                 .appendIf("bio",bio)
-                .appendIf("isAdmin",bio)
+                .appendIf("admin",bio)
                 .appendIf("can_create_group",can_create_group);
 
         String tailUrl = GitlabUser.USERS_URL + "/"+targetUserId + query.toString();
