@@ -16,8 +16,8 @@ public class GitlabAPITest {
 
     GitlabAPI _api;
     
-    private static final String TEST_URL = "http://10.216.201.236";
-    private static final String TEST_TOKEN = "ePgczFTuDuQupFhuG4HU";
+    private static final String TEST_URL = "http://localhost";
+    private static final String TEST_TOKEN = "y0E5b9761b7y4qk";
     
 	String rand = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
 	
