@@ -19,6 +19,12 @@ public class GitlabUser {
     private String _state;
     private boolean _blocked;
     
+    @JsonProperty("private_token")
+    private String _privateToken;
+    
+    @JsonProperty("color_scheme_id")
+    private Integer _colorSchemeId;
+    
     @JsonProperty("provider")
     private String _externProviderName;
     
@@ -51,6 +57,9 @@ public class GitlabUser {
 
     @JsonProperty("can_create_team")
     private boolean _canCreateTeam;
+    
+    @JsonProperty("avatar_url")
+    private String _avatarUrl;
 
     public Integer getId() {
         return _id;
@@ -219,4 +228,28 @@ public class GitlabUser {
     public void setCanCreateTeam(boolean canCreateTeam) {
         _canCreateTeam = canCreateTeam;
     }
+
+	public String getAvatarUrl() {
+		return _avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this._avatarUrl = avatarUrl;
+	}
+
+	public Integer getColorSchemeId() {
+		return _colorSchemeId;
+	}
+
+	public void setColorSchemeId(Integer colorSchemeId) {
+		this._colorSchemeId = colorSchemeId;
+	}
+
+	public String getPrivateToken() {
+		return _privateToken;
+	}
+
+	public void setPrivateToken(String privateToken) {
+		this._privateToken = privateToken;
+	}
 }
