@@ -173,7 +173,7 @@ public class GitlabUser {
     }
     
     public String getExternProviderName() {
-        return _state;
+        return _externProviderName;
     }
 
     public void setExternProviderName(String externProviderName) {
