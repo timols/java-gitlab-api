@@ -37,6 +37,7 @@ public class GitlabAPI {
     private final String _apiToken;
     private boolean _ignoreCertificateErrors = false;
     private static final String API_NAMESPACE = "/api/v3";
+    private static final String PARAM_SUDO = "sudo";
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private GitlabAPI(String hostUrl, String apiToken) {
@@ -99,6 +100,122 @@ public class GitlabAPI {
     public GitlabUser getUser(Integer userId) throws IOException {
         String tailUrl = GitlabUser.URL + "/" + userId;
         return retrieve().to(tailUrl, GitlabUser.class);
+    }
+    
+    public GitlabUser getUserViaSudo(String username) throws IOException {
+        String tailUrl = GitlabUser.USER_URL + "?" + PARAM_SUDO + "=" + username;
+        return retrieve().to(tailUrl, GitlabUser.class);
+    }
+    
+    /**
+     * Create a new User
+     * 
+     * @see http://doc.gitlab.com/ce/api/users.html
+     * 
+     * @param email
+     * @param password
+     * @param username
+     * @param fullName
+     * @param skype
+     * @param linkedIn
+     * @param twitter
+     * @param website_url
+     * @param projects_limit
+     * @param extern_uid
+     * @param extern_provider_name
+     * @param bio
+     * @param isAdmin
+     * @param can_create_group
+     * @return
+     * @throws IOException
+     */
+    public GitlabUser createUser(String email, String password, String username, 
+    							 String fullName, String skypeId, String linkedIn, 
+    							 String twitter, String website_url, Integer projects_limit, 
+    							 String extern_uid, String extern_provider_name, 
+    							 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+    	
+        Query query = new Query()
+                .append("email", email)
+                .appendIf("password", password)
+                .appendIf("username", username)
+                .appendIf("name", fullName)
+                .appendIf("skype", skypeId)
+                .appendIf("linkedIn", linkedIn)
+                .appendIf("twitter", twitter)
+                .appendIf("website_url", website_url)
+                .appendIf("projects_limit", (projects_limit != null ? projects_limit : null))
+                .appendIf("extern_uid", extern_uid)
+                .appendIf("extern_provider_name", extern_provider_name)
+                .appendIf("bio",bio)
+                .appendIf("isAdmin",bio)
+                .appendIf("can_create_group",can_create_group);
+
+        String tailUrl = GitlabUser.USERS_URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabUser.class);
+    }
+
+    
+    
+    /**
+     * Update a user
+     * 
+     * @param targetUserId
+     * @param email
+     * @param password
+     * @param username
+     * @param fullName
+     * @param skypeId
+     * @param linkedIn
+     * @param twitter
+     * @param website_url
+     * @param projects_limit
+     * @param extern_uid
+     * @param extern_provider_name
+     * @param bio
+     * @param isAdmin
+     * @param can_create_group
+     * @return
+     * @throws IOException
+     */
+    public GitlabUser updateUser(Integer targetUserId, 
+    							 String email, String password, String username, 
+    							 String fullName, String skypeId, String linkedIn, 
+    							 String twitter, String website_url, Integer projects_limit, 
+    							 String extern_uid, String extern_provider_name, 
+    							 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+    	
+        Query query = new Query()
+                .append("email", email)
+                .appendIf("password", password)
+                .appendIf("username", username)
+                .appendIf("name", fullName)
+                .appendIf("skype", skypeId)
+                .appendIf("linkedIn", linkedIn)
+                .appendIf("twitter", twitter)
+                .appendIf("website_url", (website_url != null ?website_url.toString(): null))
+                .appendIf("projects_limit", (projects_limit != null ? projects_limit : null))
+                .appendIf("extern_uid", extern_uid)
+                .appendIf("extern_provider_name", extern_provider_name)
+                .appendIf("bio",bio)
+                .appendIf("isAdmin",bio)
+                .appendIf("can_create_group",can_create_group);
+
+        String tailUrl = GitlabUser.USERS_URL + "/"+targetUserId + query.toString();
+
+        return  retrieve().method("PUT").to(tailUrl, GitlabUser.class);
+    }
+    
+    /**
+     * Delete a user
+     * 
+     * @param targetUserId
+     * @throws IOException
+     */
+    public void deleteUser(Integer targetUserId) throws IOException {
+    	String tailUrl = GitlabUser.USERS_URL + "/"+targetUserId;
+    	retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     public GitlabGroup getGroup(Integer groupId) throws IOException {
