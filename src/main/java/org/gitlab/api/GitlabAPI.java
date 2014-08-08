@@ -148,7 +148,7 @@ public class GitlabAPI {
                 .appendIf("extern_uid", extern_uid)
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio",bio)
-                .appendIf("admin",bio)
+                .appendIf("admin",isAdmin)
                 .appendIf("can_create_group",can_create_group);
 
         String tailUrl = GitlabUser.USERS_URL + query.toString();
@@ -199,7 +199,7 @@ public class GitlabAPI {
                 .appendIf("extern_uid", extern_uid)
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio",bio)
-                .appendIf("admin",bio)
+                .appendIf("admin",isAdmin)
                 .appendIf("can_create_group",can_create_group);
 
         String tailUrl = GitlabUser.USERS_URL + "/"+targetUserId + query.toString();
