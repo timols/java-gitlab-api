@@ -144,7 +144,7 @@ public class GitlabAPI {
                 .appendIf("linkedIn", linkedIn)
                 .appendIf("twitter", twitter)
                 .appendIf("website_url", website_url)
-                .appendIf("projects_limit", (projects_limit != null ? projects_limit : null))
+                .appendIf("projects_limit", projects_limit)
                 .appendIf("extern_uid", extern_uid)
                 .appendIf("extern_provider_name", extern_provider_name)
                 .appendIf("bio",bio)
