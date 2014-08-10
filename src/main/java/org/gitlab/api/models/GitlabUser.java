@@ -5,6 +5,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabUser {
     public static String URL = "/users";
+    public static String USERS_URL = "/users";
+    public static String USER_URL = "/user"; // for sudo based ops
 
     private Integer _id;
     private String _username;
@@ -16,6 +18,18 @@ public class GitlabUser {
     private String _provider;
     private String _state;
     private boolean _blocked;
+    
+    @JsonProperty("private_token")
+    private String _privateToken;
+    
+    @JsonProperty("color_scheme_id")
+    private Integer _colorSchemeId;
+    
+    @JsonProperty("provider")
+    private String _externProviderName;
+    
+    @JsonProperty("website_url")
+    private String _websiteUrl;
 
     @JsonProperty("created_at")
     private Date _createdAt;
@@ -43,6 +57,9 @@ public class GitlabUser {
 
     @JsonProperty("can_create_team")
     private boolean _canCreateTeam;
+    
+    @JsonProperty("avatar_url")
+    private String _avatarUrl;
 
     public Integer getId() {
         return _id;
@@ -163,6 +180,22 @@ public class GitlabUser {
     public void setState(String state) {
         _state = state;
     }
+    
+    public String getExternProviderName() {
+        return _externProviderName;
+    }
+
+    public void setExternProviderName(String externProviderName) {
+    	_externProviderName = externProviderName;
+    }
+    
+    public String getWebsiteUrl() {
+        return _websiteUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+    	_websiteUrl = websiteUrl;
+    }
 
     public boolean isAdmin() {
         return _isAdmin;
@@ -195,4 +228,28 @@ public class GitlabUser {
     public void setCanCreateTeam(boolean canCreateTeam) {
         _canCreateTeam = canCreateTeam;
     }
+
+	public String getAvatarUrl() {
+		return _avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this._avatarUrl = avatarUrl;
+	}
+
+	public Integer getColorSchemeId() {
+		return _colorSchemeId;
+	}
+
+	public void setColorSchemeId(Integer colorSchemeId) {
+		this._colorSchemeId = colorSchemeId;
+	}
+
+	public String getPrivateToken() {
+		return _privateToken;
+	}
+
+	public void setPrivateToken(String privateToken) {
+		this._privateToken = privateToken;
+	}
 }
