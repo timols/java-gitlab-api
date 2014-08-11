@@ -126,6 +126,8 @@ public class GitlabAPI {
      * @param bio
      * @param isAdmin
      * @param can_create_group
+     * @param skip_confirmation
+     * 
      * @return
      * @throws IOException
      */
@@ -133,10 +135,12 @@ public class GitlabAPI {
     							 String fullName, String skypeId, String linkedIn, 
     							 String twitter, String website_url, Integer projects_limit, 
     							 String extern_uid, String extern_provider_name, 
-    							 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+    							 String bio, Boolean isAdmin, Boolean can_create_group, 
+    							 Boolean skip_confirmation) throws IOException {
     	
         Query query = new Query()
                 .append("email", email)
+                .appendIf("skip_confirmation", skip_confirmation)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
@@ -176,6 +180,8 @@ public class GitlabAPI {
      * @param bio
      * @param isAdmin
      * @param can_create_group
+     * @param skip_confirmation
+     * 
      * @return
      * @throws IOException
      */
@@ -184,10 +190,12 @@ public class GitlabAPI {
     							 String fullName, String skypeId, String linkedIn, 
     							 String twitter, String website_url, Integer projects_limit, 
     							 String extern_uid, String extern_provider_name, 
-    							 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+    							 String bio, Boolean isAdmin, Boolean can_create_group, 
+    							 Boolean skip_confirmation) throws IOException {
     	
         Query query = new Query()
                 .append("email", email)
+                .appendIf("skip_confirmation", skip_confirmation)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
