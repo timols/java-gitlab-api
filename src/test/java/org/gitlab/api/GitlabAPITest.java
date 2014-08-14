@@ -64,6 +64,7 @@ public class GitlabAPITest {
 					    					randVal("externprovidername"), 
 					    					randVal("bio"), 
 					    					false, 
+					    					false,
 					    					false);
     	Assert.assertNotNull(gitUser);
     	
@@ -76,7 +77,7 @@ public class GitlabAPITest {
     	_api.updateUser(gitUser.getId(), gitUser.getEmail(), password , gitUser.getUsername(), 
     			gitUser.getName(), "newSkypeId", gitUser.getLinkedin(), gitUser.getTwitter(), gitUser.getWebsiteUrl(), 
     			10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
-    			gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
+    			gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup(), false);
     	
     	
     	GitlabUser postUpdate = _api.getUserViaSudo(gitUser.getUsername());
