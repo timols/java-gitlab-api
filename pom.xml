@@ -4,7 +4,7 @@
 
     <groupId>org.gitlab</groupId>
     <artifactId>java-gitlab-api</artifactId>
-    <version>1.1.5-SNAPSHOT</version>
+    <version>1.1.6-SNAPSHOT</version>
 
     <name>Gitlab Java API Wrapper</name>
     <description>A Java wrapper for the Gitlab Git Hosting Server API</description>
@@ -27,6 +27,16 @@
             <name>Adam Retter</name>
             <email>adam.retter@googlemail.com</email>
             <organization>Evolved Binary Ltd</organization>
+        </contributor>
+	<contributor>
+            <name>Cesar Aguilar</name>
+            <email>cesar@fuzzproductions.com</email>
+            <organization>Fuzz Productions</organization>
+        </contributor>
+	<contributor>
+            <name>Chris Luu</name>
+            <email>luu@fuzzproductions.com</email>
+            <organization>Fuzz Productions</organization>
         </contributor>
     </contributors>
 

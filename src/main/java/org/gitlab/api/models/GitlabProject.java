@@ -49,6 +49,9 @@ public class GitlabProject {
     @JsonProperty("ssh_url_to_repo")
     private String _sshUrl;
 
+    @JsonProperty("web_url")
+    private String _webUrl;
+
     @JsonProperty("http_url_to_repo")
     private String _httpUrl;
 
@@ -180,6 +183,14 @@ public class GitlabProject {
 
     public void setSshUrl(String sshUrl) {
         _sshUrl = sshUrl;
+    }
+
+    public String getWebUrl() {
+        return _webUrl;
+    }
+
+    public void setWebUrl(String webUrl) {
+        _webUrl = webUrl;
     }
 
     public String getHttpUrl() {

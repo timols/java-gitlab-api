@@ -8,8 +8,8 @@ public class GitlabBranch {
 	@JsonProperty("name")
     private String _name;
 
-//    @JsonProperty("commit")
-//    private GitlabCommit _commit;
+    	@JsonProperty("commit")
+    	private GitlabBranchCommit _commit;
 	
 	@JsonProperty("protected")
 	private boolean _protected;
@@ -20,6 +20,14 @@ public class GitlabBranch {
 
 	public void setName(String name) {
 		this._name = name;
+	}
+
+	public GitlabBranchCommit getCommit() {
+		return _commit;
+	}
+
+	public void setCommit(GitlabBranchCommit commit) {
+		this._commit = commit;
 	}
 
 	public boolean isProtected() {
