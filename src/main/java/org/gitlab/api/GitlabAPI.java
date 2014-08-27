@@ -124,7 +124,7 @@ public class GitlabAPI {
      * @param password
      * @param username
      * @param fullName
-     * @param skype
+     * @param skypeId
      * @param linkedIn
      * @param twitter
      * @param website_url
@@ -313,6 +313,60 @@ public class GitlabAPI {
         String tailUrl = GitlabGroup.URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+
+    /**
+     * Add a group member.
+     *
+     * @param group the GitlabGroup
+     * @param user the GitlabUser
+     * @param accessLevel the GitlabAccessLevel
+     * @return the GitlabGroupMember
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroupMember addGroupMember(GitlabGroup group, GitlabUser user, GitlabAccessLevel accessLevel) throws IOException {
+        return addGroupMember(group.getId(), user.getId(), accessLevel);
+    }
+
+    /**
+     * Add a group member.
+     *
+     * @param groupId the group id
+     * @param userId the user id
+     * @param accessLevel the GitlabAccessLevel
+     * @return the GitlabGroupMember
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroupMember addGroupMember(Integer groupId, Integer userId, GitlabAccessLevel accessLevel) throws IOException {
+        Query query = new Query()
+                .appendIf("id", groupId)
+                .appendIf("user_id", userId)
+                .appendIf("access_level", accessLevel);
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabProjectMember.URL + query.toString();
+        return dispatch().to(tailUrl, GitlabGroupMember.class);
+    }
+
+    /**
+     * Delete a group member.
+     *
+     * @param group the GitlabGroup
+     * @param user the GitlabUser
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteGroupMember(GitlabGroup group, GitlabUser user) throws IOException {
+        deleteGroupMember(group.getId(), user.getId());
+    }
+
+    /**
+     * Delete a group member.
+     *
+     * @param groupId the group id
+     * @param userId the user id
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteGroupMember(Integer groupId, Integer userId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + "/" + GitlabGroupMember.URL + "/" + userId;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     public GitlabProject getProject(String projectId) throws IOException {
@@ -673,16 +727,70 @@ public class GitlabAPI {
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
     	return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
     }
-    
+
+    /**
+     * Add a project member.
+     *
+     * @param project the GitlabProject
+     * @param user the GitlabUser
+     * @param accessLevel the GitlabAccessLevel
+     * @return the GitlabProjectMember
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProjectMember addProjectMember(GitlabProject project, GitlabUser user, GitlabAccessLevel accessLevel) throws IOException {
+        return addProjectMember(project.getId(), user.getId(), accessLevel);
+    }
+
+    /**
+     * Add a project member.
+     *
+     * @param projectId the project id
+     * @param userId the user id
+     * @param accessLevel the GitlabAccessLevel
+     * @return the GitlabProjectMember
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProjectMember addProjectMember(Integer projectId, Integer userId, GitlabAccessLevel accessLevel) throws IOException {
+        Query query = new Query()
+                .appendIf("id", projectId)
+                .appendIf("user_id", userId)
+                .appendIf("access_level", accessLevel);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL + query.toString();
+        return dispatch().to(tailUrl, GitlabProjectMember.class);
+    }
+
+    /**
+     * Delete a project team member.
+     *
+     * @param project the GitlabProject
+     * @param user the GitlabUser
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteProjectMember(GitlabProject project, GitlabUser user) throws IOException {
+        deleteProjectMember(project.getId(), user.getId());
+    }
+
+    /**
+     * Delete a project team member.
+     *
+     * @param projectId the project id
+     * @param userId the user id
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteProjectMember(Integer projectId, Integer userId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/" + GitlabProjectMember.URL + "/" + userId;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
     public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
     	return getProjectMembers(String.valueOf(project.getId()));
     }
-    
+
     public List<GitlabProjectMember> getProjectMembers(String projectId) throws IOException {
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL;
     	return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
-    
+
     /**
      * This will fail, if the given namespace is a user and not a group
      * @param namespace
