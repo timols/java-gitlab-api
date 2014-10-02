@@ -1,6 +1,5 @@
 package org.gitlab.api.models;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
 
