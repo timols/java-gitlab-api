@@ -59,6 +59,9 @@ public class GitlabProject {
     @JsonProperty("last_activity_at")
     private Date _lastActivityAt;
 
+    @JsonProperty("archived")
+    private boolean _archived;
+
     private GitlabNamespace _namespace;
 
     public Integer getId() {
@@ -219,6 +222,14 @@ public class GitlabProject {
 
     public void setPublic(boolean aPublic) {
         _public = aPublic;
+    }
+
+    public boolean isArchived() {
+        return _archived;
+    }
+
+    public void setArchived(boolean archived) {
+        _archived = archived;
     }
 
     public Date getLastActivityAt() {
