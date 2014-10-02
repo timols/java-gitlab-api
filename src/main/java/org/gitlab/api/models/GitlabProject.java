@@ -1,5 +1,6 @@
 package org.gitlab.api.models;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -54,6 +55,9 @@ public class GitlabProject {
 
     @JsonProperty("http_url_to_repo")
     private String _httpUrl;
+
+    @JsonProperty("last_activity_at")
+    private Date _lastActivityAt;
 
     private GitlabNamespace _namespace;
 
@@ -215,5 +219,13 @@ public class GitlabProject {
 
     public void setPublic(boolean aPublic) {
         _public = aPublic;
+    }
+
+    public Date getLastActivityAt() {
+        return _lastActivityAt;
+    }
+
+    public void setLastActivityAt(Date lastActivityAt) {
+        _lastActivityAt = lastActivityAt;
     }
 }
