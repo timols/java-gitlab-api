@@ -1,7 +1,6 @@
 package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabUser;
-import static org.hamcrest.CoreMatchers.is;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
 
 import java.net.ConnectException;
 
@@ -34,10 +32,12 @@ public class GitlabAPIT {
         try {
             _api.dispatch().with("login", "INVALID").with("password", rand).to("session", GitlabUser.class);
         } catch (ConnectException e) {
-            assumeNoException("GITLAB not running on localhost, skipping...", e);
+            assumeNoException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
         } catch (IOException e) {
             final String message = e.getMessage();
-            assumeThat(message, is("{\"message\":\"401 Unauthorized\"}"));
+            if (!message.equals("{\"message\":\"401 Unauthorized\"}")) {
+                throw new AssertionError("Expected an unauthorized message", e);
+            }
         }
     }
 
