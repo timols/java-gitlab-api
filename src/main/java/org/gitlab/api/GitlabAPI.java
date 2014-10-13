@@ -554,6 +554,13 @@ public class GitlabAPI {
         return Arrays.asList(commits);
     }
 
+    // gets all commits for a project
+    public List<GitlabCommit> getAllCommits(String projectId) throws IOException {
+       String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits";
+       GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
+       return Arrays.asList(commits);
+    }
+
     // List commit diffs for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/diff
     public List<GitlabCommitDiff> getCommitDiffs(String projectId, String commitHash) throws IOException {
