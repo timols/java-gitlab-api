@@ -623,10 +623,24 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/protect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
-    
+
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
+    }
+
+    public GitlabFile getFile(GitlabProject project, String filePath, String ref) throws IOException {
+        Query query = new Query()
+                .append("file_path", filePath)
+                .append("ref", ref);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabFile.URL + query.toString();
+        return retrieve().to(tailUrl, GitlabFile.class);
+    }
+
+    public List<GitlabTag> getTags(GitlabProject project) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
+        GitlabTag[] repositories = retrieve().to(tailUrl, GitlabTag[].class);
+        return Arrays.asList(repositories);
     }
 
     public List<GitlabProjectHook> getProjectHooks(String projectId) throws IOException {
