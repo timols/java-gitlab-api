@@ -369,6 +369,19 @@ public class GitlabAPI {
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
+    /**
+     * Delete a group.
+     * 
+     * @param groupId
+     *          the group id
+     * @throws IOException
+     *           on gitlab api call error
+     */
+    public void deleteGroup(Integer groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
     public GitlabProject getProject(String projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
         return retrieve().to(tailUrl, GitlabProject.class);
@@ -476,6 +489,19 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/user/" + userId + query.toString();
 
         return dispatch().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
+     * Delete a Project.
+     * 
+     * @param projectId
+     *          The id of the project to delete
+     * @throws IOException
+     *           on gitlab api call error
+     */
+    public void deleteProject(String projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
+        retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
