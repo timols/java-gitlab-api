@@ -11,21 +11,34 @@ import java.net.URL;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeNoException;
 
-public class GitlabAPITest {
+import java.net.ConnectException;
+
+public class GitlabAPIT {
 
     GitlabAPI _api;
     
-    private static final String TEST_URL = "http://localhost";
-    private static final String TEST_TOKEN = "y0E5b9761b7y4qk";
+    private static final String TEST_URL = System.getProperty("TEST_URL", "http://localhost");
+    private static final String TEST_TOKEN = System.getProperty("TEST_TOKEN", "y0E5b9761b7y4qk");
     
 	String rand = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
 	
 	
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         _api = GitlabAPI.connect(TEST_URL, TEST_TOKEN);
+        try {
+            _api.dispatch().with("login", "INVALID").with("password", rand).to("session", GitlabUser.class);
+        } catch (ConnectException e) {
+            assumeNoException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
+        } catch (IOException e) {
+            final String message = e.getMessage();
+            if (!message.equals("{\"message\":\"401 Unauthorized\"}")) {
+                throw new AssertionError("Expected an unauthorized message", e);
+            }
+        }
     }
 
     @Test
