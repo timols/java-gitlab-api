@@ -96,4 +96,17 @@ public class GitlabCommit {
     public void setParentIds(List<String> parentIds) {
         _parentIds = parentIds;
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		// we say that two commit objects are equal iff they have the same ID
+		// this prevents us from having to do clever workarounds for
+		// https://gitlab.com/gitlab-org/gitlab-ce/issues/759
+		try {
+			GitlabCommit commitObj = (GitlabCommit) obj;
+			return (this.getId().compareTo(commitObj.getId()) == 0);
+		} catch (ClassCastException e) {
+			return false;
+		}
+	}
 }
