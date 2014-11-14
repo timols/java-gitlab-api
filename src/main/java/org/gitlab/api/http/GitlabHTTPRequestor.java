@@ -28,6 +28,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.models.GitlabCommit;
 
 /**
  * Gitlab HTTP Requestor
@@ -235,9 +236,16 @@ public class GitlabHTTPRequestor {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
                     _url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
                 } else {
-                    // Since the page query was not present, its safe to assume that we just
-                    // currently used the first page, so we can default to page 2
-                    _url = new URL(url + "&page=2");
+                    if (GitlabCommit[].class == type) {
+                        // there is a bug in the Gitlab CE API
+                        // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
+                        // that starts pagination with page=0 for commits 
+                        _url = new URL(url + "&page=1");
+                    } else {
+                        // Since the page query was not present, its safe to assume that we just
+                        // currently used the first page, so we can default to page 2
+                        _url = new URL(url + "&page=2");
+                    }
                 }
             }
         };
