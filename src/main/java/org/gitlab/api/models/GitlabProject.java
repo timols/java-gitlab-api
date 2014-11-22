@@ -1,7 +1,6 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
-import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
