@@ -1,6 +1,7 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabProject {
@@ -62,6 +63,9 @@ public class GitlabProject {
     private boolean _archived;
 
     private GitlabNamespace _namespace;
+    
+    @JsonProperty("permissions")
+    private GitlabPersmission _permissions;
 
     public Integer getId() {
         return _id;
@@ -238,4 +242,12 @@ public class GitlabProject {
     public void setLastActivityAt(Date lastActivityAt) {
         _lastActivityAt = lastActivityAt;
     }
+
+	public GitlabPersmission getPermissions() {
+		return _permissions;
+	}
+
+	public void setPermissions(GitlabPersmission permissions) {
+		this._permissions = permissions;
+	}
 }
