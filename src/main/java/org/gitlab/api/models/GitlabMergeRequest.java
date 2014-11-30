@@ -5,136 +5,145 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
 
-    private Integer _id;
-    private Integer _iid;
-    private String _title;
-    private String _state;
-    private String _description;
-    private boolean _closed;
-    private boolean _merged;
-    private GitlabUser _author;
-    private GitlabUser _assignee;
+    private Integer id;
+    private Integer iid;
+    private String title;
+    private String state;
+    private String description;
+    private boolean closed;
+    private boolean merged;
+    private GitlabUser author;
+    private GitlabUser assignee;
 
     @JsonProperty("target_branch")
-    private String _targetBranch;
+    private String targetBranch;
 
     @JsonProperty("source_branch")
-    private String _sourceBranch;
+    private String sourceBranch;
 
     @JsonProperty("project_id")
-    private Integer _projectId;
+    private Integer projectId;
 
     @JsonProperty("source_project_id")
-    private Integer _sourceProjectId;
+    private Integer sourceProjectId;
 
     @JsonProperty("milestone_id")
-    private Integer _milestone_id;
+    private Integer milestoneId;
 
 
     public Integer getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this.id = id;
     }
 
-    public Integer getMilestoneId(){ return _milestone_id; }
-    public void setMilestoneId(Integer id) { _milestone_id = id; }
+    public Integer getMilestoneId() {
+        return milestoneId;
+    }
+
+    public void setMilestoneId(Integer id) {
+        milestoneId = id;
+    }
 
     public Integer getIid() {
-        return _iid;
+        return iid;
     }
 
     public void setIid(Integer iid) {
-        _iid = iid;
+        this.iid = iid;
     }
 
     public String getTargetBranch() {
-        return _targetBranch;
+        return targetBranch;
     }
 
     public void setTargetBranch(String targetBranch) {
-        _targetBranch = targetBranch;
+        this.targetBranch = targetBranch;
     }
 
     public String getSourceBranch() {
-        return _sourceBranch;
+        return sourceBranch;
     }
 
     public void setSourceBranch(String sourceBranch) {
-        _sourceBranch = sourceBranch;
+        this.sourceBranch = sourceBranch;
     }
 
     public Integer getProjectId() {
-        return _projectId;
+        return projectId;
     }
 
     public void setProjectId(Integer projectId) {
-        _projectId = projectId;
+        this.projectId = projectId;
     }
 
     public Integer getSourceProjectId() {
-        return _sourceProjectId;
+        return sourceProjectId;
     }
 
     public void setSourceProjectId(Integer sourceProjectId) {
-        _sourceProjectId = sourceProjectId;
+        this.sourceProjectId = sourceProjectId;
     }
 
     public String getTitle() {
-        return _title;
+        return title;
     }
 
     public void setTitle(String title) {
-        _title = title;
+        this.title = title;
     }
 
-    public String getDescription() { return _description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String d) { _description = d; }
+    public void setDescription(String d) {
+        description = d;
+    }
 
     public boolean isClosed() {
-        return _closed;
+        return closed;
     }
 
     public void setClosed(boolean closed) {
-        _closed = closed;
+        this.closed = closed;
     }
 
     public boolean isMerged() {
-        return _merged;
+        return merged;
     }
 
     public void setMerged(boolean merged) {
-        _merged = merged;
+        this.merged = merged;
     }
 
     public GitlabUser getAuthor() {
-        return _author;
+        return author;
     }
 
     public void setAuthor(GitlabUser author) {
-        _author = author;
+        this.author = author;
     }
 
     public GitlabUser getAssignee() {
-        return _assignee;
+        return assignee;
     }
 
     public void setAssignee(GitlabUser assignee) {
-        _assignee = assignee;
+        this.assignee = assignee;
     }
 
     public String getState() {
-        return _state;
+        return state;
     }
 
     public void setState(String state) {
-        _state = state;
-        if(state != null) {
-            _closed = state.equals("closed");
-            _merged = state.equals("merged");
+        this.state = state;
+        if (state != null) {
+            closed = state.equals("closed");
+            merged = state.equals("merged");
         }
     }
 }

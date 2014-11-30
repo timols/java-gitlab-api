@@ -1,5 +1,10 @@
 package org.gitlab.api.http;
 
+import org.apache.commons.io.IOUtils;
+import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.models.GitlabCommit;
+
+import javax.net.ssl.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,39 +14,26 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.commons.io.IOUtils;
-import org.gitlab.api.GitlabAPI;
-import org.gitlab.api.models.GitlabCommit;
-
 /**
  * Gitlab HTTP Requestor
- *
+ * <p/>
  * Responsible for handling HTTP requests to the Gitlab API
  *
  * @author @timols
  */
 public class GitlabHTTPRequestor {
 
-    private final GitlabAPI _root;
-    private String _method = "GET"; // Default to GET requests
-    private Map<String, Object> _data = new HashMap<String, Object>();
+    private static final Pattern PAGE_PATTERN = Pattern.compile("([&|?])page=(\\d+)");
+
+    private final GitlabAPI root;
+
+    private String method = "GET"; // Default to GET requests
+    private Map<String, Object> data = new HashMap<String, Object>();
 
     private enum METHOD {
         GET, PUT, POST, PATCH, DELETE, HEAD, OPTIONS, TRACE;
@@ -62,20 +54,20 @@ public class GitlabHTTPRequestor {
     }
 
     public GitlabHTTPRequestor(GitlabAPI root) {
-        _root = root;
+        this.root = root;
     }
 
     /**
      * Sets the HTTP Request method for the request.
-     *
+     * <p/>
      * Has a fluent api for method chaining.
      *
-     * @param   method    The HTTP method
-     * @return  this
+     * @param method The HTTP method
+     * @return this
      */
     public GitlabHTTPRequestor method(String method) {
         try {
-            _method = METHOD.valueOf(method).toString();
+            this.method = METHOD.valueOf(method).toString();
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid HTTP Method: " + method + ". Must be one of " + METHOD.prettyValues());
         }
@@ -85,16 +77,16 @@ public class GitlabHTTPRequestor {
 
     /**
      * Sets the HTTP Form Post parameters for the request
-     *
+     * <p/>
      * Has a fluent api for method chaining
      *
-     * @param   key
-     * @param   value
-     * @return  this
+     * @param key
+     * @param value
+     * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
         if (value != null && key != null) {
-            _data.put(key, value);
+            data.put(key, value);
         }
         return this;
     }
@@ -110,22 +102,22 @@ public class GitlabHTTPRequestor {
     /**
      * Opens the HTTP(S) connection, submits any data and parses the response.
      * Will throw an error
-     * @param tailAPIUrl       The url to open a connection to (after the host and namespace)
-     * @param type             The type of the response to be deserialized from
-     * @param instance         The instance to update from the response
      *
-     * @return                 An object of type T
+     * @param tailAPIUrl The url to open a connection to (after the host and namespace)
+     * @param type       The type of the response to be deserialized from
+     * @param instance   The instance to update from the response
+     * @return An object of type T
      * @throws java.io.IOException
      */
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
-        HttpURLConnection connection = setupConnection(_root.getAPIUrl(tailAPIUrl));
+        HttpURLConnection connection = setupConnection(root.getAPIUrl(tailAPIUrl));
 
         if (hasOutput()) {
             submitData(connection);
-        } else if( "PUT".equals(_method) ) {
-        	// PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
-        	connection.setDoOutput(true);
-        	connection.setFixedLengthStreamingMode(0);
+        } else if ("PUT".equals(method)) {
+            // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
+            connection.setDoOutput(true);
+            connection.setFixedLengthStreamingMode(0);
         }
 
         try {
@@ -138,8 +130,8 @@ public class GitlabHTTPRequestor {
     }
 
     public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
-    	List<T> results = new ArrayList<T>();
-    	Iterator<T[]> iterator = asIterator(tailUrl, type);
+        List<T> results = new ArrayList<T>();
+        Iterator<T[]> iterator = asIterator(tailUrl, type);
 
         while (iterator.hasNext()) {
             T[] requests = iterator.next();
@@ -155,17 +147,17 @@ public class GitlabHTTPRequestor {
         method("GET"); // Ensure we only use iterators for GET requests
 
         // Ensure that we don't submit any data and alert the user
-        if (!_data.isEmpty()) {
+        if (!data.isEmpty()) {
             throw new IllegalStateException();
         }
 
         return new Iterator<T>() {
-            T _next;
-            URL _url;
+            T next;
+            URL url;
 
             {
                 try {
-                    _url = _root.getAPIUrl(tailApiUrl);
+                    url = root.getAPIUrl(tailApiUrl);
                 } catch (IOException e) {
                     throw new Error(e);
                 }
@@ -173,23 +165,23 @@ public class GitlabHTTPRequestor {
 
             public boolean hasNext() {
                 fetch();
-                if (_next.getClass().isArray()) {
-                    Object[] arr = (Object[]) _next;
+                if (next != null && next.getClass().isArray()) {
+                    Object[] arr = (Object[]) next;
                     return arr.length != 0;
                 } else {
-                    return _next != null;
+                    return next != null;
                 }
             }
 
             public T next() {
                 fetch();
-                T record = _next;
+                T record = next;
 
                 if (record == null) {
                     throw new NoSuchElementException();
                 }
 
-                _next = null;
+                next = null;
                 return record;
             }
 
@@ -198,20 +190,20 @@ public class GitlabHTTPRequestor {
             }
 
             private void fetch() {
-                if (_next != null) {
+                if (next != null) {
                     return;
                 }
 
-                if (_url == null) {
+                if (url == null) {
                     return;
                 }
 
                 try {
-                    HttpURLConnection connection = setupConnection(_url);
+                    HttpURLConnection connection = setupConnection(url);
                     try {
-                        _next = parse(connection, type, null);
-                        assert _next != null;
-                        findNextUrl(connection);
+                        next = parse(connection, type, null);
+                        assert next != null;
+                        findNextUrl();
                     } catch (IOException e) {
                         handleAPIError(e, connection);
                     }
@@ -220,31 +212,30 @@ public class GitlabHTTPRequestor {
                 }
             }
 
-            private void findNextUrl(HttpURLConnection connection) throws MalformedURLException {
-                String url = _url.toString();
+            private void findNextUrl() throws MalformedURLException {
+                String url = this.url.toString();
 
-                _url = null;
+                this.url = null;
                 /* Increment the page number for the url if a "page" property exists,
                  * otherwise, add the page property and increment it.
                  * The Gitlab API is not a compliant hypermedia REST api, so we use
                  * a naive implementation.
                  */
-                Pattern pattern = Pattern.compile("([&|?])page=(\\d+)");
-                Matcher matcher = pattern.matcher(url);
+                Matcher matcher = PAGE_PATTERN.matcher(url);
 
                 if (matcher.find()) {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
-                    _url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
+                    this.url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
                 } else {
                     if (GitlabCommit[].class == type) {
                         // there is a bug in the Gitlab CE API
                         // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
-                        // that starts pagination with page=0 for commits 
-                        _url = new URL(url + "&page=1");
+                        // that starts pagination with page=0 for commits
+                        this.url = new URL(url + "&page=1");
                     } else {
                         // Since the page query was not present, its safe to assume that we just
                         // currently used the first page, so we can default to page 2
-                        _url = new URL(url + "&page=2");
+                        this.url = new URL(url + "&page=2");
                     }
                 }
             }
@@ -254,28 +245,28 @@ public class GitlabHTTPRequestor {
     private void submitData(HttpURLConnection connection) throws IOException {
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/json");
-        GitlabAPI.MAPPER.writeValue(connection.getOutputStream(), _data);
+        GitlabAPI.MAPPER.writeValue(connection.getOutputStream(), data);
     }
 
     private boolean hasOutput() {
-        return _method.equals("POST") || _method.equals("PUT") && !_data.isEmpty();
+        return method.equals("POST") || method.equals("PUT") && !data.isEmpty();
     }
 
     private HttpURLConnection setupConnection(URL url) throws IOException {
-        if (_root.isIgnoreCertificateErrors()) {
+        if (root.isIgnoreCertificateErrors()) {
             ignoreCertificateErrors();
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         try {
-            connection.setRequestMethod(_method);
+            connection.setRequestMethod(method);
         } catch (ProtocolException e) {
             // Hack in case the API uses a non-standard HTTP verb
             try {
                 Field methodField = connection.getClass().getDeclaredField("method");
                 methodField.setAccessible(true);
-                methodField.set(connection, _method);
+                methodField.set(connection, method);
             } catch (Exception x) {
                 throw (IOException) new IOException("Failed to set the custom verb").initCause(x);
             }
@@ -336,17 +327,19 @@ public class GitlabHTTPRequestor {
 
     private void ignoreCertificateErrors() {
         TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
                 }
-                public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-                }
-                public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            }
         };
 
         try {

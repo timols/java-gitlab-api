@@ -4,29 +4,29 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabProjectAccessLevel {
 
-	@JsonProperty("access_level")
-	private int _accessLevel;
+    @JsonProperty("access_level")
+    private int accessLevel;
 
-	@JsonProperty("notification_level")
-	private int _notificationLevel;
+    @JsonProperty("notification_level")
+    private int notificationLevel;
 
-	
-	public GitlabAccessLevel getAccessLevel() {
-		return GitlabAccessLevel.fromAccessValue(_accessLevel);
-	}
 
-	public void setAccessLevel(GitlabAccessLevel accessLevel) {
-		_accessLevel = accessLevel.accessValue;
-	}
+    public GitlabAccessLevel getAccessLevel() {
+        return GitlabAccessLevel.fromAccessValue(accessLevel);
+    }
 
-	
-	public int getNoficationLevel() {
-		return _notificationLevel;
-	}
-	
-	public void  setNoficationLevel(int notificationLevel) {
-		this._accessLevel=notificationLevel;
-	}
-	
-	
+    public void setAccessLevel(GitlabAccessLevel accessLevel) {
+        this.accessLevel = accessLevel.accessValue;
+    }
+
+
+    public int getNoficationLevel() {
+        return notificationLevel;
+    }
+
+    public void setNoficationLevel(int notificationLevel) {
+        this.accessLevel = notificationLevel;
+    }
+
+
 }

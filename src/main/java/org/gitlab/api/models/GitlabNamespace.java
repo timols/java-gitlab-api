@@ -1,78 +1,79 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Date;
+
 public class GitlabNamespace {
-	public static final String URL = "/groups";
-	
-    private Integer _id;
-    private String _name;
-    private String _path;
-    private String _description;
+    public static final String URL = "/groups";
+
+    private Integer id;
+    private String name;
+    private String path;
+    private String description;
 
     @JsonProperty("created_at")
-    private Date _createdAt;
+    private Date createdAt;
 
     @JsonProperty("updated_at")
-    private Date _updatedAt;
+    private Date updatedAt;
 
     @JsonProperty("owner_id")
-    private Integer _ownerId;
+    private Integer ownerId;
 
     public Integer getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this.id = id;
     }
 
     public Date getCreatedAt() {
-        return _createdAt;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public Date getUpdatedAt() {
-        return _updatedAt;
+        return updatedAt;
     }
 
     public void setUpdatedAt(Date updatedAt) {
-        _updatedAt = updatedAt;
+        this.updatedAt = updatedAt;
     }
 
     public Integer getOwnerId() {
-        return _ownerId;
+        return ownerId;
     }
 
     public void setOwnerId(Integer ownerId) {
-        _ownerId = ownerId;
+        this.ownerId = ownerId;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public String getPath() {
-        return _path;
+        return path;
     }
 
     public void setPath(String path) {
-        _path = path;
+        this.path = path;
     }
 
     public String getDescription() {
-        return _description;
+        return description;
     }
 
     public void setDescription(String description) {
-        _description = description;
+        this.description = description;
     }
 }

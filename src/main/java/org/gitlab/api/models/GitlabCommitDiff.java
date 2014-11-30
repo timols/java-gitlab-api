@@ -7,90 +7,90 @@ public class GitlabCommitDiff {
     public final static String URL = "/diff";
 
     @JsonProperty("diff")
-    private String _diff;
+    private String diff;
 
     @JsonProperty("new_path")
-    private String _newPath;
+    private String newPath;
 
     @JsonProperty("old_path")
-    private String _oldPath;
+    private String oldPath;
 
     @JsonProperty("a_mode")
-    private String _aMode;
+    private String aMode;
 
     @JsonProperty("b_mode")
-    private String _bMode;
+    private String bMode;
 
     @JsonProperty("new_file")
-    private boolean _newFile;
+    private boolean newFile;
 
     @JsonProperty("renamed_file")
-    private boolean _renamedFile;
+    private boolean renamedFile;
 
     @JsonProperty("deleted_file")
-    private boolean _deletedFile;
+    private boolean deletedFile;
 
     public String getDiff() {
-        return _diff;
+        return diff;
     }
 
     public void setDiff(String diff) {
-        _diff = diff;
+        this.diff = diff;
     }
 
     public String getNewPath() {
-        return _newPath;
+        return newPath;
     }
 
     public void setNewPath(String newPath) {
-        _newPath = newPath;
+        this.newPath = newPath;
     }
 
     public String getOldPath() {
-        return _oldPath;
+        return oldPath;
     }
 
     public void setOldPath(String oldPath) {
-        _oldPath = oldPath;
+        this.oldPath = oldPath;
     }
 
     public String getAMode() {
-        return _aMode;
+        return aMode;
     }
 
     public void setAMode(String aMode) {
-        _aMode = aMode;
+        this.aMode = aMode;
     }
 
     public String getBMode() {
-        return _bMode;
+        return bMode;
     }
 
     public void setBMode(String bMode) {
-        _bMode = bMode;
+        this.bMode = bMode;
     }
 
     public boolean getNewFile() {
-        return _newFile;
+        return newFile;
     }
 
     public void setNewFile(boolean newFile) {
-        _newFile = newFile;
+        this.newFile = newFile;
     }
 
     public boolean getRenamedFile() {
-        return _renamedFile;
+        return renamedFile;
     }
 
     public void setRenamedFile(boolean renamedFile) {
-        _renamedFile = renamedFile;
+        this.renamedFile = renamedFile;
     }
 
     public boolean getDeletedFile() {
-        return _deletedFile;
+        return deletedFile;
     }
 
     public void setDeletedFile(boolean deletedFile) {
-        _deletedFile = deletedFile;
+        this.deletedFile = deletedFile;
     }
 }

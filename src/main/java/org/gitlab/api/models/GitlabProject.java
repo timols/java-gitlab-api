@@ -1,253 +1,253 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
-
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabProject {
 
     public static final String URL = "/projects";
 
-    private Integer _id;
-    private String _name;
+    private Integer id;
+    private String name;
 
     @JsonProperty("name_with_namespace")
-    private String _nameWithNamespace;
+    private String nameWithNamespace;
 
-    private String _description;
+    private String description;
 
     @JsonProperty("default_branch")
-    private String _defaultBranch;
+    private String defaultBranch;
 
-    private GitlabUser _owner;
-    private boolean _public;
-    private String _path;
+    private GitlabUser owner;
+    private boolean publicProject;
+    private String path;
 
     @JsonProperty("visibility_level")
-    private Integer _visibilityLevel;
+    private Integer visibilityLevel;
 
     @JsonProperty("path_with_namespace")
-    private String _pathWithNamespace;
+    private String pathWithNamespace;
 
     @JsonProperty("issues_enabled")
-    private boolean _issuesEnabled;
+    private boolean issuesEnabled;
 
     @JsonProperty("merge_requests_enabled")
-    private boolean _mergeRequestsEnabled;
+    private boolean mergeRequestsEnabled;
 
     @JsonProperty("snippets_enabled")
-    private boolean _snippetsEnabled;
+    private boolean snippetsEnabled;
 
     @JsonProperty("wall_enabled")
-    private boolean _wallEnabled;
+    private boolean wallEnabled;
 
     @JsonProperty("wiki_enabled")
-    private boolean _wikiEnabled;
+    private boolean wikiEnabled;
 
     @JsonProperty("created_at")
-    private Date _createdAt;
+    private Date createdAt;
 
     @JsonProperty("ssh_url_to_repo")
-    private String _sshUrl;
+    private String sshUrl;
 
     @JsonProperty("web_url")
-    private String _webUrl;
+    private String webUrl;
 
     @JsonProperty("http_url_to_repo")
-    private String _httpUrl;
+    private String httpUrl;
 
     @JsonProperty("last_activity_at")
-    private Date _lastActivityAt;
+    private Date lastActivityAt;
 
     @JsonProperty("archived")
-    private boolean _archived;
+    private boolean archived;
 
-    private GitlabNamespace _namespace;
-    
+    private GitlabNamespace namespace;
+
     @JsonProperty("permissions")
-    private GitlabPersmission _permissions;
+    private GitlabPermission permissions;
 
     public Integer getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public String getNameWithNamespace() {
-        return _nameWithNamespace;
+        return nameWithNamespace;
     }
 
     public void setNameWithNamespace(String nameWithNamespace) {
-        this._nameWithNamespace = nameWithNamespace;
+        this.nameWithNamespace = nameWithNamespace;
     }
 
     public String getDescription() {
-        return _description;
+        return description;
     }
 
     public void setDescription(String description) {
-        _description = description;
+        this.description = description;
     }
 
     public String getDefaultBranch() {
-        return _defaultBranch;
+        return defaultBranch;
     }
 
     public void setDefaultBranch(String defaultBranch) {
-        _defaultBranch = defaultBranch;
+        this.defaultBranch = defaultBranch;
     }
 
     public Integer getVisibilityLevel() {
-        return _visibilityLevel;
+        return visibilityLevel;
     }
 
     public void setVisibilityLevel(Integer visibilityLevel) {
-        this._visibilityLevel = visibilityLevel;
+        this.visibilityLevel = visibilityLevel;
     }
 
     public GitlabUser getOwner() {
-        return _owner;
+        return owner;
     }
 
     public void setOwner(GitlabUser owner) {
-        _owner = owner;
+        this.owner = owner;
     }
 
     public String getPath() {
-        return _path;
+        return path;
     }
 
     public void setPath(String path) {
-        _path = path;
+        this.path = path;
     }
 
     public String getPathWithNamespace() {
-        return _pathWithNamespace;
+        return pathWithNamespace;
     }
 
     public void setPathWithNamespace(String pathWithNamespace) {
-        _pathWithNamespace = pathWithNamespace;
+        this.pathWithNamespace = pathWithNamespace;
     }
 
     public boolean isIssuesEnabled() {
-        return _issuesEnabled;
+        return issuesEnabled;
     }
 
     public void setIssuesEnabled(boolean issuesEnabled) {
-        _issuesEnabled = issuesEnabled;
+        this.issuesEnabled = issuesEnabled;
     }
 
     public boolean isMergeRequestsEnabled() {
-        return _mergeRequestsEnabled;
+        return mergeRequestsEnabled;
     }
 
     public void setMergeRequestsEnabled(boolean mergeRequestsEnabled) {
-        _mergeRequestsEnabled = mergeRequestsEnabled;
+        this.mergeRequestsEnabled = mergeRequestsEnabled;
     }
 
     public boolean isSnippetsEnabled() {
-        return _snippetsEnabled;
+        return snippetsEnabled;
     }
 
     public void setSnippetsEnabled(boolean snippetsEnabled) {
-        this._snippetsEnabled = snippetsEnabled;
+        this.snippetsEnabled = snippetsEnabled;
     }
 
     public boolean isWallEnabled() {
-        return _wallEnabled;
+        return wallEnabled;
     }
 
     public void setWallEnabled(boolean wallEnabled) {
-        _wallEnabled = wallEnabled;
+        this.wallEnabled = wallEnabled;
     }
 
     public boolean isWikiEnabled() {
-        return _wikiEnabled;
+        return wikiEnabled;
     }
 
     public void setWikiEnabled(boolean wikiEnabled) {
-        _wikiEnabled = wikiEnabled;
+        this.wikiEnabled = wikiEnabled;
     }
 
     public Date getCreatedAt() {
-        return _createdAt;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public String getSshUrl() {
-        return _sshUrl;
+        return sshUrl;
     }
 
     public void setSshUrl(String sshUrl) {
-        _sshUrl = sshUrl;
+        this.sshUrl = sshUrl;
     }
 
     public String getWebUrl() {
-        return _webUrl;
+        return webUrl;
     }
 
     public void setWebUrl(String webUrl) {
-        _webUrl = webUrl;
+        this.webUrl = webUrl;
     }
 
     public String getHttpUrl() {
-        return _httpUrl;
+        return httpUrl;
     }
 
     public void setHttpUrl(String httpUrl) {
-        _httpUrl = httpUrl;
+        this.httpUrl = httpUrl;
     }
 
     public GitlabNamespace getNamespace() {
-        return _namespace;
+        return namespace;
     }
 
     public void setNamespace(GitlabNamespace namespace) {
-        _namespace = namespace;
+        this.namespace = namespace;
     }
 
     public boolean isPublic() {
-        return _public;
+        return publicProject;
     }
 
     public void setPublic(boolean aPublic) {
-        _public = aPublic;
+        publicProject = aPublic;
     }
 
     public boolean isArchived() {
-        return _archived;
+        return archived;
     }
 
     public void setArchived(boolean archived) {
-        _archived = archived;
+        this.archived = archived;
     }
 
     public Date getLastActivityAt() {
-        return _lastActivityAt;
+        return lastActivityAt;
     }
 
     public void setLastActivityAt(Date lastActivityAt) {
-        _lastActivityAt = lastActivityAt;
+        this.lastActivityAt = lastActivityAt;
     }
 
-	public GitlabPersmission getPermissions() {
-		return _permissions;
-	}
+    public GitlabPermission getPermissions() {
+        return permissions;
+    }
 
-	public void setPermissions(GitlabPersmission permissions) {
-		this._permissions = permissions;
-	}
+    public void setPermissions(GitlabPermission permissions) {
+        this.permissions = permissions;
+    }
 }

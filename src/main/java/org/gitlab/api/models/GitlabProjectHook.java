@@ -1,84 +1,82 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
-
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabProjectHook {
 
-	public final static String URL = "/hooks";
-	
-	private String _id;
-	private String _url;
-	
-	private Integer _projectId;
+    public final static String URL = "/hooks";
 
-    	@JsonProperty("push_events")
-    	private boolean _pushEvents;
+    private String id;
+    private String url;
+    private Integer projectId;
 
-    	@JsonProperty("issues_events")
-    	private boolean _issueEvents;
+    @JsonProperty("push_events")
+    private boolean pushEvents;
 
-    	@JsonProperty("merge_requests_events")
-    	private boolean _mergeRequestsEvents;
+    @JsonProperty("issues_events")
+    private boolean issueEvents;
 
-	@JsonProperty("created_at")
-    private Date _createdAt;
-	
-	
-	public String getId() {
-        return _id;
+    @JsonProperty("merge_requests_events")
+    private boolean mergeRequestsEvents;
+
+    @JsonProperty("created_at")
+    private Date createdAt;
+
+    public String getId() {
+        return id;
     }
 
     public void setId(String id) {
-        _id = id;
+        this.id = id;
     }
 
-	public String getUrl() {
-		return _url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setUrl(String url) {
-		this._url = url;
-	}
-    
-	public Integer getProjectId() {
-        	return _projectId;
-    	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    	public void setProjectId(Integer projectId) {
-        	_projectId = projectId;
-    	}
+    public Integer getProjectId() {
+        return projectId;
+    }
 
-    	public boolean getPushEvents() {
-        	return _pushEvents;
-    	}
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
 
-    	public void setPushEvents(boolean pushEvents) {
-        	_pushEvents = pushEvents;
-    	}
+    public boolean getPushEvents() {
+        return pushEvents;
+    }
 
-    	public boolean getIssueEvents() {
-        	return _issueEvents;
-    	}
+    public void setPushEvents(boolean pushEvents) {
+        this.pushEvents = pushEvents;
+    }
 
-    	public void setIssueEvents(boolean issueEvents) {
-        	_issueEvents = issueEvents;
-    	}
+    public boolean getIssueEvents() {
+        return issueEvents;
+    }
 
-    	public boolean isMergeRequestsEvents() {
-        	return _mergeRequestsEvents;
-    	}
+    public void setIssueEvents(boolean issueEvents) {
+        this.issueEvents = issueEvents;
+    }
 
-    	public void setMergeRequestsEvents(boolean mergeRequestsEvents) {
-        	_mergeRequestsEvents = mergeRequestsEvents;
-    	}
+    public boolean isMergeRequestsEvents() {
+        return mergeRequestsEvents;
+    }
 
-	public Date getCreatedAt() {
-        return _createdAt;
+    public void setMergeRequestsEvents(boolean mergeRequestsEvents) {
+        this.mergeRequestsEvents = mergeRequestsEvents;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 }

@@ -1,57 +1,58 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabNote {
 
     public static final String URL = "/notes";
 
-    private Integer _id;
-    private String _body;
-    private String _attachment;
-    private GitlabUser _author;
+    private Integer id;
+    private String body;
+    private String attachment;
+    private GitlabUser author;
 
     @JsonProperty("created_at")
-    private Date _createdAt;
+    private Date createdAt;
 
     public Integer getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getBody() {
-        return _body;
+        return body;
     }
 
     public void setBody(String body) {
-        _body = body;
+        this.body = body;
     }
 
     public GitlabUser getAuthor() {
-        return _author;
+        return author;
     }
 
     public void setAuthor(GitlabUser author) {
-        _author = author;
+        this.author = author;
     }
 
     public Date getCreatedAt() {
-        return _createdAt;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public String getAttachment() {
-        return _attachment;
+        return attachment;
     }
 
     public void setAttachment(String attachment) {
-        _attachment = attachment;
+        this.attachment = attachment;
     }
 }

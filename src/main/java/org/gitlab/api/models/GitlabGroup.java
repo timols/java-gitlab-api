@@ -6,53 +6,53 @@ public class GitlabGroup {
 
     public static final String URL = "/groups";
 
-    private Integer _id;
-    private String _name;
-    private String _path;
+    private Integer id;
+    private String name;
+    private String path;
 
     @JsonProperty("ldap_cn")
-    private String _ldapCn;
+    private String ldapCn;
 
     @JsonProperty("ldap_access")
-    private Integer _ldapAccess;
+    private Integer ldapAccess;
 
     public Integer getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public String getPath() {
-        return _path;
+        return path;
     }
 
     public void setPath(String path) {
-        _path = path;
+        this.path = path;
     }
 
     public String getLdapCn() {
-        return _ldapCn;
+        return ldapCn;
     }
 
     public void setLdapCn(String ldapCn) {
-        this._ldapCn = ldapCn;
+        this.ldapCn = ldapCn;
     }
 
     public GitlabAccessLevel getLdapAccess() {
-        return GitlabAccessLevel.fromAccessValue(_ldapAccess);
+        return GitlabAccessLevel.fromAccessValue(ldapAccess);
     }
 
     public void setLdapAccess(GitlabAccessLevel ldapGitlabAccessLevel) {
-        this._ldapAccess = ldapGitlabAccessLevel.accessValue;
+        this.ldapAccess = ldapGitlabAccessLevel.accessValue;
     }
 }

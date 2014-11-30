@@ -1,7 +1,8 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabUser {
     public static String URL = "/users";
@@ -18,16 +19,16 @@ public class GitlabUser {
     private String _provider;
     private String _state;
     private boolean _blocked;
-    
+
     @JsonProperty("private_token")
     private String _privateToken;
-    
+
     @JsonProperty("color_scheme_id")
     private Integer _colorSchemeId;
-    
+
     @JsonProperty("provider")
     private String _externProviderName;
-    
+
     @JsonProperty("website_url")
     private String _websiteUrl;
 
@@ -57,7 +58,7 @@ public class GitlabUser {
 
     @JsonProperty("can_create_team")
     private boolean _canCreateTeam;
-    
+
     @JsonProperty("avatar_url")
     private String _avatarUrl;
 
@@ -180,21 +181,21 @@ public class GitlabUser {
     public void setState(String state) {
         _state = state;
     }
-    
+
     public String getExternProviderName() {
         return _externProviderName;
     }
 
     public void setExternProviderName(String externProviderName) {
-    	_externProviderName = externProviderName;
+        _externProviderName = externProviderName;
     }
-    
+
     public String getWebsiteUrl() {
         return _websiteUrl;
     }
 
     public void setWebsiteUrl(String websiteUrl) {
-    	_websiteUrl = websiteUrl;
+        _websiteUrl = websiteUrl;
     }
 
     public boolean isAdmin() {
@@ -229,27 +230,27 @@ public class GitlabUser {
         _canCreateTeam = canCreateTeam;
     }
 
-	public String getAvatarUrl() {
-		return _avatarUrl;
-	}
+    public String getAvatarUrl() {
+        return _avatarUrl;
+    }
 
-	public void setAvatarUrl(String avatarUrl) {
-		this._avatarUrl = avatarUrl;
-	}
+    public void setAvatarUrl(String avatarUrl) {
+        this._avatarUrl = avatarUrl;
+    }
 
-	public Integer getColorSchemeId() {
-		return _colorSchemeId;
-	}
+    public Integer getColorSchemeId() {
+        return _colorSchemeId;
+    }
 
-	public void setColorSchemeId(Integer colorSchemeId) {
-		this._colorSchemeId = colorSchemeId;
-	}
+    public void setColorSchemeId(Integer colorSchemeId) {
+        this._colorSchemeId = colorSchemeId;
+    }
 
-	public String getPrivateToken() {
-		return _privateToken;
-	}
+    public String getPrivateToken() {
+        return _privateToken;
+    }
 
-	public void setPrivateToken(String privateToken) {
-		this._privateToken = privateToken;
-	}
+    public void setPrivateToken(String privateToken) {
+        this._privateToken = privateToken;
+    }
 }

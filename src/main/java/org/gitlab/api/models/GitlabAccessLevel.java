@@ -9,13 +9,14 @@ public enum GitlabAccessLevel {
     Owner(50);
 
     public final int accessValue;
+
     GitlabAccessLevel(int accessValue) {
         this.accessValue = accessValue;
     }
 
     public static GitlabAccessLevel fromAccessValue(final int accessValue) throws IllegalArgumentException {
-        for(final GitlabAccessLevel gitlabAccessLevel : GitlabAccessLevel.values()) {
-            if(gitlabAccessLevel.accessValue == accessValue) {
+        for (final GitlabAccessLevel gitlabAccessLevel : GitlabAccessLevel.values()) {
+            if (gitlabAccessLevel.accessValue == accessValue) {
                 return gitlabAccessLevel;
             }
         }

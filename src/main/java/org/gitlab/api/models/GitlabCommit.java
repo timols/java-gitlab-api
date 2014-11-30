@@ -1,112 +1,113 @@
 package org.gitlab.api.models;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import java.util.Date;
 import java.util.List;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GitlabCommit {
 
     public final static String URL = "/commits";
 
-    private String _id;
-    private String _title;
-    private String _description;
+    private String id;
+    private String title;
+    private String description;
 
     @JsonProperty("short_id")
-    private String _shortId;
+    private String shortId;
 
     @JsonProperty("author_name")
-    private String _authorName;
+    private String authorName;
 
     @JsonProperty("author_email")
-    private String _authorEmail;
+    private String authorEmail;
 
     @JsonProperty("created_at")
-    private Date _createdAt;
+    private Date createdAt;
 
     @JsonProperty("committed_date")
-    private Date _committedDate;
+    private Date committedDate;
 
     @JsonProperty("authored_date")
-    private Date _authoredDate;
+    private Date authoredDate;
 
     @JsonProperty("parent_ids")
-    private List<String> _parentIds;
+    private List<String> parentIds;
 
     public String getId() {
-        return _id;
+        return id;
     }
 
     public void setId(String id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getShortId() {
-        return _shortId;
+        return shortId;
     }
 
     public void setShortId(String shortId) {
-        _shortId = shortId;
+        this.shortId = shortId;
     }
 
     public String getTitle() {
-        return _title;
+        return title;
     }
 
     public void setTitle(String title) {
-        _title = title;
+        this.title = title;
     }
 
     public String getDescription() {
-        return _description;
+        return description;
     }
 
     public void setDescription(String description) {
-        _description = description;
+        this.description = description;
     }
 
     public String getAuthorName() {
-        return _authorName;
+        return authorName;
     }
 
     public void setAuthorName(String authorName) {
-        _authorName = authorName;
+        this.authorName = authorName;
     }
 
     public String getAuthorEmail() {
-        return _authorEmail;
+        return authorEmail;
     }
 
     public void setAuthorEmail(String authorEmail) {
-        _authorEmail = authorEmail;
+        this.authorEmail = authorEmail;
     }
 
     public Date getCreatedAt() {
-        return _createdAt;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public List<String> getParentIds() {
-        return _parentIds;
+        return parentIds;
     }
 
     public void setParentIds(List<String> parentIds) {
-        _parentIds = parentIds;
+        this.parentIds = parentIds;
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		// we say that two commit objects are equal iff they have the same ID
-		// this prevents us from having to do clever workarounds for
-		// https://gitlab.com/gitlab-org/gitlab-ce/issues/759
-		try {
-			GitlabCommit commitObj = (GitlabCommit) obj;
-			return (this.getId().compareTo(commitObj.getId()) == 0);
-		} catch (ClassCastException e) {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        // we say that two commit objects are equal iff they have the same ID
+        // this prevents us from having to do clever workarounds for
+        // https://gitlab.com/gitlab-org/gitlab-ce/issues/759
+        try {
+            GitlabCommit commitObj = (GitlabCommit) obj;
+            return (this.getId().compareTo(commitObj.getId()) == 0);
+        } catch (ClassCastException e) {
+            return false;
+        }
+    }
 }
