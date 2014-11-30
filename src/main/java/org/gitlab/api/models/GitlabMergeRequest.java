@@ -2,6 +2,8 @@ package org.gitlab.api.models;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Date;
+
 public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
 
@@ -14,6 +16,12 @@ public class GitlabMergeRequest {
     private boolean merged;
     private GitlabUser author;
     private GitlabUser assignee;
+    private GitlabMilestone milestone;
+
+    private String[] labels;
+
+    private int upvotes;
+    private int downvotes;
 
     @JsonProperty("target_branch")
     private String targetBranch;
@@ -27,9 +35,17 @@ public class GitlabMergeRequest {
     @JsonProperty("source_project_id")
     private Integer sourceProjectId;
 
+    @JsonProperty("target_projectId")
+    private Integer targetProjectId;
+
     @JsonProperty("milestone_id")
     private Integer milestoneId;
 
+    @JsonProperty("updated_at")
+    private Date updatedAt;
+
+    @JsonProperty("created_at")
+    private Date createdAt;
 
     public Integer getId() {
         return id;
@@ -39,10 +55,12 @@ public class GitlabMergeRequest {
         this.id = id;
     }
 
+    @Deprecated
     public Integer getMilestoneId() {
         return milestoneId;
     }
 
+    @Deprecated
     public void setMilestoneId(Integer id) {
         milestoneId = id;
     }
@@ -103,18 +121,22 @@ public class GitlabMergeRequest {
         description = d;
     }
 
+    @Deprecated
     public boolean isClosed() {
         return closed;
     }
 
+    @Deprecated
     public void setClosed(boolean closed) {
         this.closed = closed;
     }
 
+    @Deprecated
     public boolean isMerged() {
         return merged;
     }
 
+    @Deprecated
     public void setMerged(boolean merged) {
         this.merged = merged;
     }
@@ -145,5 +167,61 @@ public class GitlabMergeRequest {
             closed = state.equals("closed");
             merged = state.equals("merged");
         }
+    }
+
+    public GitlabMilestone getMilestone() {
+        return milestone;
+    }
+
+    public void setMilestone(GitlabMilestone milestone) {
+        this.milestone = milestone;
+    }
+
+    public String[] getLabels() {
+        return labels;
+    }
+
+    public void setLabels(String[] labels) {
+        this.labels = labels;
+    }
+
+    public int getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(int upvotes) {
+        this.upvotes = upvotes;
+    }
+
+    public int getDownvotes() {
+        return downvotes;
+    }
+
+    public void setDownvotes(int downvotes) {
+        this.downvotes = downvotes;
+    }
+
+    public Integer getTargetProjectId() {
+        return targetProjectId;
+    }
+
+    public void setTargetProjectId(Integer targetProjectId) {
+        this.targetProjectId = targetProjectId;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }
