@@ -7,35 +7,35 @@ public class GitlabTag {
     public static final String URL = "/repository/tags/";
 
     @JsonProperty("name")
-    private String _name;
+    private String name;
 
     @JsonProperty("commit")
-    private GitlabCommit _commit;
+    private GitlabCommit commit;
 
     @JsonProperty("protected")
-    private Boolean _protected;
+    private Boolean protectedFlag; // protected is a keyword in java
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String name) {
-        this._name = name;
+        this.name = name;
     }
 
     public GitlabCommit getCommit() {
-        return _commit;
+        return commit;
     }
 
     public void setCommit(GitlabCommit commit) {
-        this._commit = commit;
+        this.commit = commit;
     }
 
     public Boolean getProtected() {
-        return _protected;
+        return protectedFlag;
     }
 
-    public void setProtected(Boolean _protected) {
-        this._protected = _protected;
+    public void setProtected(Boolean protectedFlag) {
+        this.protectedFlag = protectedFlag;
     }
 }

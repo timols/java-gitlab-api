@@ -7,90 +7,90 @@ public class GitlabFile {
     public static final String URL = "/repository/files/";
 
     @JsonProperty("file_name")
-    private String _file_name;
+    private String fileName;
 
     @JsonProperty("file_path")
-    private String _file_path;
+    private String filePath;
 
     @JsonProperty("size")
-    private int _size;
+    private int size;
 
     @JsonProperty("encoding")
-    private String _encoding;
+    private String encoding;
 
     @JsonProperty("content")
-    private String _content;
+    private String content;
 
     @JsonProperty("ref")
-    private String _ref;
+    private String ref;
 
     @JsonProperty("blob_id")
-    private String _blob_id;
+    private String blobId;
 
     @JsonProperty("commit_id")
-    private String _commit_id;
+    private String commitId;
 
     public String getFileName() {
-        return _file_name;
+        return fileName;
     }
 
     public void setFileName(String fileName) {
-        this._file_name = fileName;
+        this.fileName = fileName;
     }
 
     public String getFilePath() {
-        return _file_path;
+        return filePath;
     }
 
     public void setFilePath(String filePath) {
-        this._file_path = filePath;
+        this.filePath = filePath;
     }
 
     public int getSize() {
-        return _size;
+        return size;
     }
 
     public void setSize(int size) {
-        this._size = size;
+        this.size = size;
     }
 
     public String getEncoding() {
-        return _encoding;
+        return encoding;
     }
 
     public void setEncoding(String encoding) {
-        this._encoding = encoding;
+        this.encoding = encoding;
     }
 
     public String getContent() {
-        return _content;
+        return content;
     }
 
     public void setContent(String content) {
-        this._content = content;
+        this.content = content;
     }
 
     public String getRef() {
-        return _ref;
+        return ref;
     }
 
     public void setRef(String ref) {
-        this._ref = ref;
+        this.ref = ref;
     }
 
     public String getBlobId() {
-        return _blob_id;
+        return blobId;
     }
 
     public void setBlobId(String blobId) {
-        this._blob_id = blobId;
+        this.blobId = blobId;
     }
 
     public String getCommitId() {
-        return _commit_id;
+        return commitId;
     }
 
     public void setCommitId(String commitId) {
-        this._commit_id = commitId;
+        this.commitId = commitId;
     }
 }
