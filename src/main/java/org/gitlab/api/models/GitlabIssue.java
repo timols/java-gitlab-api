@@ -1,135 +1,136 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Date;
+
 public class GitlabIssue {
-	public enum Action {
-		LEAVE, CLOSE, REOPEN
-	}
-	
-	public static final String StateClosed = "closed";
-	public static final String StateOpened = "opened";
 
-	public static final String URL = "/issues";
-	
-	private int _id;
-	private int _iid;
-	
-	@JsonProperty("project_id")
-	private int _projectId;
-	
-	private String _title;
-	private String _description;
-	private String[] _labels;
-	private GitlabMilestone _milestone;
-	
-	private GitlabUser _assignee;
-	private GitlabUser _author;
-	
-	private String _state;
-	
-	@JsonProperty("updated_at")
-	private Date _updatedAt;
-	
-	@JsonProperty("created_at")
-	private Date _createdAt;
+    public enum Action {
+        LEAVE, CLOSE, REOPEN
+    }
 
-	public int getId() {
-		return _id;
-	}
+    public static final String STATE_CLOSED = "closed";
+    public static final String STATE_OPENED = "opened";
 
-	public void setId(int id) {
-		_id = id;
-	}
+    public static final String URL = "/issues";
 
-	public int getIid() {
-		return _iid;
-	}
+    private int id;
+    private int iid;
 
-	public void setIid(int iid) {
-		_iid = iid;
-	}
+    @JsonProperty("project_id")
+    private int projectId;
 
-	public int getProjectId() {
-		return _projectId;
-	}
+    private String title;
+    private String description;
+    private String[] labels;
+    private GitlabMilestone milestone;
 
-	public void setProjectId(int projectId) {
-		_projectId = projectId;
-	}
+    private GitlabUser assignee;
+    private GitlabUser author;
 
-	public String getTitle() {
-		return _title;
-	}
+    private String state;
 
-	public void setTitle(String title) {
-		_title = title;
-	}
+    @JsonProperty("updated_at")
+    private Date updatedAt;
 
-	public String getDescription() {
-		return _description;
-	}
+    @JsonProperty("created_at")
+    private Date createdAt;
 
-	public void setDescription(String description) {
-		_description = description;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String[] getLabels() {
-		return _labels;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setLabels(String[] labels) {
-		_labels = labels;
-	}
+    public int getIid() {
+        return iid;
+    }
 
-	public GitlabMilestone getMilestone() {
-		return _milestone;
-	}
+    public void setIid(int iid) {
+        this.iid = iid;
+    }
 
-	public void setMilestone(GitlabMilestone milestone) {
-		_milestone = milestone;
-	}
+    public int getProjectId() {
+        return projectId;
+    }
 
-	public GitlabUser getAssignee() {
-		return _assignee;
-	}
+    public void setProjectId(int projectId) {
+        this.projectId = projectId;
+    }
 
-	public void setAssignee(GitlabUser assignee) {
-		_assignee = assignee;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public GitlabUser getAuthor() {
-		return _author;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setAuthor(GitlabUser author) {
-		_author = author;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getState() {
-		return _state;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setState(String state) {
-		_state = state;
-	}
+    public String[] getLabels() {
+        return labels;
+    }
 
-	public Date getUpdatedAt() {
-		return _updatedAt;
-	}
+    public void setLabels(String[] labels) {
+        this.labels = labels;
+    }
 
-	public void setUpdatedAt(Date updatedAt) {
-		_updatedAt = updatedAt;
-	}
+    public GitlabMilestone getMilestone() {
+        return milestone;
+    }
 
-	public Date getCreatedAt() {
-		return _createdAt;
-	}
+    public void setMilestone(GitlabMilestone milestone) {
+        this.milestone = milestone;
+    }
 
-	public void setCreatedAt(Date createdAt) {
-		_createdAt = createdAt;
-	}
+    public GitlabUser getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(GitlabUser assignee) {
+        this.assignee = assignee;
+    }
+
+    public GitlabUser getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(GitlabUser author) {
+        this.author = author;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
 }

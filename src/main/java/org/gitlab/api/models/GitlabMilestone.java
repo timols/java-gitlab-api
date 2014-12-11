@@ -1,100 +1,100 @@
 package org.gitlab.api.models;
 
-import java.util.Date;
-
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabMilestone {
 
-	public static final String URL = "/milestones";
-	
-	private int _id;
-	private int _iid;
-	private int _projectId;
-	private String _title;
-	private String _description;
-	
-	@JsonProperty("due_date")
-	private Date _dueDate;
-	
-	private String _state;
-	
-	@JsonProperty("updated_date")
-	private Date _updatedDate;
-	
-	@JsonProperty("created_date")
-	private Date _createdDate;
+    public static final String URL = "/milestones";
 
-	public int getId() {
-		return _id;
-	}
+    private int id;
+    private int iid;
+    private int projectId;
+    private String title;
+    private String description;
 
-	public void setId(int id) {
-		_id = id;
-	}
+    @JsonProperty("due_date")
+    private Date dueDate;
 
-	public int getIid() {
-		return _iid;
-	}
+    private String state;
 
-	public void setIid(int iid) {
-		_iid = iid;
-	}
+    @JsonProperty("updated_date")
+    private Date updatedDate;
 
-	public int getProjectId() {
-		return _projectId;
-	}
+    @JsonProperty("created_date")
+    private Date createdDate;
 
-	public void setProjectId(int projectId) {
-		_projectId = projectId;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return _title;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		_title = title;
-	}
+    public int getIid() {
+        return iid;
+    }
 
-	public String getDescription() {
-		return _description;
-	}
+    public void setIid(int iid) {
+        this.iid = iid;
+    }
 
-	public void setDescription(String description) {
-		_description = description;
-	}
+    public int getProjectId() {
+        return projectId;
+    }
 
-	public Date getDueDate() {
-		return _dueDate;
-	}
+    public void setProjectId(int projectId) {
+        this.projectId = projectId;
+    }
 
-	public void setDueDate(Date dueDate) {
-		_dueDate = dueDate;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getState() {
-		return _state;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setState(String state) {
-		_state = state;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Date getUpdatedDate() {
-		return _updatedDate;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setUpdatedDate(Date updatedDate) {
-		_updatedDate = updatedDate;
-	}
+    public Date getDueDate() {
+        return dueDate;
+    }
 
-	public Date getCreatedDate() {
-		return _createdDate;
-	}
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
 
-	public void setCreatedDate(Date createdDate) {
-		_createdDate = createdDate;
-	}
-	
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
 }

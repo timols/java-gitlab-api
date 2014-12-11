@@ -1,79 +1,77 @@
 package org.gitlab.api.models;
 
-import org.gitlab.api.models.GitlabUser;
-
-import java.lang.String;
-import java.util.Date;
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.Date;
 
 public class GitlabBranchCommit {
     public static String URL = "/users";
 
-    private String _id;
-    private String _tree;
-    private String _message;
-    private GitlabUser _author;
-    private GitlabUser _committer;
+    private String id;
+    private String tree;
+    private String message;
+    private GitlabUser author;
+    private GitlabUser committer;
 
     @JsonProperty("authored_date")
-    private Date _authoredDate;
+    private Date authoredDate;
 
     @JsonProperty("committed_date")
-    private Date _committedDate;
+    private Date committedDate;
 
     public String getId() {
-        return _id;
+        return id;
     }
 
     public void setId(String id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getTree() {
-        return _tree;
+        return tree;
     }
 
     public void setTree(String tree) {
-        _tree = tree;
+        this.tree = tree;
     }
 
     public String getMessage() {
-        return _message;
+        return message;
     }
 
     public void setMessage(String message) {
-        _message = message;
+        this.message = message;
     }
 
     public GitlabUser getAuthor() {
-        return _author;
+        return author;
     }
 
     public void setAuthor(GitlabUser author) {
-        _author = author;
+        this.author = author;
     }
 
     public GitlabUser getCommitter() {
-        return _committer;
+        return committer;
     }
 
     public void setCommitter(GitlabUser committer) {
-        _committer = committer;
+        this.committer = committer;
     }
 
     public Date getAuthoredDate() {
-        return _authoredDate;
+        return authoredDate;
     }
 
     public void setAuthoredDate(Date authoredDate) {
-        _authoredDate = authoredDate;
+        this.authoredDate = authoredDate;
     }
 
     public Date getCommittedDate() {
-        return _committedDate;
+        return committedDate;
     }
 
     public void setCommittedDate(Date committedDate) {
-        _committedDate = committedDate;
+        this.committedDate = committedDate;
     }
 }

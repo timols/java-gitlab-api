@@ -5,3 +5,6 @@ build/
 target/*
 *.*~
 .gradle
+/bin/
+/target/
+target
