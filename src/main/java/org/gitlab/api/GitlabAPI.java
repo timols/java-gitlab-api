@@ -605,6 +605,19 @@ public class GitlabAPI {
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
+    /**
+     * Get a file includes some meta information e.g. size.
+     *
+     * @param project The project.
+     * @param filePath Full path to new file. Ex. lib/class.rb
+     * @param ref The name of branch, tag or commit
+     *
+     * @return A file or <code>null</code> if not found
+     *
+     * @throws IOException communication error
+     *
+     * @see <a href="http://doc.gitlab.com/ce/api/repository_files.html">Gitlab API files documentation</a>
+     */
     public GitlabFile getFile(GitlabProject project, String filePath, String ref) throws IOException {
         Query query = new Query()
                 .append("file_path", filePath)
@@ -613,6 +626,17 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabFile.class);
     }
 
+    /**
+     * Get a list of repository tags from a project, sorted by name in reverse alphabetical order.
+     *
+     * @param project The project.
+     *
+     * @return A list with all tags
+     *
+     * @throws IOException communication error
+     *
+     * @see <a href="http://doc.gitlab.com/ce/api/repositories.html">Gitlab API repositories documentation</a>
+     */
     public List<GitlabTag> getTags(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
         GitlabTag[] repositories = retrieve().to(tailUrl, GitlabTag[].class);
