@@ -514,6 +514,24 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
+    /**
+     *
+     * @param project
+     * @param mergeRequestId
+     * @param mergeCommitMessage optional merge commit message. Null if not set
+     * @return new merge request status
+     * @throws IOException
+     */
+    public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId + "/merge";
+        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        requestor.with("id", project.getId());
+        requestor.with("merge_request_id", mergeRequestId);
+        if (mergeCommitMessage != null)
+            requestor.with("merge_commit_message", mergeCommitMessage);
+        return requestor.to(tailUrl, GitlabMergeRequest.class);
+    }
+
     public List<GitlabNote> getNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
