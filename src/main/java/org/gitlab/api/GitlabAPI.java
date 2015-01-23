@@ -481,17 +481,8 @@ public class GitlabAPI {
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
-        List<GitlabMergeRequest> allMergeRequests = getAllMergeRequests(project);
-        List<GitlabMergeRequest> openMergeRequests = new ArrayList<GitlabMergeRequest>();
-
-        for (GitlabMergeRequest mergeRequest : allMergeRequests) {
-            if (mergeRequest.isMerged() || mergeRequest.isClosed()) {
-                continue;
-            }
-            openMergeRequests.add(mergeRequest);
-        }
-
-        return openMergeRequests;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "?state=opened";
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
     public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) throws IOException {
