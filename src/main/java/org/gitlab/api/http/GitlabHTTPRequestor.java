@@ -341,11 +341,20 @@ public class GitlabHTTPRequestor {
                     }
                 }
         };
+        // Added per https://github.com/timols/java-gitlab-api/issues/44
+        HostnameVerifier nullVerifier = new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            // Added per https://github.com/timols/java-gitlab-api/issues/44
+            HttpsURLConnection.setDefaultHostnameVerifier(nullVerifier);
         } catch (Exception e) {
             // Ignore it
         }

@@ -1,5 +1,6 @@
 package org.gitlab.api.models;
 
+import org.codehaus.jackson.annotate.JsonCreator;
 
 public enum GitlabAccessLevel {
     Guest(10),
@@ -14,6 +15,8 @@ public enum GitlabAccessLevel {
         this.accessValue = accessValue;
     }
 
+    // http://fasterxml.github.io/jackson-annotations/javadoc/2.2.0/index.html?com/fasterxml/jackson/annotation/JsonCreator.html
+    @JsonCreator
     public static GitlabAccessLevel fromAccessValue(final int accessValue) throws IllegalArgumentException {
         for (final GitlabAccessLevel gitlabAccessLevel : GitlabAccessLevel.values()) {
             if (gitlabAccessLevel.accessValue == accessValue) {
