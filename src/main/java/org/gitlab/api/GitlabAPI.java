@@ -213,6 +213,50 @@ public class GitlabAPI {
     }
 
     /**
+     * Create a new ssh key for the user
+     *
+     * @param targetUserId The id of the Gitlab user
+     * @param title The title of the ssh key
+     * @param key The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException
+     */
+    public GitlabSSHKey createSSHKey(Integer targetUserId, String title, String key) throws IOException {
+
+        Query query = new Query()
+                .append("title", title)
+                .append("key", key);
+
+        String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabSSHKey.class);
+    }
+
+    /**
+     * Delete user's ssh key
+     *
+     * @param targetUserId The id of the Gitlab user
+     * @param targetKeyId The id of the Gitlab ssh key
+     * @throws IOException
+     */
+    public void deleteSSHKey(Integer targetUserId, Integer targetKeyId) throws IOException {
+        String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+
+    /**
+     * Gets all ssh keys for a user
+     *
+     * @param targetUserId The id of the GitLab User
+     * @return The list of user ssh keys
+     */
+    public List<GitlabSSHKey> getSSHKeys(Integer targetUserId) throws IOException {
+        String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabSSHKey[].class));
+    }
+
+    /**
      * Delete a user
      *
      * @param targetUserId
