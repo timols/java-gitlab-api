@@ -524,6 +524,11 @@ public class GitlabAPI {
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
+    public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "?state=opened";
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "?state=opened";
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
@@ -531,12 +536,12 @@ public class GitlabAPI {
 
     public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL;
-        return fetchMergeRequests(tailUrl);
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
     public List<GitlabMergeRequest> getMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
-        return fetchMergeRequests(tailUrl);
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
     public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
@@ -711,11 +716,6 @@ public class GitlabAPI {
     public void deleteProjectHook(GitlabProject project, String hookId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
-    }
-
-    private List<GitlabMergeRequest> fetchMergeRequests(String tailUrl) throws IOException {
-        GitlabMergeRequest[] mergeRequests = retrieve().to(tailUrl, GitlabMergeRequest[].class);
-        return Arrays.asList(mergeRequests);
     }
 
     public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
