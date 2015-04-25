@@ -521,7 +521,7 @@ public class GitlabAPI {
      */
     public void deleteProject(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method("DELETE").to(tailUrl, null);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
