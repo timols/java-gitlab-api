@@ -11,12 +11,12 @@ public class GitlabProjectAccessLevel {
     private int notificationLevel;
 
 
-    public GitlabAccessLevel getAccessLevel() {
-        return GitlabAccessLevel.fromAccessValue(accessLevel);
+    public int getAccessLevel() {
+        return accessLevel;
     }
 
-    public void setAccessLevel(GitlabAccessLevel accessLevel) {
-        this.accessLevel = accessLevel.accessValue;
+    public void setAccessLevel(int accessLevel) {
+        this.accessLevel = accessLevel;
     }
 
 

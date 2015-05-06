@@ -412,6 +412,11 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
         return retrieve().to(tailUrl, GitlabProject.class);
     }
+    
+    public GitlabProject getProject(String nameSpace, String projectName) throws IOException{
+    	 String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(nameSpace)+"%2F"+sanitizeProjectId(projectName.toLowerCase());
+         return retrieve().to(tailUrl, GitlabProject.class);    	
+    }
 
     public List<GitlabProject> getProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
