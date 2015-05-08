@@ -35,7 +35,7 @@ public class GitlabMergeRequest {
     @JsonProperty("source_project_id")
     private Integer sourceProjectId;
 
-    @JsonProperty("target_projectId")
+    @JsonProperty("target_project_id")
     private Integer targetProjectId;
 
     @JsonProperty("milestone_id")
