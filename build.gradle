@@ -1,18 +1,46 @@
+buildscript {
+	tasks.withType(JavaCompile) {
+		options.encoding = 'UTF-8'
+	}
+}
+
 apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+group = 'org.gitlab'
+version = '1.1.8-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    compile 'org.codehaus.jackson:jackson-core-asl:1.9.9'
-    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.9'
-    compile 'commons-io:commons-io:1.4'
-    testCompile 'org.hamcrest:hamcrest-all:1.3'
-    testCompile 'junit:junit:4.11'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+	compile(group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13')
+	compile(group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13')
+    compile(group: 'commons-io', name: 'commons-io', version: '1.4')
+	testCompile(group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3')
+	testCompile(group: 'junit', name: 'junit', version: '4.11')
 }
 
+jar {
+	manifest { attributes 'Gradle-Version': gradle.gradleVersion }
+}
+
+install {
+	repositories.mavenInstaller { pom.artifactId = 'java-gitlab-api' }
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts { archives sourcesJar }
+
 task wrapper(type: Wrapper) {
-	gradleVersion = '1.12'
+	gradleVersion = '2.4'
 }
