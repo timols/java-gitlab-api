@@ -1,9 +1,9 @@
 package org.gitlab.api.models;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabCommit {
 

@@ -1,8 +1,5 @@
 package org.gitlab.api.models;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
-import java.util.Date;
 
 public class GitlabSSHKey {
     public static String KEYS_URL = "/keys";
