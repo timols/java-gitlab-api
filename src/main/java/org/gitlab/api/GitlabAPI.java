@@ -1,19 +1,35 @@
 package org.gitlab.api;
 
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.http.Query;
-import org.gitlab.api.models.*;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
+import org.gitlab.api.models.GitlabAccessLevel;
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabCommitDiff;
+import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabGroupMember;
+import org.gitlab.api.models.GitlabIssue;
+import org.gitlab.api.models.GitlabMergeRequest;
+import org.gitlab.api.models.GitlabMilestone;
+import org.gitlab.api.models.GitlabNamespace;
+import org.gitlab.api.models.GitlabNote;
+import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
+import org.gitlab.api.models.GitlabProjectMember;
+import org.gitlab.api.models.GitlabSSHKey;
+import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabUser;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -23,7 +39,7 @@ import java.util.List;
  */
 public class GitlabAPI {
 
-    public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private static final String API_NAMESPACE = "/api/v3";
     private static final String PARAM_SUDO = "sudo";
