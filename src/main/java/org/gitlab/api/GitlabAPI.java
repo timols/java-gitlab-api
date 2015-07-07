@@ -126,7 +126,7 @@ public class GitlabAPI {
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
      * @return                     A GitlabUser
-     * @throws IOException         An error
+     * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
      */
     public GitlabUser createUser(String email, String password, String username,
@@ -179,7 +179,7 @@ public class GitlabAPI {
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
      * @return The Updated User
-     * @throws IOException an error
+     * @throws IOException on gitlab api call error
      */
     public GitlabUser updateUser(Integer targetUserId,
                                  String email, String password, String username,
@@ -218,7 +218,7 @@ public class GitlabAPI {
      * @param title        The title of the ssh key
      * @param key          The public key
      * @return The new GitlabSSHKey
-     * @throws IOException an error
+     * @throws IOException on gitlab api call error
      */
     public GitlabSSHKey createSSHKey(Integer targetUserId, String title, String key) throws IOException {
 
@@ -236,7 +236,7 @@ public class GitlabAPI {
      *
      * @param targetUserId The id of the Gitlab user
      * @param targetKeyId  The id of the Gitlab ssh key
-     * @throws IOException an error
+     * @throws IOException on gitlab api call error
      */
     public void deleteSSHKey(Integer targetUserId, Integer targetKeyId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
@@ -249,6 +249,7 @@ public class GitlabAPI {
      *
      * @param targetUserId The id of the GitLab User
      * @return The list of user ssh keys
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabSSHKey> getSSHKeys(Integer targetUserId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL;
@@ -259,7 +260,7 @@ public class GitlabAPI {
      * Delete a user
      *
      * @param targetUserId  The target User ID
-     * @throws IOException an error
+     * @throws IOException on gitlab api call error
      */
     public void deleteUser(Integer targetUserId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId;
@@ -281,6 +282,7 @@ public class GitlabAPI {
      *
      * @param group The GitLab Group
      * @return The Group Members
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabGroupMember> getGroupMembers(GitlabGroup group) throws IOException {
         return getGroupMembers(group.getId());
@@ -291,6 +293,7 @@ public class GitlabAPI {
      *
      * @param groupId The id of the GitLab Group
      * @return The Group Members
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabGroupMember> getGroupMembers(Integer groupId) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabGroupMember.URL;
@@ -304,6 +307,7 @@ public class GitlabAPI {
      *             name will also be used as the path
      *             of the group.
      * @return The GitLab Group
+     * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name) throws IOException {
         return createGroup(name, name);
@@ -315,6 +319,7 @@ public class GitlabAPI {
      * @param name The name of the group
      * @param path The path for the group
      * @return The GitLab Group
+     * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path) throws IOException {
         return createGroup(name, path, null, null);
@@ -328,6 +333,7 @@ public class GitlabAPI {
      * @param ldapCn     LDAP Group Name to sync with, null otherwise
      * @param ldapAccess Access level for LDAP group members, null otherwise
      * @return The GitLab Group
+     * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess) throws IOException {
 
@@ -427,6 +433,7 @@ public class GitlabAPI {
      *
      * @param name The name of the project
      * @return The GitLab Project
+     * @throws IOException on gitlab api call error
      */
     public GitlabProject createProject(String name) throws IOException {
         return createProject(name, null, null, null, null, null, null, null, null, null, null);
@@ -447,6 +454,7 @@ public class GitlabAPI {
      * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
      * @param importUrl            The Import URL for the project, otherwise null
      * @return the Gitlab Project
+     * @throws IOException on gitlab api call error
      */
     public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
         Query query = new Query()
@@ -473,6 +481,7 @@ public class GitlabAPI {
      * @param userId The id of the user to create the project for
      * @param name   The name of the project
      * @return The GitLab Project
+     * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name) throws IOException {
         return createUserProject(userId, name, null, null, null, null, null, null, null, null, null);
@@ -493,6 +502,7 @@ public class GitlabAPI {
      * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
      * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
      * @return The GitLab Project
+     * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel) throws IOException {
         Query query = new Query()
