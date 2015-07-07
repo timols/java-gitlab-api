@@ -21,10 +21,9 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Gitlab HTTP Requestor
- * <p/>
  * Responsible for handling HTTP requests to the Gitlab API
  *
- * @author @timols
+ * @author &#064;timols (Tim O)
  */
 public class GitlabHTTPRequestor {
 
@@ -59,7 +58,6 @@ public class GitlabHTTPRequestor {
 
     /**
      * Sets the HTTP Request method for the request.
-     * <p/>
      * Has a fluent api for method chaining.
      *
      * @param method The HTTP method
@@ -77,7 +75,6 @@ public class GitlabHTTPRequestor {
 
     /**
      * Sets the HTTP Form Post parameters for the request
-     * <p/>
      * Has a fluent api for method chaining
      *
      * @param key       Form parameter Key
@@ -103,6 +100,7 @@ public class GitlabHTTPRequestor {
      * Opens the HTTP(S) connection, submits any data and parses the response.
      * Will throw an error
      *
+     * @param <T>        The return type of the method
      * @param tailAPIUrl The url to open a connection to (after the host and namespace)
      * @param type       The type of the response to be deserialized from
      * @param instance   The instance to update from the response

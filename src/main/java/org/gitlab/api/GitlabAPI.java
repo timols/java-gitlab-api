@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Gitlab API Wrapper class
  *
- * @author @timols
+ * @author &#064;timols (Tim O)
  */
 public class GitlabAPI {
 
