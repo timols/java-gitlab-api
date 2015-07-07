@@ -80,8 +80,8 @@ public class GitlabHTTPRequestor {
      * <p/>
      * Has a fluent api for method chaining
      *
-     * @param key
-     * @param value
+     * @param key       Form parameter Key
+     * @param value     Form parameter Value
      * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
