@@ -2,6 +2,7 @@ package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabUser;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeNoException;
 
+@Ignore
 public class GitlabAPIT {
 
     GitlabAPI api;
