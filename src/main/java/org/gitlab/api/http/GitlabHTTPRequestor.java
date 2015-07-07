@@ -107,7 +107,7 @@ public class GitlabHTTPRequestor {
      * @param type       The type of the response to be deserialized from
      * @param instance   The instance to update from the response
      * @return An object of type T
-     * @throws java.io.IOException
+     * @throws java.io.IOException on gitlab api error
      */
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
         HttpURLConnection connection = setupConnection(root.getAPIUrl(tailAPIUrl));

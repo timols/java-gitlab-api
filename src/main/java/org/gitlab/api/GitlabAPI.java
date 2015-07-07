@@ -125,8 +125,8 @@ public class GitlabAPI {
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
-     * @return A GitlabUser
-     * @throws IOException
+     * @return                     A GitlabUser
+     * @throws IOException         An error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
      */
     public GitlabUser createUser(String email, String password, String username,
@@ -179,7 +179,7 @@ public class GitlabAPI {
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
      * @return The Updated User
-     * @throws IOException
+     * @throws IOException an error
      */
     public GitlabUser updateUser(Integer targetUserId,
                                  String email, String password, String username,
@@ -218,7 +218,7 @@ public class GitlabAPI {
      * @param title        The title of the ssh key
      * @param key          The public key
      * @return The new GitlabSSHKey
-     * @throws IOException
+     * @throws IOException an error
      */
     public GitlabSSHKey createSSHKey(Integer targetUserId, String title, String key) throws IOException {
 
@@ -236,7 +236,7 @@ public class GitlabAPI {
      *
      * @param targetUserId The id of the Gitlab user
      * @param targetKeyId  The id of the Gitlab ssh key
-     * @throws IOException
+     * @throws IOException an error
      */
     public void deleteSSHKey(Integer targetUserId, Integer targetKeyId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
@@ -259,7 +259,7 @@ public class GitlabAPI {
      * Delete a user
      *
      * @param targetUserId  The target User ID
-     * @throws IOException
+     * @throws IOException an error
      */
     public void deleteUser(Integer targetUserId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId;
@@ -558,7 +558,7 @@ public class GitlabAPI {
      * @param mergeRequestId    Merge Request ID
      * @param mergeCommitMessage optional merge commit message. Null if not set
      * @return new merge request status
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId + "/merge";
@@ -852,7 +852,7 @@ public class GitlabAPI {
      *
      * @param namespace The namespace
      * @return  A list of Gitlab Project members
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProjectMember> getNamespaceMembers(GitlabNamespace namespace) throws IOException {
         return getNamespaceMembers(namespace.getId());
@@ -863,7 +863,7 @@ public class GitlabAPI {
      *
      * @param namespaceId Namespace ID
      * @return  A list of Gitlab Project members
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
         String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
