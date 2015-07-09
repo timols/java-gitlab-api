@@ -34,6 +34,7 @@ public class Query {
      *
      * @param name  Parameter name
      * @param value Parameter value
+     * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
     public Query append(final String name, final String value) throws UnsupportedEncodingException {
@@ -47,6 +48,7 @@ public class Query {
      *
      * @param name  Parameter name
      * @param value Parameter value
+     * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
     public Query appendIf(final String name, final String value) throws UnsupportedEncodingException {
@@ -62,6 +64,7 @@ public class Query {
      *
      * @param name  Parameter name
      * @param value Parameter value
+     * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
     public Query appendIf(final String name, final Integer value) throws UnsupportedEncodingException {
@@ -77,6 +80,7 @@ public class Query {
      *
      * @param name  Parameter name
      * @param value Parameter value
+     * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
     public Query appendIf(final String name, final Boolean value) throws UnsupportedEncodingException {
@@ -92,6 +96,7 @@ public class Query {
      *
      * @param name  Parameter name
      * @param value Parameter value
+     * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
     public Query appendIf(final String name, final GitlabAccessLevel value) throws UnsupportedEncodingException {

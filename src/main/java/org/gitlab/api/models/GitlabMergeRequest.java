@@ -1,8 +1,8 @@
 package org.gitlab.api.models;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
@@ -35,7 +35,7 @@ public class GitlabMergeRequest {
     @JsonProperty("source_project_id")
     private Integer sourceProjectId;
 
-    @JsonProperty("target_projectId")
+    @JsonProperty("target_project_id")
     private Integer targetProjectId;
 
     @JsonProperty("milestone_id")

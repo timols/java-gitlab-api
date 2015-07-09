@@ -1,6 +1,6 @@
 package org.gitlab.api.models;
 
-import org.codehaus.jackson.annotate.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum GitlabAccessLevel {
     Guest(10),

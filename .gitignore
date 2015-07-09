@@ -8,3 +8,6 @@ target/*
 /bin/
 /target/
 target
+.classpath
+.project
+.settings
