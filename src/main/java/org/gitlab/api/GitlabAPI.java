@@ -212,6 +212,32 @@ public class GitlabAPI {
     }
 
     /**
+     * Block a user
+     *
+     * @param targetUserId The id of the Gitlab user
+     * @throws IOException on gitlab api call error
+     */
+    public void blockUser(Integer targetUserId) throws IOException {
+
+        String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.BLOCK_URL;
+
+        retrieve().method("PUT").to(tailUrl, Void.class);
+    }
+
+    /**
+     * Unblock a user
+     *
+     * @param targetUserId The id of the Gitlab user
+     * @throws IOException on gitlab api call error
+     */
+    public void unblockUser(Integer targetUserId) throws IOException {
+
+        String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.UNBLOCK_URL;
+
+        retrieve().method("PUT").to(tailUrl, Void.class);
+    }
+
+    /**
      * Create a new ssh key for the user
      *
      * @param targetUserId The id of the Gitlab user
@@ -520,6 +546,39 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/user/" + userId + query.toString();
 
         return dispatch().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
+     * Updates a Project
+     *
+     * @param projectId            The id of the project to update
+     * @param name                 The name of the project
+     * @param description          A description for the project, null otherwise
+     * @param issuesEnabled        Whether Issues should be enabled, otherwise null indicates to use GitLab default
+     * @param wallEnabled          Whether The Wall should be enabled, otherwise null indicates to use GitLab default
+     * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
+     * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
+     * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
+     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
+     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @return the Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject updateProject(Integer projectId, String name, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel) throws IOException {
+        Query query = new Query()
+                .appendIf("name", name)
+                .appendIf("description", description)
+                .appendIf("issues_enabled", issuesEnabled)
+                .appendIf("wall_enabled", wallEnabled)
+                .appendIf("merge_requests_enabled", mergeRequestsEnabled)
+                .appendIf("wiki_enabled", wikiEnabled)
+                .appendIf("snippets_enabled", snippetsEnabled)
+                .appendIf("public", publik)
+                .appendIf("visibility_level", visibilityLevel);
+
+        String tailUrl = GitlabProject.URL + "/" + projectId + query.toString();
+
+        return retrieve().method("PUT").to(tailUrl, GitlabProject.class);
     }
 
     /**
@@ -878,6 +937,18 @@ public class GitlabAPI {
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
         String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    }
+
+    /**
+     * Transfer a project to the given namespace
+     *
+     * @param namespaceId Namespace ID
+     * @param projectId   Project ID
+     * @throws IOException on gitlab api call error
+     */
+    public void transfer(Integer namespaceId, Integer projectId) throws IOException {
+        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
+        dispatch().to(tailUrl, Void.class);
     }
 
     public GitlabSession getCurrentSession() throws IOException {

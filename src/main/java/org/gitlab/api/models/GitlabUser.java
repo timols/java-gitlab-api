@@ -8,6 +8,8 @@ public class GitlabUser {
     public static String URL = "/users";
     public static String USERS_URL = "/users";
     public static String USER_URL = "/user"; // for sudo based ops
+    public static String BLOCK_URL = "/block";
+    public static String UNBLOCK_URL = "/unblock";
 
     private Integer _id;
     private String _username;
