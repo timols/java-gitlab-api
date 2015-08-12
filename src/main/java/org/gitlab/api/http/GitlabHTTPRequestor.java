@@ -108,23 +108,30 @@ public class GitlabHTTPRequestor {
      * @throws java.io.IOException on gitlab api error
      */
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
-        HttpURLConnection connection = setupConnection(root.getAPIUrl(tailAPIUrl));
-
-        if (hasOutput()) {
-            submitData(connection);
-        } else if ("PUT".equals(method)) {
-            // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
-            connection.setDoOutput(true);
-            connection.setFixedLengthStreamingMode(0);
-        }
-
+        HttpURLConnection connection = null;
         try {
-            return parse(connection, type, instance);
-        } catch (IOException e) {
-            handleAPIError(e, connection);
-        }
+            connection = setupConnection(root.getAPIUrl(tailAPIUrl));
 
-        return null;
+            if (hasOutput()) {
+                 submitData(connection);
+            } else if ("PUT".equals(method)) {
+                // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
+                connection.setDoOutput(true);
+                connection.setFixedLengthStreamingMode(0);
+            }
+
+            try {
+                return parse(connection, type, instance);
+            } catch (IOException e) {
+                handleAPIError(e, connection);
+            }
+
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
     public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
