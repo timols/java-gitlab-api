@@ -124,7 +124,7 @@ public class GitlabAPI {
      * @param bio                  Bio
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
-     * @param skip_confirmation    Skip Confirmation
+     * @param confirm              Require confirmation
      * @return                     A GitlabUser
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
@@ -134,11 +134,11 @@ public class GitlabAPI {
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
                                  String bio, Boolean isAdmin, Boolean can_create_group,
-                                 Boolean skip_confirmation) throws IOException {
+                                 Boolean confirm) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
-                .appendIf("skip_confirmation", skip_confirmation)
+                .appendIf("confirm", confirm)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
@@ -177,7 +177,7 @@ public class GitlabAPI {
      * @param bio                  Bio
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
-     * @param skip_confirmation    Skip Confirmation
+     * @param confirm              Require confirmation
      * @return The Updated User
      * @throws IOException on gitlab api call error
      */
@@ -187,11 +187,11 @@ public class GitlabAPI {
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
                                  String bio, Boolean isAdmin, Boolean can_create_group,
-                                 Boolean skip_confirmation) throws IOException {
+                                 Boolean confirm) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
-                .appendIf("skip_confirmation", skip_confirmation)
+                .appendIf("confirm", confirm)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
