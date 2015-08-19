@@ -951,6 +951,49 @@ public class GitlabAPI {
         dispatch().to(tailUrl, Void.class);
     }
 
+    /**
+     * Create a new deploy key for the project
+     *
+     * @param targetProjectId The id of the Gitlab project
+     * @param title        The title of the ssh key
+     * @param key          The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey createDeployKey(Integer targetProjectId, String title, String key) throws IOException {
+        Query query = new Query()
+                .append("title", title)
+                .append("key", key);
+
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabSSHKey.class);
+    }
+
+    /**
+     * Delete a deploy key for a project
+     *
+     * @param targetProjectId The id of the Gitlab project
+     * @param targetKeyId  The id of the Gitlab ssh key
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteDeployKey(Integer targetProjectId, Integer targetKeyId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+    /**
+     * Gets all deploy keys for a project
+     *
+     * @param targetProjectId The id of the Gitlab project
+     * @return The list of project deploy keys
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabSSHKey> getDeployKeys(Integer targetProjectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabSSHKey[].class));
+    }
+
     public GitlabSession getCurrentSession() throws IOException {
         String tailUrl = "/user";
         return retrieve().to(tailUrl, GitlabSession.class);
