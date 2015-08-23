@@ -89,7 +89,7 @@ public class GitlabAPIT {
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
                 gitUser.getName(), "newSkypeId", gitUser.getLinkedin(), gitUser.getTwitter(), gitUser.getWebsiteUrl(),
                 10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
-                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup(), false);
+                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
 
 
         GitlabUser postUpdate = api.getUserViaSudo(gitUser.getUsername());

@@ -177,7 +177,6 @@ public class GitlabAPI {
      * @param bio                  Bio
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
-     * @param skip_confirmation    Skip Confirmation
      * @return The Updated User
      * @throws IOException on gitlab api call error
      */
