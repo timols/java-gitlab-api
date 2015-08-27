@@ -285,8 +285,10 @@ public class GitlabHTTPRequestor {
         InputStreamReader reader = null;
         try {
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
+            if (byte[].class == type) {
+            	return type.cast(IOUtils.toByteArray(reader));
+            }
             String data = IOUtils.toString(reader);
-
             if (type != null) {
                 return GitlabAPI.MAPPER.readValue(data, type);
             } else if (instance != null) {

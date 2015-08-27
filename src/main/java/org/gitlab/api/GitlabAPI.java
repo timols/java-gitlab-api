@@ -690,6 +690,63 @@ public class GitlabAPI {
         GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
         return Arrays.asList(diffs);
     }
+    
+    /**
+     * Get raw file content
+     *
+     * @param project Project
+     * @param sha   The commit or branch name
+     * @param filepath   The path the file
+     * @throws IOException 
+     */
+	public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + "?filepath=" + filepath;
+        return retrieve().to(tailUrl, byte[].class);
+	}
+	
+    
+    /**
+     * Get the raw file contents for a blob by blob SHA.
+     *
+     * @param project Project
+     * @param sha   The commit or branch name
+     * @throws IOException 
+     */
+	public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
+        return retrieve().to(tailUrl, byte[].class);
+	}
+	
+    /**
+     * Get an archive of the repository
+     *
+     * @param project Project
+     * @throws IOException 
+     */
+	public byte[] getFileArchive(GitlabProject project) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/archive";
+        return retrieve().to(tailUrl, byte[].class);
+	}
+	
+    /**
+     * Get an archive of the repository
+     *
+     * @param project Project
+     * @param path The path inside repository. Used to get contend of subdirectories (optional)
+     * @param ref_name The name of a repository branch or tag or if not given the default branch (optional)
+     * @throws IOException 
+     */
+	public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL;
+        if (path != null) {
+        	tailUrl = tailUrl + (tailUrl.indexOf('?') > 0 ? '&' : '?') + "path=" + path;
+        }
+        if (ref_name != null) {
+        	tailUrl = tailUrl + (tailUrl.indexOf('?') > 0 ? '&' : '?') + "ref_name=" + ref_name;
+        }
+        GitlabRepositoryTree[] tree = retrieve().to(tailUrl, GitlabRepositoryTree[].class);
+        return Arrays.asList(tree);
+	}
 
     public GitlabNote createNote(GitlabMergeRequest mergeRequest, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
