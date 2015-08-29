@@ -280,6 +280,18 @@ public class GitlabAPI {
     }
 
     /**
+     * Get key with user information by ID of an SSH key.
+     *
+     * @param keyId The ID of an SSH key
+     * @return The SSH key with user information
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey getSSHKey(Integer keyId) throws IOException {
+        String tailUrl = GitlabSSHKey.KEYS_URL + "/" + keyId;
+        return retrieve().to(tailUrl, GitlabSSHKey.class);
+    }
+
+    /**
      * Delete a user
      *
      * @param targetUserId  The target User ID
