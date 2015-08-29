@@ -30,22 +30,28 @@ public class GitlabAPI {
     private final String hostUrl;
 
     private final String apiToken;
+    private final TokenType tokenType;
     private boolean ignoreCertificateErrors = false;
 
-    private GitlabAPI(String hostUrl, String apiToken) {
+    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType) {
         this.hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
         this.apiToken = apiToken;
+        this.tokenType = tokenType;
     }
 
     public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
         String tailUrl = GitlabSession.URL;
-        GitlabAPI api = connect(hostUrl, null);
+        GitlabAPI api = connect(hostUrl, null, (TokenType) null);
         return api.dispatch().with("login", username).with("password", password)
                 .to(tailUrl, GitlabSession.class);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken) {
-        return new GitlabAPI(hostUrl, apiToken);
+        return new GitlabAPI(hostUrl, apiToken, TokenType.PRIVATE_TOKEN);
+    }
+
+    public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType) {
+        return new GitlabAPI(hostUrl, apiToken, tokenType);
     }
 
     public GitlabAPI ignoreCertificateErrors(boolean ignoreCertificateErrors) {
@@ -67,7 +73,7 @@ public class GitlabAPI {
 
     public URL getAPIUrl(String tailAPIUrl) throws IOException {
         if (apiToken != null) {
-            tailAPIUrl = tailAPIUrl + (tailAPIUrl.indexOf('?') > 0 ? '&' : '?') + "private_token=" + apiToken;
+            tailAPIUrl = tailAPIUrl + (tailAPIUrl.indexOf('?') > 0 ? '&' : '?') + tokenType.getTokenParamName() + "=" + apiToken;
         }
 
         if (!tailAPIUrl.startsWith("/")) {
