@@ -1,0 +1,10 @@
+language: java
+sudo: false
+jdk:
+- oraclejdk7
+install:
+- ./gradlew assemble
+script:
+- ./gradlew check
+before_deploy:
+- ./gradlew deployZip
