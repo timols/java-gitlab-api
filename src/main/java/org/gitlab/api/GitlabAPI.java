@@ -711,56 +711,56 @@ public class GitlabAPI {
     /**
      * Get raw file content
      *
-     * @param project Project
+     * @param project The Project
      * @param sha   The commit or branch name
-     * @param filepath   The path the file
-     * @throws IOException
+     * @param filepath   The path of the file
+     * @throws IOException on gitlab api call error
      */
-	public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + "?filepath=" + filepath;
-        return retrieve().to(tailUrl, byte[].class);
-	}
+    public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
+        Query query = new Query()
+                .append("filepath", filepath);
 
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + query.toString();
+        return retrieve().to(tailUrl, byte[].class);
+    }
 
     /**
      * Get the raw file contents for a blob by blob SHA.
      *
-     * @param project Project
+     * @param project The Project
      * @param sha   The commit or branch name
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
-	public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
+    public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
         return retrieve().to(tailUrl, byte[].class);
-	}
+    }
 
     /**
      * Get an archive of the repository
      *
-     * @param project Project
-     * @throws IOException
+     * @param project The Project
+     * @throws IOException on gitlab api call error
      */
-	public byte[] getFileArchive(GitlabProject project) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/archive";
+    public byte[] getFileArchive(GitlabProject project) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/archive";
         return retrieve().to(tailUrl, byte[].class);
-	}
+    }
 
     /**
      * Get an archive of the repository
      *
-     * @param project Project
-     * @param path The path inside repository. Used to get contend of subdirectories (optional)
+     * @param project The Project
+     * @param path The path inside the repository. Used to get content of subdirectories (optional)
      * @param ref_name The name of a repository branch or tag or if not given the default branch (optional)
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
-	public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL;
-        if (path != null) {
-        	tailUrl = tailUrl + (tailUrl.indexOf('?') > 0 ? '&' : '?') + "path=" + path;
-        }
-        if (ref_name != null) {
-        	tailUrl = tailUrl + (tailUrl.indexOf('?') > 0 ? '&' : '?') + "ref_name=" + ref_name;
-        }
+    public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name) throws IOException {
+        Query query = new Query()
+                .appendIf("path", path)
+                .appendIf("ref_name", ref_name);
+
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL + query.toString();
         GitlabRepositoryTree[] tree = retrieve().to(tailUrl, GitlabRepositoryTree[].class);
         return Arrays.asList(tree);
 	}
