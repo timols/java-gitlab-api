@@ -7,6 +7,7 @@ public class GitlabSSHKey {
     private Integer _id;
     private String _title;
     private String _key;
+    private GitlabUser _user;
 
     public Integer getId() {
         return _id;
@@ -30,5 +31,13 @@ public class GitlabSSHKey {
 
     public void setKey(String key) {
         _key = key;
+    }
+
+    public GitlabUser getUser() {
+        return _user;
+    }
+
+    public void setUser(GitlabUser user) {
+        _user = user;
     }
 }
