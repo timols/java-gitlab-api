@@ -701,51 +701,51 @@ public class GitlabAPI {
         GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
         return Arrays.asList(diffs);
     }
-    
+
     /**
      * Get raw file content
      *
      * @param project Project
      * @param sha   The commit or branch name
      * @param filepath   The path the file
-     * @throws IOException 
+     * @throws IOException
      */
 	public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + "?filepath=" + filepath;
         return retrieve().to(tailUrl, byte[].class);
 	}
-	
-    
+
+
     /**
      * Get the raw file contents for a blob by blob SHA.
      *
      * @param project Project
      * @param sha   The commit or branch name
-     * @throws IOException 
+     * @throws IOException
      */
 	public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
         return retrieve().to(tailUrl, byte[].class);
 	}
-	
+
     /**
      * Get an archive of the repository
      *
      * @param project Project
-     * @throws IOException 
+     * @throws IOException
      */
 	public byte[] getFileArchive(GitlabProject project) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/archive";
         return retrieve().to(tailUrl, byte[].class);
 	}
-	
+
     /**
      * Get an archive of the repository
      *
      * @param project Project
      * @param path The path inside repository. Used to get contend of subdirectories (optional)
      * @param ref_name The name of a repository branch or tag or if not given the default branch (optional)
-     * @throws IOException 
+     * @throws IOException
      */
 	public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL;
@@ -1063,6 +1063,48 @@ public class GitlabAPI {
     public GitlabSession getCurrentSession() throws IOException {
         String tailUrl = "/user";
         return retrieve().to(tailUrl, GitlabSession.class);
+    }
+
+    /**
+     * Get list of system hooks
+     *
+     * @return The system hooks list
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabSystemHook> getSystemHooks() throws IOException {
+        String tailUrl = GitlabSystemHook.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabSystemHook[].class));
+    }
+
+    /**
+     * Add new system hook hook
+     *
+     * @param url System hook url
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSystemHook addSystemHook(String url) throws IOException {
+        String tailUrl = GitlabSystemHook.URL;
+        return dispatch().with("url", url).to(tailUrl, GitlabSystemHook.class);
+    }
+
+    /**
+     * Test system hook
+     *
+     * @throws IOException on gitlab api call error
+     */
+    public void testSystemHook(Integer hookId) throws IOException {
+        String tailUrl = GitlabSystemHook.URL + "/" + hookId;
+        retrieve().to(tailUrl, Void.class);
+    }
+
+    /**
+     * Delete system hook
+     *
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSystemHook deleteSystemHook(Integer hookId) throws IOException {
+        String tailUrl = GitlabSystemHook.URL + "/" + hookId;
+        return retrieve().method("DELETE").to(tailUrl, GitlabSystemHook.class);
     }
 
     private String sanitizeProjectId(Serializable projectId) {
