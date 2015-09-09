@@ -1,6 +1,7 @@
 package org.gitlab.api.http;
 
 import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.TokenType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
