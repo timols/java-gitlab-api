@@ -825,7 +825,7 @@ public class GitlabAPI {
         return dispatch().to(tailUrl, GitlabProjectHook.class);
     }
 
-    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents) throws IOException {
+    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean sslVerification) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
         return dispatch()
@@ -833,6 +833,7 @@ public class GitlabAPI {
                 .with("push_events", pushEvents ? "true" : "false")
                 .with("issues_events", issuesEvents ? "true" : "false")
                 .with("merge_requests_events", mergeRequestEvents ? "true" : "false")
+                .with("enable_ssl_verification", sslVerification ? "true" : "false")
                 .to(tailUrl, GitlabProjectHook.class);
     }
 

@@ -24,6 +24,9 @@ public class GitlabProjectHook {
     @JsonProperty("created_at")
     private Date createdAt;
 
+    @JsonProperty("enable_ssl_verification")
+    private boolean sslVerificationEnabled;
+
     public String getId() {
         return id;
     }
@@ -79,4 +82,13 @@ public class GitlabProjectHook {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
+    public boolean isSslVerificationEnabled() {
+        return sslVerificationEnabled;
+    }
+
+    public void setSslVerificationEnabled(boolean sslVerificationEnabled) {
+        this.sslVerificationEnabled = sslVerificationEnabled;
+    }
+
 }
