@@ -10,7 +10,6 @@ public class GitlabProjectAccessLevel {
     @JsonProperty("notification_level")
     private int notificationLevel;
 
-
     public GitlabAccessLevel getAccessLevel() {
         return GitlabAccessLevel.fromAccessValue(accessLevel);
     }
@@ -19,7 +18,6 @@ public class GitlabProjectAccessLevel {
         this.accessLevel = accessLevel.accessValue;
     }
 
-
     public int getNoficationLevel() {
         return notificationLevel;
     }
@@ -27,6 +25,5 @@ public class GitlabProjectAccessLevel {
     public void setNoficationLevel(int notificationLevel) {
         this.accessLevel = notificationLevel;
     }
-
 
 }

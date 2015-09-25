@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Models the Query
- * aspect of a URL
+ * Models the Query aspect of a URL
  */
 public class Query {
 
     private class Tuple<T1, T2> {
+
         T1 _1;
         T2 _2;
 
@@ -24,18 +24,19 @@ public class Query {
     }
 
     /**
-     * The type of params is:
-     * Tuple<name, Tuple<value, URLEncoder.encode(value, "UTF-8")>>
+     * The type of params is: Tuple<name,
+     * Tuple<value, URLEncoder.encode(value, "UTF-8")>>
      */
     private final List<Tuple<String, Tuple<String, String>>> params = new ArrayList<Tuple<String, Tuple<String, String>>>();
 
     /**
      * Appends a parameter to the query
      *
-     * @param name  Parameter name
+     * @param name Parameter name
      * @param value Parameter value
      * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
+     * @throws java.io.UnsupportedEncodingException If the provided value cannot
+     * be URL Encoded
      */
     public Query append(final String name, final String value) throws UnsupportedEncodingException {
         params.add(new Tuple<String, Tuple<String, String>>(name, new Tuple<String, String>(value, URLEncoder.encode(value, "UTF-8"))));
@@ -43,13 +44,14 @@ public class Query {
     }
 
     /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
+     * Conditionally append a parameter to the query if the value of the
+     * parameter is not null
      *
-     * @param name  Parameter name
+     * @param name Parameter name
      * @param value Parameter value
      * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
+     * @throws java.io.UnsupportedEncodingException If the provided value cannot
+     * be URL Encoded
      */
     public Query appendIf(final String name, final String value) throws UnsupportedEncodingException {
         if (value != null) {
@@ -59,13 +61,14 @@ public class Query {
     }
 
     /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
+     * Conditionally append a parameter to the query if the value of the
+     * parameter is not null
      *
-     * @param name  Parameter name
+     * @param name Parameter name
      * @param value Parameter value
      * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
+     * @throws java.io.UnsupportedEncodingException If the provided value cannot
+     * be URL Encoded
      */
     public Query appendIf(final String name, final Integer value) throws UnsupportedEncodingException {
         if (value != null) {
@@ -75,13 +78,14 @@ public class Query {
     }
 
     /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
+     * Conditionally append a parameter to the query if the value of the
+     * parameter is not null
      *
-     * @param name  Parameter name
+     * @param name Parameter name
      * @param value Parameter value
      * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
+     * @throws java.io.UnsupportedEncodingException If the provided value cannot
+     * be URL Encoded
      */
     public Query appendIf(final String name, final Boolean value) throws UnsupportedEncodingException {
         if (value != null) {
@@ -91,13 +95,14 @@ public class Query {
     }
 
     /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
+     * Conditionally append a parameter to the query if the value of the
+     * parameter is not null
      *
-     * @param name  Parameter name
+     * @param name Parameter name
      * @param value Parameter value
      * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
+     * @throws java.io.UnsupportedEncodingException If the provided value cannot
+     * be URL Encoded
      */
     public Query appendIf(final String name, final GitlabAccessLevel value) throws UnsupportedEncodingException {
         if (value != null) {
@@ -107,8 +112,7 @@ public class Query {
     }
 
     /**
-     * Returns a Query suitable for appending
-     * to a URI
+     * Returns a Query suitable for appending to a URI
      */
     @Override
     public String toString() {

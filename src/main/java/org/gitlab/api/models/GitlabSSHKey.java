@@ -1,7 +1,7 @@
 package org.gitlab.api.models;
 
-
 public class GitlabSSHKey {
+
     public static String KEYS_URL = "/keys";
 
     private Integer _id;

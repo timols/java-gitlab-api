@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabBranchCommit {
+
     public static String URL = "/users";
 
     private String id;

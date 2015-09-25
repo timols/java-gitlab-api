@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabMergeRequest {
+
     public static final String URL = "/merge_requests";
 
     private Integer id;

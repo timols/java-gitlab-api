@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Gitlab HTTP Requestor
- * Responsible for handling HTTP requests to the Gitlab API
+ * Gitlab HTTP Requestor Responsible for handling HTTP requests to the Gitlab
+ * API
  *
  * @author &#064;timols (Tim O)
  */
@@ -57,8 +57,8 @@ public class GitlabHTTPRequestor {
     }
 
     /**
-     * Sets the HTTP Request method for the request.
-     * Has a fluent api for method chaining.
+     * Sets the HTTP Request method for the request. Has a fluent api for method
+     * chaining.
      *
      * @param method The HTTP method
      * @return this
@@ -74,11 +74,11 @@ public class GitlabHTTPRequestor {
     }
 
     /**
-     * Sets the HTTP Form Post parameters for the request
-     * Has a fluent api for method chaining
+     * Sets the HTTP Form Post parameters for the request Has a fluent api for
+     * method chaining
      *
-     * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param key Form parameter Key
+     * @param value Form parameter Value
      * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
@@ -100,10 +100,11 @@ public class GitlabHTTPRequestor {
      * Opens the HTTP(S) connection, submits any data and parses the response.
      * Will throw an error
      *
-     * @param <T>        The return type of the method
-     * @param tailAPIUrl The url to open a connection to (after the host and namespace)
-     * @param type       The type of the response to be deserialized from
-     * @param instance   The instance to update from the response
+     * @param <T> The return type of the method
+     * @param tailAPIUrl The url to open a connection to (after the host and
+     * namespace)
+     * @param type The type of the response to be deserialized from
+     * @param instance The instance to update from the response
      * @return An object of type T
      * @throws java.io.IOException on gitlab api error
      */
@@ -113,7 +114,7 @@ public class GitlabHTTPRequestor {
             connection = setupConnection(root.getAPIUrl(tailAPIUrl));
 
             if (hasOutput()) {
-                 submitData(connection);
+                submitData(connection);
             } else if ("PUT".equals(method)) {
                 // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
                 connection.setDoOutput(true);
@@ -231,17 +232,15 @@ public class GitlabHTTPRequestor {
                 if (matcher.find()) {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
                     this.url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
+                } else if (GitlabCommit[].class == type) {
+                    // there is a bug in the Gitlab CE API
+                    // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
+                    // that starts pagination with page=0 for commits
+                    this.url = new URL(url + "&page=1");
                 } else {
-                    if (GitlabCommit[].class == type) {
-                        // there is a bug in the Gitlab CE API
-                        // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
-                        // that starts pagination with page=0 for commits
-                        this.url = new URL(url + "&page=1");
-                    } else {
-                        // Since the page query was not present, its safe to assume that we just
-                        // currently used the first page, so we can default to page 2
-                        this.url = new URL(url + "&page=2");
-                    }
+                    // Since the page query was not present, its safe to assume that we just
+                    // currently used the first page, so we can default to page 2
+                    this.url = new URL(url + "&page=2");
                 }
             }
         };
@@ -286,7 +285,7 @@ public class GitlabHTTPRequestor {
         try {
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             if (byte[].class == type) {
-            	return type.cast(IOUtils.toByteArray(reader));
+                return type.cast(IOUtils.toByteArray(reader));
             }
             String data = IOUtils.toString(reader);
             if (type != null) {
@@ -334,19 +333,19 @@ public class GitlabHTTPRequestor {
 
     private void ignoreCertificateErrors() {
         TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
+            new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
                 }
+
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
         };
         // Added per https://github.com/timols/java-gitlab-api/issues/44
         HostnameVerifier nullVerifier = new HostnameVerifier() {
