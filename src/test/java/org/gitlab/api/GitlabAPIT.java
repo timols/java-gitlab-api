@@ -24,6 +24,7 @@ public class GitlabAPIT {
 
     String rand = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
 
+
     @Before
     public void setup() throws IOException {
         api = GitlabAPI.connect(TEST_URL, TEST_TOKEN);
@@ -61,6 +62,7 @@ public class GitlabAPIT {
 
         String password = randVal("$%password");
 
+
         GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
                 password,
                 randVal("userName"),
@@ -89,10 +91,13 @@ public class GitlabAPIT {
                 10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
                 gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
 
+
         GitlabUser postUpdate = api.getUserViaSudo(gitUser.getUsername());
+
 
         assertNotNull(postUpdate);
         assertEquals(postUpdate.getSkype(), "newSkypeId");
+
 
         api.deleteUser(postUpdate.getId());
 
@@ -103,6 +108,7 @@ public class GitlabAPIT {
         } catch (FileNotFoundException thisIsSoOddForAnRESTApiClient) {
             assertTrue(true); // expected
         }
+
 
     }
 

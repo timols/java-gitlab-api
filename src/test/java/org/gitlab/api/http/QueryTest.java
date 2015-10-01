@@ -32,6 +32,7 @@ public class QueryTest {
         Query query = new Query()
                 .append("p1", "v1");
 
+
         query.append("p2", "v2");
 
         query = query.append("p3", "v3");

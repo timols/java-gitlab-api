@@ -5,7 +5,6 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabUser {
-
     public static String URL = "/users";
     public static String USERS_URL = "/users";
     public static String USER_URL = "/user"; // for sudo based ops

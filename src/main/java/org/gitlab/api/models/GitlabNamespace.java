@@ -5,7 +5,6 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabNamespace {
-
     public static final String URL = "/groups";
 
     private Integer id;

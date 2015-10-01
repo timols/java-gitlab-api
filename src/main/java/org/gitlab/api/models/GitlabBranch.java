@@ -3,7 +3,6 @@ package org.gitlab.api.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabBranch {
-
     public final static String URL = "/repository/branches/";
 
     @JsonProperty("name")
