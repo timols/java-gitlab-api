@@ -708,6 +708,27 @@ public class GitlabAPI {
         return Arrays.asList(diffs);
     }
 
+    // List commit statuses for a project ID and commit hash
+    // GET /projects/:id/repository/commits/:sha/statuses
+    public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabCommit.URL + "/" + commitHash + GitlabCommitStatus.URL;
+        GitlabCommitStatus[] statuses = retrieve().to(tailUrl, GitlabCommitStatus[].class);
+        return Arrays.asList(statuses);
+    }
+
+    // Submit new commit statuses for a project ID and commit hash
+    // GET /projects/:id/statuses/:sha
+    public GitlabCommitStatus createCommitStatus(GitlabProject project, String commitHash, String state, String ref, String name, String targetUrl, String description) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabCommitStatus.URL + "/" + commitHash;
+        return dispatch()
+                .with("state", state)
+                .with("ref", ref)
+                .with("name", name)
+                .with("target_url", targetUrl)
+                .with("description", description)
+                .to(tailUrl, GitlabCommitStatus.class);
+    }
+
     /**
      * Get raw file content
      *
