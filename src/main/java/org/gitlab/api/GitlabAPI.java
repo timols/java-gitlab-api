@@ -103,6 +103,14 @@ public class GitlabAPI {
         return Arrays.asList(users);
     }
 
+    /**
+     * Return API User
+     */
+    public GitlabUser getUser() throws IOException {
+        String tailUrl = GitlabUser.USER_URL;
+        return retrieve().to(tailUrl, GitlabUser.class);
+    }
+
     public GitlabUser getUser(Integer userId) throws IOException {
         String tailUrl = GitlabUser.URL + "/" + userId;
         return retrieve().to(tailUrl, GitlabUser.class);
