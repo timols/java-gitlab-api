@@ -1,6 +1,7 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -66,6 +67,21 @@ public class GitlabProject {
 
     @JsonProperty("permissions")
     private GitlabPermission permissions;
+
+    @JsonProperty("avatar_url")
+    private String avatarUrl;
+
+    @JsonProperty("creator_id")
+    private Integer creatorId;
+
+    @JsonProperty("star_count")
+    private Integer starCount;
+
+    @JsonProperty("forks_count")
+    private Integer forksCount;
+
+    @JsonProperty("tag_list")
+    private List<String> tagList;
 
     public Integer getId() {
         return id;
@@ -249,5 +265,45 @@ public class GitlabProject {
 
     public void setPermissions(GitlabPermission permissions) {
         this.permissions = permissions;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public Integer getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Integer creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public Integer getStarCount() {
+        return starCount;
+    }
+
+    public void setStarCount(Integer starCount) {
+        this.starCount = starCount;
+    }
+
+    public Integer getForksCount() {
+        return forksCount;
+    }
+
+    public void setForksCount(Integer forksCount) {
+        this.forksCount = forksCount;
+    }
+
+    public List<String> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(List<String> tagList) {
+        this.tagList = tagList;
     }
 }
