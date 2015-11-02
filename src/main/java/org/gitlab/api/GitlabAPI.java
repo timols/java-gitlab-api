@@ -794,6 +794,25 @@ public class GitlabAPI {
         return Arrays.asList(tree);
 	}
 
+    /**
+     * Update a Merge Request Note
+     *
+     * @param mergeRequest         The merge request
+     * @param noteId               The id of the note
+     * @param body                 The content of the note
+     * @return the Gitlab Note
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabNote updateNote(GitlabMergeRequest mergeRequest, Integer noteId, String body) throws IOException {
+        Query query = new Query()
+                .appendIf("body", body);
+
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getId() + GitlabNote.URL + "/" + noteId + query.toString();
+
+        return retrieve().method("PUT").to(tailUrl, GitlabNote.class);
+    }
+
     public GitlabNote createNote(GitlabMergeRequest mergeRequest, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() + GitlabNote.URL;
