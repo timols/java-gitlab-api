@@ -12,6 +12,9 @@ public class GitlabNote {
     private String body;
     private String attachment;
     private GitlabUser author;
+    private boolean system;
+    private boolean upvote;
+    private boolean downvote;
 
     @JsonProperty("created_at")
     private Date createdAt;
@@ -54,5 +57,29 @@ public class GitlabNote {
 
     public void setAttachment(String attachment) {
         this.attachment = attachment;
+    }
+
+    public boolean isSystem() {
+        return system;
+    }
+
+    public void setSystem(boolean system) {
+        this.system = system;
+    }
+
+    public boolean isUpvote() {
+        return upvote;
+    }
+
+    public void setUpvote(boolean upvote) {
+        this.upvote = upvote;
+    }
+
+    public boolean isDownvote() {
+        return downvote;
+    }
+
+    public void setDownvote(boolean downvote) {
+        this.downvote = downvote;
     }
 }
