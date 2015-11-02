@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeNoException;
 
 @Ignore
-public class GitlabAPIT {
+public class GitlabAPITest {
 
     GitlabAPI api;
 
