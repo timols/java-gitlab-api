@@ -1,6 +1,7 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,6 +20,7 @@ public class GitlabMergeRequest {
     private GitlabMilestone milestone;
 
     private String[] labels;
+    private List<GitlabCommitDiff> changes;
 
     private int upvotes;
     private int downvotes;
@@ -223,5 +225,13 @@ public class GitlabMergeRequest {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<GitlabCommitDiff> getChanges() {
+        return changes;
+    }
+
+    public void setChanges(List<GitlabCommitDiff> changes) {
+        this.changes = changes;
     }
 }

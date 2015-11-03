@@ -660,6 +660,19 @@ public class GitlabAPI {
         return ls.get(0);
     }
 
+    /**
+     * Return a Merge Request including its changes.
+     *
+     * @param projectId       The id of the project
+     * @param mergeRequestId  The id of the merge request
+     * @return the Gitlab Merge Request
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabMergeRequest getMergeRequestChanges(Serializable projectId, Integer mergeRequestId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_request/" + mergeRequestId + "/changes";
+        return retrieve().to(tailUrl, GitlabMergeRequest.class);
+    }
+
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
