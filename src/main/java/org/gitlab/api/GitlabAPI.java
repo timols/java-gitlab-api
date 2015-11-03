@@ -692,6 +692,22 @@ public class GitlabAPI {
         return requestor.to(tailUrl, GitlabMergeRequest.class);
     }
 
+    /**
+     * Get a Note from a Merge Request.
+     *
+     * @param mergeRequest         The merge request
+     * @param noteId               The id of the note
+     * @return the Gitlab Note
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabNote getNote(GitlabMergeRequest mergeRequest, Integer noteId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
+                GitlabNote.URL + "/" + noteId;
+
+        return retrieve().to(tailUrl, GitlabNote.class);
+    }
+
     public List<GitlabNote> getNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
