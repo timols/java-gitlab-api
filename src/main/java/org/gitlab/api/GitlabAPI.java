@@ -646,6 +646,36 @@ public class GitlabAPI {
     }
 
     /**
+     * Updates a Merge Request
+     *
+     * @param projectId            The id of the project
+     * @param mergeRequestId       The id of the merge request to update
+     * @param targetBranch         The target branch of the merge request, otherwise null to leave it untouched
+     * @param assigneeId           The id of the assignee, otherwise null to leave it untouched
+     * @param title                The title of the merge request, otherwise null to leave it untouched
+     * @param description          The description of the merge request, otherwise null to leave it untouched
+     * @param stateEvent           The state (close|reopen|merge) of the merge request, otherwise null to leave it untouched
+     * @param labels               A comma separated list of labels, otherwise null to leave it untouched
+     * @return the Merge Request
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabMergeRequest updateMergeRequest(Serializable projectId, Integer mergeRequestId, String targetBranch,
+                                                 Integer assigneeId, String title, String description, String stateEvent,
+                                                 String labels) throws IOException {
+        Query query = new Query()
+                .appendIf("target_branch", targetBranch)
+                .appendIf("assignee_id", assigneeId)
+                .appendIf("title", title)
+                .appendIf("description", description)
+                .appendIf("state_event", stateEvent)
+                .appendIf("labels", labels);
+
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_request/" + mergeRequestId + query.toString();
+
+        return retrieve().method("PUT").to(tailUrl, GitlabMergeRequest.class);
+    }
+
+    /**
      * @param project           The Project
      * @param mergeRequestId    Merge Request ID
      * @param mergeCommitMessage optional merge commit message. Null if not set
