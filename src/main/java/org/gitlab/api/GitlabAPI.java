@@ -6,6 +6,7 @@ import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -638,6 +639,25 @@ public class GitlabAPI {
     public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+
+    /**
+     * Return Merge Request.
+     *
+     * @param projectId       The id of the project
+     * @param mergeRequestIid The iid of the merge request
+     * @return the Gitlab Merge Request
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabMergeRequest getMergeRequestByIid(Serializable projectId, Integer mergeRequestIid) throws IOException {
+        Query query = new Query()
+                .append("iid", mergeRequestIid.toString());
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query.toString();
+        List<GitlabMergeRequest> ls = retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+        if (ls.size() == 0) {
+            throw new FileNotFoundException();
+        }
+        return ls.get(0);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
