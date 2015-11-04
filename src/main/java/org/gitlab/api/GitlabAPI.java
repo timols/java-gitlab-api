@@ -32,27 +32,33 @@ public class GitlabAPI {
 
     private final String apiToken;
     private final TokenType tokenType;
+    private AuthMethod authMethod;
     private boolean ignoreCertificateErrors = false;
 
-    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType) {
+    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
         this.hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
         this.apiToken = apiToken;
         this.tokenType = tokenType;
+        this.authMethod = method;
     }
 
     public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
         String tailUrl = GitlabSession.URL;
-        GitlabAPI api = connect(hostUrl, null, (TokenType) null);
+        GitlabAPI api = connect(hostUrl, null, null, null);
         return api.dispatch().with("login", username).with("password", password)
                 .to(tailUrl, GitlabSession.class);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken) {
-        return new GitlabAPI(hostUrl, apiToken, TokenType.PRIVATE_TOKEN);
+        return new GitlabAPI(hostUrl, apiToken, TokenType.PRIVATE_TOKEN, AuthMethod.HEADER);
     }
 
     public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType) {
-        return new GitlabAPI(hostUrl, apiToken, tokenType);
+        return new GitlabAPI(hostUrl, apiToken, tokenType, AuthMethod.HEADER);
+    }
+
+    public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
+        return new GitlabAPI(hostUrl, apiToken, tokenType, method);
     }
 
     public GitlabAPI ignoreCertificateErrors(boolean ignoreCertificateErrors) {
@@ -61,11 +67,11 @@ public class GitlabAPI {
     }
 
     public GitlabHTTPRequestor retrieve() {
-        return new GitlabHTTPRequestor(this);
+        return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod);
     }
 
     public GitlabHTTPRequestor dispatch() {
-        return new GitlabHTTPRequestor(this).method("POST");
+        return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod).method("POST");
     }
 
     public boolean isIgnoreCertificateErrors() {
@@ -73,10 +79,6 @@ public class GitlabAPI {
     }
 
     public URL getAPIUrl(String tailAPIUrl) throws IOException {
-        if (apiToken != null) {
-            tailAPIUrl = tailAPIUrl + (tailAPIUrl.indexOf('?') > 0 ? '&' : '?') + tokenType.getTokenParamName() + "=" + apiToken;
-        }
-
         if (!tailAPIUrl.startsWith("/")) {
             tailAPIUrl = "/" + tailAPIUrl;
         }
