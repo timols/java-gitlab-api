@@ -3,6 +3,7 @@ package org.gitlab.api.http;
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.GitlabAPIException;
 import org.gitlab.api.TokenType;
 import org.gitlab.api.models.GitlabCommit;
 
@@ -353,11 +354,11 @@ public class GitlabHTTPRequestor {
 
         InputStream es = wrapStream(connection, connection.getErrorStream());
         try {
+            String error = null;
             if (es != null) {
-                throw (IOException) new IOException(IOUtils.toString(es, "UTF-8")).initCause(e);
-            } else {
-                throw e;
+                error = IOUtils.toString(es, "UTF-8");
             }
+            throw new GitlabAPIException(error, connection.getResponseCode(), e);
         } finally {
             IOUtils.closeQuietly(es);
         }
