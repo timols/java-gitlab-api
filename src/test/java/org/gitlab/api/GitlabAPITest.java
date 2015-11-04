@@ -41,13 +41,18 @@ public class GitlabAPITest {
     }
 
     @Test
+    public void testAllProjects() throws IOException {
+        api.getAllProjects();
+    }
+
+    @Test
     public void testConnect() throws IOException {
         assertEquals(GitlabAPI.class, api.getClass());
     }
 
     @Test
     public void testGetAPIUrl() throws IOException {
-        URL expected = new URL(TEST_URL + "/api/v3/?private_token=" + TEST_TOKEN);
+        URL expected = new URL(TEST_URL + "/api/v3/");
         assertEquals(expected, api.getAPIUrl(""));
     }
 
