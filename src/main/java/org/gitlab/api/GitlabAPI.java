@@ -911,6 +911,18 @@ public class GitlabAPI {
         return Arrays.asList(branches);
     }
 
+    /**
+     * Delete Branch.
+     *
+     * @param projectId  The id of the project
+     * @param branchName The name of the branch to delete
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteBranch(Serializable projectId, String branchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + branchName;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
     public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName;
         return retrieve().to(tailUrl, GitlabBranch.class);
