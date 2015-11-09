@@ -1058,6 +1058,114 @@ public class GitlabAPI {
         return createNote(String.valueOf(issue.getProjectId()), issue.getId(), message);
     }
 
+    /**
+     * Gets labels associated with a project.
+     * @param projectId The ID of the project.
+     * @return A non-null list of labels.
+     * @throws IOException
+     */
+    public List<GitlabLabel> getLabels(Serializable projectId)
+            throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        GitlabLabel[] labels = retrieve().to(tailUrl, GitlabLabel[].class);
+        return Arrays.asList(labels);
+    }
+
+    /**
+     * Gets labels associated with a project.
+     * @param project The project associated with labels.
+     * @return A non-null list of labels.
+     * @throws IOException
+     */
+    public List<GitlabLabel> getLabels(GitlabProject project)
+            throws IOException {
+        return getLabels(project.getId());
+    }
+
+    /**
+     * Creates a new label.
+     * @param projectId The ID of the project containing the new label.
+     * @param name The name of the label.
+     * @param color The color of the label (eg #ff0000).
+     * @return The newly created label.
+     * @throws IOException
+     */
+    public GitlabLabel createLabel(
+            Serializable projectId,
+            String name,
+            String color) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        return dispatch().with("name", name)
+                         .with("color", color)
+                         .to(tailUrl, GitlabLabel.class);
+    }
+
+    /**
+     * Creates a new label.
+     * @param projectId The ID of the project containing the label.
+     * @param label The label to create.
+     * @return The newly created label.
+     */
+    public GitlabLabel createLabel(Serializable projectId, GitlabLabel label)
+            throws IOException {
+        String name = label.getName();
+        String color = label.getColor();
+        return createLabel(projectId, name, color);
+    }
+
+    /**
+     * Deletes an existing label.
+     * @param projectId The ID of the project containing the label.
+     * @param name The name of the label to delete.
+     * @throws IOException
+     */
+    public void deleteLabel(Serializable projectId, String name)
+            throws IOException {
+        Query query = new Query();
+        query.append("name", name);
+        String tailUrl = GitlabProject.URL + "/" +
+                projectId +
+                GitlabLabel.URL +
+                query.toString();
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+    /**
+     * Deletes an existing label.
+     * @param projectId The ID of the project containing the label.
+     * @param label The label to delete.
+     * @throws IOException
+     */
+    public void deleteLabel(Serializable projectId, GitlabLabel label)
+            throws IOException {
+        deleteLabel(projectId, label.getName());
+    }
+
+    /**
+     * Updates an existing label.
+     * @param projectId The ID of the project containing the label.
+     * @param name The name of the label to update.
+     * @param newName The updated name.
+     * @param newColor The updated color.
+     * @return The updated, deserialized label.
+     * @throws IOException
+     */
+    public GitlabLabel updateLabel(Serializable projectId,
+                                   String name,
+                                   String newName,
+                                   String newColor) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        requestor.with("name", name);
+        if (newName != null) {
+            requestor.with("new_name", newName);
+        }
+        if (newColor != null) {
+            requestor = requestor.with("color", newColor);
+        }
+        return requestor.to(tailUrl, GitlabLabel.class);
+    }
+
     public List<GitlabMilestone> getMilestones(GitlabProject project) throws IOException {
         return getMilestones(String.valueOf(project.getId()));
     }
