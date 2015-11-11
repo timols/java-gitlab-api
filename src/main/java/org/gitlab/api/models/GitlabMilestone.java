@@ -9,9 +9,14 @@ public class GitlabMilestone {
     public static final String URL = "/milestones";
 
     private int id;
+
     private int iid;
+
+    @JsonProperty("project_id")
     private int projectId;
+
     private String title;
+
     private String description;
 
     @JsonProperty("due_date")

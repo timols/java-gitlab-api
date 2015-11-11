@@ -12,7 +12,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -1065,6 +1067,126 @@ public class GitlabAPI {
     public List<GitlabMilestone> getMilestones(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
+    }
+
+    /**
+     * Cretaes a new project milestone.
+     * @param projectId The ID of the project.
+     * @param title The title of the milestone.
+     * @param description The description of the milestone. (Optional)
+     * @param dueDate The date the milestone is due. (Optional)
+     * @return The newly created, de-serialized milestone.
+     * @throws IOException
+     */
+    public GitlabMilestone createMilestone(
+            Serializable projectId,
+            String title,
+            String description,
+            Date dueDate) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMilestone.URL;
+        GitlabHTTPRequestor requestor = dispatch().with("title", title);
+        if (description != null) {
+            requestor = requestor.with("description", description);
+        }
+        if (dueDate != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String formatted = formatter.format(dueDate);
+            requestor = requestor.with("due_date", formatted);
+        }
+        return requestor.to(tailUrl, GitlabMilestone.class);
+    }
+
+    /**
+     * Creates a new project milestone.
+     * @param projectId The ID of the project.
+     * @param milestone The milestone to create.
+     * @return The newly created, de-serialized milestone.
+     * @throws IOException
+     */
+    public GitlabMilestone createMilestone(
+            Serializable projectId,
+            GitlabMilestone milestone) throws IOException {
+        String title = milestone.getTitle();
+        String description = milestone.getDescription();
+        Date dateDue = milestone.getDueDate();
+        return createMilestone(projectId, title, description, dateDue);
+    }
+
+    /**
+     * Updates an existing project milestone.
+     * @param projectId The ID of the project.
+     * @param milestoneId The ID of the milestone.
+     * @param title The title of the milestone. (Optional)
+     * @param description The description of the milestone. (Optional)
+     * @param dueDate The date the milestone is due. (Optional)
+     * @param stateEvent A value used to update the state of the milestone.
+     *                   (Optional) (activate | close)
+     * @return The updated, de-serialized milestone.
+     * @throws IOException
+     */
+    public GitlabMilestone updateMilestone(
+            Serializable projectId,
+            int milestoneId,
+            String title,
+            String description,
+            Date dueDate,
+            String stateEvent) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" +
+                projectId +
+                GitlabMilestone.URL + "/" +
+                milestoneId;
+        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        if (title != null) {
+            requestor.with("title", title);
+        }
+        if (description != null) {
+            requestor = requestor.with("description", description);
+        }
+        if (dueDate != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String formatted = formatter.format(dueDate);
+            requestor = requestor.with("due_date", formatted);
+        }
+        if (stateEvent != null) {
+            requestor.with("state_event", stateEvent);
+        }
+        return requestor.to(tailUrl, GitlabMilestone.class);
+    }
+
+    /**
+     * Updates an existing project milestone.
+     * @param projectId The ID of the project.
+     * @param edited The already edited milestone.
+     * @param stateEvent A value used to update the state of the milestone.
+     *                   (Optional) (activate | close)
+     * @return The updated, de-serialized milestone.
+     * @throws IOException
+     */
+    public GitlabMilestone updateMilestone(
+            Serializable projectId,
+            GitlabMilestone edited,
+            String stateEvent) throws IOException {
+        return updateMilestone(projectId,
+                edited.getId(),
+                edited.getTitle(),
+                edited.getDescription(),
+                edited.getDueDate(),
+                stateEvent);
+    }
+
+    /**
+     * Updates an existing project milestone.
+     * @param edited The already edited milestone.
+     * @return The updated, de-serialized milestone.
+     * @param stateEvent A value used to update the state of the milestone.
+     *                   (Optional) (activate | close)
+     * @throws IOException
+     */
+    public GitlabMilestone updateMilestone(
+            GitlabMilestone edited,
+            String stateEvent)
+            throws IOException {
+        return updateMilestone(edited.getProjectId(), edited, stateEvent);
     }
 
     /**
