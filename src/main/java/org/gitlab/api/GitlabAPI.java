@@ -793,24 +793,53 @@ public class GitlabAPI {
     }
 
     public List<GitlabCommit> getLastCommits(Serializable projectId) throws IOException {
-        return getCommits(projectId, new Pagination());
+        return getCommits(projectId, null, null);
     }
 
-    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination) throws IOException {
+    public List<GitlabCommit> getLastCommits(Serializable projectId, String branchOrTag) throws IOException {
+        return getCommits(projectId, null, branchOrTag);
+    }
+
+    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
+                                         String branchOrTag) throws IOException {
+        final Query query = new Query();
+        if (branchOrTag != null) {
+            query.append("ref_name", branchOrTag);
+        }
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
-                "/repository" + GitlabCommit.URL + pagination;
+                "/repository" + GitlabCommit.URL + query;
         final GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
         return Arrays.asList(commits);
     }
 
     // gets all commits for a project
     public List<GitlabCommit> getAllCommits(Serializable projectId) throws IOException {
-        return getAllCommits(projectId, new Pagination());
+        return getAllCommits(projectId, null, null);
     }
 
-    public List<GitlabCommit> getAllCommits(Serializable projectId, Pagination pagination) throws IOException {
+    // gets all commits for a project
+    public List<GitlabCommit> getAllCommits(Serializable projectId, String branchOrTag) throws IOException {
+        return getAllCommits(projectId, null, branchOrTag);
+    }
+
+    public List<GitlabCommit> getAllCommits(Serializable projectId, Pagination pagination,
+                                            String branchOrTag) throws IOException {
+        final Query query = new Query();
+        if (branchOrTag != null) {
+            query.append("ref_name", branchOrTag);
+        }
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
-                "/repository" + GitlabCommit.URL + pagination;
+                "/repository" + GitlabCommit.URL + query;
         return retrieve().getAll(tailUrl, GitlabCommit[].class);
     }
 
