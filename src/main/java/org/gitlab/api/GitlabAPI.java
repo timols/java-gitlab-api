@@ -792,6 +792,17 @@ public class GitlabAPI {
         return Arrays.asList(commits);
     }
 
+    public List<GitlabCommit> getLastCommits(Serializable projectId) throws IOException {
+        return getCommits(projectId, new Pagination());
+    }
+
+    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                "/repository" + GitlabCommit.URL + pagination;
+        final GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
+        return Arrays.asList(commits);
+    }
+
     // gets all commits for a project
     public List<GitlabCommit> getAllCommits(Serializable projectId) throws IOException {
         return getAllCommits(projectId, new Pagination());
