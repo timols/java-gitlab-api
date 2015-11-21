@@ -23,6 +23,7 @@ import java.util.List;
  *
  * @author &#064;timols (Tim O)
  */
+@SuppressWarnings("unused")
 public class GitlabAPI {
 
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -770,6 +771,10 @@ public class GitlabAPI {
     }
 
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
+        return getCommits(mergeRequest, new Pagination());
+    }
+
+    public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest, Pagination pagination) throws IOException {
         Integer projectId = mergeRequest.getSourceProjectId();
         if (projectId == null) {
             projectId = mergeRequest.getProjectId();
@@ -777,6 +782,8 @@ public class GitlabAPI {
 
         Query query = new Query()
                 .append("ref_name", mergeRequest.getSourceBranch());
+
+        query.mergeWith(pagination.asQuery());
 
         String tailUrl = GitlabProject.URL + "/" + projectId +
                 "/repository" + GitlabCommit.URL + query.toString();
@@ -787,14 +794,25 @@ public class GitlabAPI {
 
     // gets all commits for a project
     public List<GitlabCommit> getAllCommits(Serializable projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository" + GitlabCommit.URL;
+        return getAllCommits(projectId, new Pagination());
+    }
+
+    public List<GitlabCommit> getAllCommits(Serializable projectId, Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                "/repository" + GitlabCommit.URL + pagination;
         return retrieve().getAll(tailUrl, GitlabCommit[].class);
     }
 
     // List commit diffs for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/diff
     public List<GitlabCommitDiff> getCommitDiffs(Serializable projectId, String commitHash) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash + GitlabCommitDiff.URL;
+        return getCommitDiffs(projectId, commitHash, new Pagination());
+    }
+
+    public List<GitlabCommitDiff> getCommitDiffs(Serializable projectId, String commitHash,
+                                                 Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash +
+                GitlabCommitDiff.URL + pagination;
         GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
         return Arrays.asList(diffs);
     }
@@ -802,14 +820,21 @@ public class GitlabAPI {
     // List commit statuses for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/statuses
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabCommit.URL + "/" + commitHash + GitlabCommitStatus.URL;
+        return getCommitStatuses(project, commitHash, new Pagination());
+    }
+
+    public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash,
+                                                      Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabCommit.URL + "/" +
+                commitHash + GitlabCommitStatus.URL + pagination;
         GitlabCommitStatus[] statuses = retrieve().to(tailUrl, GitlabCommitStatus[].class);
         return Arrays.asList(statuses);
     }
 
     // Submit new commit statuses for a project ID and commit hash
     // GET /projects/:id/statuses/:sha
-    public GitlabCommitStatus createCommitStatus(GitlabProject project, String commitHash, String state, String ref, String name, String targetUrl, String description) throws IOException {
+    public GitlabCommitStatus createCommitStatus(GitlabProject project, String commitHash, String state, String ref,
+                                                 String name, String targetUrl, String description) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabCommitStatus.URL + "/" + commitHash;
         return dispatch()
                 .with("state", state)
@@ -956,8 +981,7 @@ public class GitlabAPI {
 
     public GitlabProjectHook getProjectHook(GitlabProject project, String hookId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
-        GitlabProjectHook hook = retrieve().to(tailUrl, GitlabProjectHook.class);
-        return hook;
+        return retrieve().to(tailUrl, GitlabProjectHook.class);
     }
 
     public GitlabProjectHook addProjectHook(GitlabProject project, String url) throws IOException {
