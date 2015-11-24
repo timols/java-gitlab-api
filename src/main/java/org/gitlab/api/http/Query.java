@@ -106,6 +106,10 @@ public class Query {
         return this;
     }
 
+    public boolean mergeWith(Query query) {
+        return params.addAll(query.params);
+    }
+
     /**
      * Returns a Query suitable for appending
      * to a URI
