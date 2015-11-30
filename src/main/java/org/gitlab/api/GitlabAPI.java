@@ -101,12 +101,21 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabUser[].class);
     }
 
-    // Search users by Email or username
-    // GET /users?search=:email_or_username
+    /**
+     * Finds users by email address or username.
+     * @param emailOrUsername Some portion of the email address or username
+     * @return A non-null List of GitlabUser instances.  If the search term is
+     *         null or empty a List with zero GitlabUsers is returned.
+     * @throws IOException
+     */
     public List<GitlabUser> findUsers(String emailOrUsername) throws IOException {
-        String tailUrl = GitlabUser.URL + "?search=" + emailOrUsername;
-        GitlabUser[] users = retrieve().to(tailUrl, GitlabUser[].class);
-        return Arrays.asList(users);
+        List<GitlabUser> users = new ArrayList<GitlabUser>();
+        if (emailOrUsername != null && !emailOrUsername.equals("")) {
+            String tailUrl = GitlabUser.URL + "?search=" + emailOrUsername;
+            GitlabUser[] response = retrieve().to(tailUrl, GitlabUser[].class);
+            users = Arrays.asList(response);
+        }
+        return users;
     }
 
     /**
