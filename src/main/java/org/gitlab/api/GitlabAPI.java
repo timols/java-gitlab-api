@@ -1550,8 +1550,8 @@ public class GitlabAPI {
     }
 
     private String sanitizeProjectId(Serializable projectId) {
-        if (!(projectId instanceof String) && !(projectId instanceof Integer)) {
-            throw new IllegalArgumentException();
+        if (!(projectId instanceof String) && !(projectId instanceof Number)) {
+            throw new IllegalArgumentException("projectId needs to be of type String or Number");
         }
 
         try {
