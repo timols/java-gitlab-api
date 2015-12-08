@@ -548,7 +548,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name) throws IOException {
-        return createUserProject(userId, name, null, null, null, null, null, null, null, null, null);
+        return createUserProject(userId, name, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -565,10 +565,11 @@ public class GitlabAPI {
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
      * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
      * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param importUrl            The Import URL for the project, otherwise null
      * @return The GitLab Project
      * @throws IOException on gitlab api call error
      */
-    public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel) throws IOException {
+    public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
                 .appendIf("description", description)
@@ -579,7 +580,8 @@ public class GitlabAPI {
                 .appendIf("wiki_enabled", wikiEnabled)
                 .appendIf("snippets_enabled", snippetsEnabled)
                 .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel);
+                .appendIf("visibility_level", visibilityLevel)
+                .appendIf("import_url", importUrl);
 
         String tailUrl = GitlabProject.URL + "/user/" + userId + query.toString();
 
