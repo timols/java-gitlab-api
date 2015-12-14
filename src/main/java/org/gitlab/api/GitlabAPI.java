@@ -1572,4 +1572,47 @@ public class GitlabAPI {
             throw new RuntimeException((e));
         }
     }
+
+    /**
+     * Post comment to commit
+     *
+     * @param projectId            	(required) - The ID of a project
+     * @param sha 					(required) - The name of a repository branch or tag or if not given the default branch
+     * @param note 					(required) - Text of comment
+     * @param path 					(optional) - The file path
+     * @param line 					(optional) - The line number
+     * @param line_type			    (optional) - The line type (new or old)
+     * @return                     	A CommitComment
+     * @throws IOException on gitlab api call error
+     * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
+     */
+    public CommitComment createCommitComment(Integer projectId, String sha, String note,
+    		String path, String line, String line_type) throws IOException {
+    
+    	Query query = new Query()
+    			.append("id", projectId.toString())
+    			.appendIf("sha", sha)
+    			.appendIf("note", note)
+    			.appendIf("path", path)
+    			.appendIf("line", line);
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL + query.toString();
+    
+    	return dispatch().to(tailUrl, CommitComment.class);
+    }
+    
+    /**
+     * Get the comments of a commit
+     *
+     * @param projectId            	(required) - The ID of a project
+     * @param sha 					(required) - The name of a repository branch or tag or if not given the default branch
+     * @return                     	A CommitComment
+     * @throws IOException on gitlab api call error
+     * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
+     */
+    public List<CommitComment> getCommitComments(Integer projectId, String sha) throws IOException {
+    
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL;
+    
+    	return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
+    }
 }
