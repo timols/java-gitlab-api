@@ -343,6 +343,29 @@ public class GitlabAPI {
     }
 
     /**
+     * Get all the projects for a group.
+     *
+     * @param group the target group
+     * @return a list of projects for the group
+     * @throws IOException
+     */
+    public List<GitlabProject> getGroupProjects(GitlabGroup group) throws IOException {
+        return getGroupProjects(group.getId());
+    }
+
+    /**
+     * Get all the projects for a group.
+     *
+     * @param groupId the target group's id.
+     * @return a list of projects for the group
+     * @throws IOException
+     */
+    public List<GitlabProject> getGroupProjects(Integer groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabProject.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabProject[].class));
+    }
+
+    /**
      * Gets all members of a Group
      *
      * @param group The GitLab Group
@@ -387,7 +410,20 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path) throws IOException {
-        return createGroup(name, path, null, null);
+        return createGroup(name, path, null, null, null);
+    }
+
+    /**
+     * Creates a Group
+     *
+     * @param name The name of the group
+     * @param path The path for the group
+     * @param sudoUser The user to create the group on behalf of
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroupViaSudo(String name, String path, GitlabUser sudoUser) throws IOException {
+        return createGroup(name, path, null, null, sudoUser);
     }
 
     /**
@@ -397,16 +433,35 @@ public class GitlabAPI {
      * @param path       The path for the group
      * @param ldapCn     LDAP Group Name to sync with, null otherwise
      * @param ldapAccess Access level for LDAP group members, null otherwise
+     *
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess) throws IOException {
+        return createGroup(name, path, ldapCn, ldapAccess, null);
+    }
+
+
+    /**
+     * Creates a Group
+     *
+     * @param name       The name of the group
+     * @param path       The path for the group
+     * @param ldapCn     LDAP Group Name to sync with, null otherwise
+     * @param ldapAccess Access level for LDAP group members, null otherwise
+     * @param sudoUser The user to create the group on behalf of
+     *
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess, GitlabUser sudoUser) throws IOException {
 
         Query query = new Query()
                 .append("name", name)
                 .append("path", path)
                 .appendIf("ldap_cn", ldapCn)
-                .appendIf("ldap_access", ldapAccess);
+                .appendIf("ldap_access", ldapAccess)
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
 
         String tailUrl = GitlabGroup.URL + query.toString();
 
@@ -483,11 +538,39 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
+    /**
+     *
+     * Get a list of projects accessible by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
     public List<GitlabProject> getProjects() throws IOException {
         String tailUrl = GitlabProject.URL;
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
+    /**
+     *
+     * Get a list of projects accessible by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getProjectsViaSudo(GitlabUser user) throws IOException {
+        Query query = new Query()
+                .appendIf(PARAM_SUDO, user.getId());
+        String tailUrl = GitlabProject.URL + query.toString();
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     *
+     * Get's all projects in Gitlab, requires sudo user
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
     public List<GitlabProject> getAllProjects() throws IOException {
         String tailUrl = GitlabProject.URL + "/all";
         return retrieve().getAll(tailUrl, GitlabProject[].class);
