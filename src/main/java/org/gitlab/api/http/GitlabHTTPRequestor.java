@@ -191,6 +191,7 @@ public class GitlabHTTPRequestor {
                 }
             }
 
+            @Override
             public boolean hasNext() {
                 fetch();
                 if (next != null && next.getClass().isArray()) {
@@ -201,6 +202,7 @@ public class GitlabHTTPRequestor {
                 }
             }
 
+            @Override
             public T next() {
                 fetch();
                 T record = next;
@@ -213,6 +215,7 @@ public class GitlabHTTPRequestor {
                 return record;
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
@@ -367,14 +370,17 @@ public class GitlabHTTPRequestor {
     private void ignoreCertificateErrors() {
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
+                    @Override
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return null;
                     }
 
+                    @Override
                     public void checkClientTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
 
+                    @Override
                     public void checkServerTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }

@@ -9,10 +9,12 @@ public class GitlabSession extends GitlabUser {
     @JsonProperty("private_token")
     private String privateToken;
 
+    @Override
     public String getPrivateToken() {
         return privateToken;
     }
 
+    @Override
     public void setPrivateToken(String privateToken) {
         this.privateToken = privateToken;
     }
