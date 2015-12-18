@@ -38,6 +38,7 @@ public class GitlabAPI {
     private final TokenType tokenType;
     private AuthMethod authMethod;
     private boolean ignoreCertificateErrors = false;
+    private int requestTimeout = 0;
 
     private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
         this.hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
@@ -67,6 +68,15 @@ public class GitlabAPI {
 
     public GitlabAPI ignoreCertificateErrors(boolean ignoreCertificateErrors) {
         this.ignoreCertificateErrors = ignoreCertificateErrors;
+        return this;
+    }
+
+    public int getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public GitlabAPI setRequestTimeout(int requestTimeout) {
+        this.requestTimeout = requestTimeout;
         return this;
     }
 
