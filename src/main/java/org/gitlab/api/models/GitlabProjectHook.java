@@ -10,6 +10,8 @@ public class GitlabProjectHook {
 
     private String id;
     private String url;
+
+    @JsonProperty("project_id")
     private Integer projectId;
 
     @JsonProperty("push_events")
