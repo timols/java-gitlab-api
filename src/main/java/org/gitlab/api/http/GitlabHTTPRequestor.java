@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -299,6 +296,11 @@ public class GitlabHTTPRequestor {
             connection.setRequestProperty(tokenType.getTokenHeaderName(), String.format(tokenType.getTokenHeaderFormat(), apiToken));
         }
 
+        final int requestTimeout = root.getRequestTimeout();
+        if (requestTimeout > 0) {
+            connection.setReadTimeout(requestTimeout);
+        }
+
         try {
             connection.setRequestMethod(method);
         } catch (ProtocolException e) {
@@ -353,6 +355,9 @@ public class GitlabHTTPRequestor {
     private void handleAPIError(IOException e, HttpURLConnection connection) throws IOException {
         if (e instanceof FileNotFoundException) {
             throw e;    // pass through 404 Not Found to allow the caller to handle it intelligently
+        }
+        if (e instanceof SocketTimeoutException && root.getRequestTimeout() > 0) {
+            throw e;
         }
 
         InputStream es = wrapStream(connection, connection.getErrorStream());
