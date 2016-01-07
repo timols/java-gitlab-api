@@ -1687,7 +1687,8 @@ public class GitlabAPI {
     			.appendIf("sha", sha)
     			.appendIf("note", note)
     			.appendIf("path", path)
-    			.appendIf("line", line);
+    			.appendIf("line", line)
+    			.appendIf("line_type", line_type);
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL + query.toString();
     
     	return dispatch().to(tailUrl, CommitComment.class);
