@@ -1078,7 +1078,7 @@ public class GitlabAPI {
     /**
      * Create Branch.
      * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
-     *     Create Repository Branch Documents
+     *     Create Repository Branch Documentation
      * </a>
      * 
      * @param project  The gitlab project
@@ -1093,7 +1093,7 @@ public class GitlabAPI {
     /**
      * Create Branch.
      * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
-     *     Create Repository Branch Documents
+     *     Create Repository Branch Documentation
      * </a>
      *
      *
@@ -1104,8 +1104,8 @@ public class GitlabAPI {
      */
     public void createBranch(Serializable projectId, String branchName, String ref) throws IOException {
         Query query = new Query()
-                .appendIf("branch_name", branchName)
-                .appendIf("ref", ref);
+                .append("branch_name", branchName)
+                .append("ref", ref);
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
         retrieve().method("POST").to(tailUrl, Void.class);
     }
