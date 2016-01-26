@@ -1103,11 +1103,8 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void createBranch(Serializable projectId, String branchName, String ref) throws IOException {
-        Query query = new Query()
-                .append("branch_name", branchName)
-                .append("ref", ref);
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
-        dispatch().to(tailUrl, Void.class);
+        dispatch().with("branch_name", branchName).with("ref", ref).to(tailUrl, Void.class);
     }
 
     /**
