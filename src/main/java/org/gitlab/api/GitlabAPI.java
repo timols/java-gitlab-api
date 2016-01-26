@@ -1107,7 +1107,7 @@ public class GitlabAPI {
                 .append("branch_name", branchName)
                 .append("ref", ref);
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
-        retrieve().method("POST").to(tailUrl, Void.class);
+        dispatch().to(tailUrl, Void.class);
     }
 
     /**
