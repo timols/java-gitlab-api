@@ -1086,6 +1086,38 @@ public class GitlabAPI {
     }
 
     /**
+     * Create Branch.
+     * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
+     *     Create Repository Branch Documentation
+     * </a>
+     * 
+     * @param project  The gitlab project
+     * @param branchName The name of the branch to create
+     * @param ref The branch name or commit SHA to create branch from
+     * @throws IOException on gitlab api call error
+     */
+    public void createBranch(GitlabProject project, String branchName, String ref) throws IOException {
+        createBranch(project.getId(), branchName, ref);
+    }
+
+    /**
+     * Create Branch.
+     * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
+     *     Create Repository Branch Documentation
+     * </a>
+     *
+     *
+     * @param projectId  The id of the project
+     * @param branchName The name of the branch to create
+     * @param ref The branch name or commit SHA to create branch from
+     * @throws IOException on gitlab api call error
+     */
+    public void createBranch(Serializable projectId, String branchName, String ref) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
+        dispatch().with("branch_name", branchName).with("ref", ref).to(tailUrl, Void.class);
+    }
+
+    /**
      * Delete Branch.
      *
      * @param projectId  The id of the project
