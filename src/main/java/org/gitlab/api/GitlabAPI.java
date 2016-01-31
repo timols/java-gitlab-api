@@ -587,6 +587,32 @@ public class GitlabAPI {
     }
 
     /**
+     *
+     * Gets a list of a project's builds in Gitlab
+     *
+     * @param project the project
+     * @return A list of project builds
+     * @throws IOException
+     */
+    public List<GitlabBuild> getProjectBuilds(GitlabProject project) throws IOException {
+        return getProjectBuilds(project.getId());
+    }
+
+    /**
+     *
+     * Gets a list of a project's builds in Gitlab
+     *
+     * @param projectId the project id
+     * @return A list of project builds
+     * @throws IOException
+     */
+    public List<GitlabBuild> getProjectBuilds(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL;
+        return retrieve().getAll(tailUrl, GitlabBuild[].class);
+    }
+
+
+    /**
      * Creates a private Project
      *
      * @param name The name of the project
@@ -874,6 +900,17 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash;
         return retrieve().to(tailUrl, GitlabCommit.class);
     }
+
+
+    public List<GitlabBuild> getCommitBuilds(GitlabProject projectId, String commitHash) throws IOException {
+        return getCommitBuilds(projectId.getId(), commitHash);
+    }
+
+    public List<GitlabBuild> getCommitBuilds(Serializable projectId, String commitHash) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash + GitlabBuild.URL;
+        return retrieve().getAll(tailUrl, GitlabBuild[].class);
+    }
+
 
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
         return getCommits(mergeRequest, new Pagination());
