@@ -1162,22 +1162,22 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteBranch(Serializable projectId, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + branchName;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + sanitizeBranch(branchName);
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName);
         return retrieve().to(tailUrl, GitlabBranch.class);
     }
 
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/protect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName) + "/protect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + branchName + "/unprotect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName) + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
@@ -1730,6 +1730,14 @@ public class GitlabAPI {
 
         try {
             return URLEncoder.encode(String.valueOf(projectId), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException((e));
+        }
+    }
+
+    private String sanitizeBranch(String branch){
+        try {
+            return URLEncoder.encode(branch, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException((e));
         }
