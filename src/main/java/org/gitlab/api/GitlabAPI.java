@@ -1786,4 +1786,96 @@ public class GitlabAPI {
     
     	return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
     }
+
+    /**
+     * Get a list of tags in specific project
+     *
+     * @param projectId
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabTag> getTags(Serializable projectId) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL;
+      GitlabTag[] tags = retrieve().to(tailUrl, GitlabTag[].class);
+      return Arrays.asList(tags);
+    }
+
+    /**
+     * Get a list of tags in specific project
+     *
+     * @param project
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabTag> getTags(GitlabProject project) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
+      GitlabTag[] tags = retrieve().to(tailUrl, GitlabTag[].class);
+      return Arrays.asList(tags);
+    }
+
+    /**
+     * Create tag in specific project
+     *
+     * @param projectId
+     * @param tagName
+     * @param ref
+     * @param message
+     * @param releaseDescription
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabTag addTag(Serializable projectId, String tagName, String ref, String message, String releaseDescription) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL;
+      return dispatch()
+          .with("tag_name", tagName )
+          .with("ref", ref)
+          .with("message", message)
+          .with("release_description", releaseDescription)
+          .to(tailUrl, GitlabTag.class);
+    }
+
+    /**
+     * Create tag in specific project
+     *
+     * @param project
+     * @param tagName
+     * @param ref
+     * @param message
+     * @param releaseDescription
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabTag addTag(GitlabProject project, String tagName, String ref, String message, String releaseDescription) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
+      return dispatch()
+          .with("tag_name", tagName )
+          .with("ref", ref)
+          .with("message", message)
+          .with("release_description", releaseDescription)
+          .to(tailUrl, GitlabTag.class);
+    }
+
+    /**
+     * Delete tag in specific project
+     *
+     * @param projectId
+     * @param tagName
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteTag(Serializable projectId, String tagName) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + "/" + tagName;
+      retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+    /**
+     * Delete tag in specific project
+     *
+     * @param project
+     * @param tagName
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteTag(GitlabProject project, String tagName) throws IOException {
+      String tailUrl = GitlabProject.URL + "/" + project + GitlabTag.URL + "/" + tagName;
+      retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
 }
