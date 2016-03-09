@@ -1,12 +1,10 @@
 package org.gitlab.api.models;
 
-import org.gitlab.api.models.GitlabBranchCommit;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabTag {
 
-    public final static String URL = "/repository/tags/";
+    public final static String URL = "/repository/tags";
 
     @JsonProperty("commit")
     private GitlabBranchCommit commit;
