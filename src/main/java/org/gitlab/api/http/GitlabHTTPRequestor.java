@@ -321,10 +321,10 @@ public class GitlabHTTPRequestor {
     private <T> T parse(HttpURLConnection connection, Class<T> type, T instance) throws IOException {
         InputStreamReader reader = null;
         try {
-            reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             if (byte[].class == type) {
-            	return type.cast(IOUtils.toByteArray(reader));
+                return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
+            reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             String data = IOUtils.toString(reader);
             if (type != null) {
                 return GitlabAPI.MAPPER.readValue(data, type);

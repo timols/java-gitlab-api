@@ -613,6 +613,29 @@ public class GitlabAPI {
 
 
     /**
+     * Get build artifacts of a project build
+     *
+     * @param project The Project
+     * @param build The build
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getBuildArtifact(GitlabProject project, GitlabBuild build) throws IOException {
+        return getBuildArtifact(project.getId(), build.getId());
+    }
+
+    /**
+     * Get build artifacts of a project build
+     *
+     * @param projectId The Project's Id
+     * @param buildId The build's Id
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getBuildArtifact(Integer projectId, Integer buildId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL + "/" + buildId + "/artifacts";
+        return retrieve().to(tailUrl, byte[].class);
+    }
+
+    /**
      * Creates a private Project
      *
      * @param name The name of the project
