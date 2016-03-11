@@ -322,7 +322,7 @@ public class GitlabHTTPRequestor {
         InputStreamReader reader = null;
         try {
             if (byte[].class == type) {
-                return type.cast(IOUtils.toByteArray(connection.getInputStream()));
+                return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             String data = IOUtils.toString(reader);
