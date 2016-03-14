@@ -53,7 +53,6 @@ public class GitlabGroup {
     }
 
     public void setLdapAccess(GitlabAccessLevel ldapGitlabAccessLevel) {
-        if(ldapGitlabAccessLevel != null)//Check to see if a group has ldap_access as null
-        this.ldapAccess = ldapGitlabAccessLevel.accessValue;
+       this.ldapAccess = ldapGitlabAccessLevel.accessValue;
     }
 }
