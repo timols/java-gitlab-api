@@ -1059,10 +1059,22 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
+        return getRawFileContent(project.getId(), sha, filepath);
+    }
+
+    /**
+     * Get raw file content
+     *
+     * @param projectId The Project
+     * @param sha   The commit or branch name
+     * @param filepath   The path of the file
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getRawFileContent(Integer projectId, String sha, String filepath) throws IOException {
         Query query = new Query()
                 .append("filepath", filepath);
 
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/blobs/" + sha + query.toString();
         return retrieve().to(tailUrl, byte[].class);
     }
 
