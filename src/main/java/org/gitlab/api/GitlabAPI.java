@@ -1022,6 +1022,24 @@ public class GitlabAPI {
         return Arrays.asList(diffs);
     }
 
+
+    // List commit diffs for a project ID and two commit hashes
+    // GET /projects/:id/repository/compare
+    public GitlabCommitComparison compareCommits(Serializable projectId, String commitHash1, String commitHash2) throws IOException {
+        return compareCommits(projectId, commitHash1, commitHash2, new Pagination());
+    }
+
+    // List commit diffs for a project ID and two commit hashes
+    // GET /projects/:id/repository/compare
+    public GitlabCommitComparison compareCommits(Serializable projectId, String commitHash1, String commitHash2, Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabCommitComparison.URL;
+        Query query = new Query()
+                .append("from", commitHash1)
+                .append("to", commitHash2);
+        query.mergeWith(pagination.asQuery());
+        return retrieve().to(tailUrl + query, GitlabCommitComparison.class);
+    }
+
     // List commit statuses for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/statuses
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
