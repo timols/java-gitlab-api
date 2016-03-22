@@ -837,6 +837,34 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
+
+    /**
+     * Create a new MergeRequest
+     *
+     * @param projectId
+     * @param sourceBranch
+     * @param targetBranch
+     * @param assigneeId
+     * @param title
+     * @return GitlabMergeRequest
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabMergeRequest createMergeRequest(Serializable projectId, String sourceBranch, String targetBranch,
+                                                 Integer assigneeId, String title) throws IOException {
+
+        Query query = new Query()
+                .appendIf("target_branch", targetBranch)
+                .appendIf("source_branch", sourceBranch)
+                .appendIf("assignee_id", assigneeId)
+                .appendIf("title", title);
+
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabMergeRequest.class);
+    }
+    
+    
+    
     /**
      * Updates a Merge Request
      *

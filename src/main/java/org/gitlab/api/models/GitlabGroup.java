@@ -53,6 +53,6 @@ public class GitlabGroup {
     }
 
     public void setLdapAccess(GitlabAccessLevel ldapGitlabAccessLevel) {
-        this.ldapAccess = ldapGitlabAccessLevel.accessValue;
+       this.ldapAccess = ldapGitlabAccessLevel.accessValue;
     }
 }
