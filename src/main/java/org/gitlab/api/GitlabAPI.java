@@ -611,6 +611,19 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabBuild[].class);
     }
 
+    /**
+     *
+     * Gets a build for a project
+     *
+     * @param projectId the project id
+     * @param buildId the build id
+     * @return A list of project builds
+     * @throws IOException
+     */
+    public GitlabBuild getProjectBuild(Integer projectId, Integer buildId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL + "/" + buildId;
+        return retrieve().to(tailUrl, GitlabBuild.class);
+    }
 
     /**
      * Get build artifacts of a project build
