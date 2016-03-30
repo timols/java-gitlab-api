@@ -8,7 +8,7 @@ public class GitlabBuild {
     public final static String URL = "/builds";
 
     private GitlabCommit commit;
-    private String coverage;
+    private Float coverage;
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("download_url")
@@ -122,11 +122,11 @@ public class GitlabBuild {
         this.createdAt = createdAt;
     }
 
-    public String getCoverage() {
+    public Float getCoverage() {
         return coverage;
     }
 
-    public void setCoverage(String coverage) {
+    public void setCoverage(Float coverage) {
         this.coverage = coverage;
     }
 
