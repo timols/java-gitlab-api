@@ -750,6 +750,7 @@ public class GitlabAPI {
      * @param projectId            The id of the project to update
      * @param name                 The name of the project
      * @param description          A description for the project, null otherwise
+     * @param defaultBranch        The branch displayed in the Gitlab UI when a user navigates to the project
      * @param issuesEnabled        Whether Issues should be enabled, otherwise null indicates to use GitLab default
      * @param wallEnabled          Whether The Wall should be enabled, otherwise null indicates to use GitLab default
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
@@ -760,10 +761,24 @@ public class GitlabAPI {
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
      */
-    public GitlabProject updateProject(Integer projectId, String name, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel) throws IOException {
+    public GitlabProject updateProject(
+            Integer projectId,
+            String  name,
+            String  description,
+            String  defaultBranch,
+            Boolean issuesEnabled,
+            Boolean wallEnabled,
+            Boolean mergeRequestsEnabled,
+            Boolean wikiEnabled,
+            Boolean snippetsEnabled,
+            Boolean publik,
+            Integer visibilityLevel)
+        throws IOException
+    {
         Query query = new Query()
                 .appendIf("name", name)
                 .appendIf("description", description)
+                .appendIf("default_branch", defaultBranch)
                 .appendIf("issues_enabled", issuesEnabled)
                 .appendIf("wall_enabled", wallEnabled)
                 .appendIf("merge_requests_enabled", mergeRequestsEnabled)
@@ -875,9 +890,9 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabMergeRequest.class);
     }
-    
-    
-    
+
+
+
     /**
      * Updates a Merge Request
      *
@@ -1221,7 +1236,7 @@ public class GitlabAPI {
      * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
      *     Create Repository Branch Documentation
      * </a>
-     * 
+     *
      * @param project  The gitlab project
      * @param branchName The name of the branch to create
      * @param ref The branch name or commit SHA to create branch from
@@ -1852,7 +1867,7 @@ public class GitlabAPI {
      */
     public CommitComment createCommitComment(Integer projectId, String sha, String note,
     		String path, String line, String line_type) throws IOException {
-    
+
     	Query query = new Query()
     			.append("id", projectId.toString())
     			.appendIf("sha", sha)
@@ -1861,10 +1876,10 @@ public class GitlabAPI {
     			.appendIf("line", line)
     			.appendIf("line_type", line_type);
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL + query.toString();
-    
+
     	return dispatch().to(tailUrl, CommitComment.class);
     }
-    
+
     /**
      * Get the comments of a commit
      *
@@ -1875,9 +1890,9 @@ public class GitlabAPI {
      * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
      */
     public List<CommitComment> getCommitComments(Integer projectId, String sha) throws IOException {
-    
+
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL;
-    
+
     	return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
     }
 
