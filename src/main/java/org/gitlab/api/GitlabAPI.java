@@ -1702,11 +1702,19 @@ public class GitlabAPI {
         return getProjectMembers(project.getId());
     }
 
-    public List<GitlabProjectMember> getProjectMembers(Serializable projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    public List<GitlabProjectMember> getProjectMembers(GitlabProject project, Pagination pagination) throws IOException {
+        return getProjectMembers(project.getId(), pagination);
     }
 
+    public List<GitlabProjectMember> getProjectMembers(Serializable projectId) throws IOException {
+    	return getProjectMembers(projectId, new Pagination());
+    }
+
+    public List<GitlabProjectMember> getProjectMembers(Serializable projectId, Pagination pagination) throws IOException {
+    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL + pagination.asQuery();
+        return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
+    }
+    
     /**
      * This will fail, if the given namespace is a user and not a group
      *
