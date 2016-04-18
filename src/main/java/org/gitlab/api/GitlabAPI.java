@@ -348,8 +348,20 @@ public class GitlabAPI {
     }
 
     public List<GitlabGroup> getGroups() throws IOException {
+        return getGroupsViaSudo(null, null);
+    }
+
+    public List<GitlabGroup> getGroupsViaSudo(String username, Pagination pagination) throws IOException {
         String tailUrl = GitlabGroup.URL;
-        return retrieve().getAll(tailUrl, GitlabGroup[].class);
+
+        Query query = new Query()
+                .appendIf(PARAM_SUDO, username);
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
+        return retrieve().getAll(tailUrl + query.toString(), GitlabGroup[].class);
     }
 
     /**
