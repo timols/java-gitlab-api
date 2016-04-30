@@ -54,6 +54,9 @@ public class GitlabProject {
     @JsonProperty("public_builds")
     private boolean publicBuilds;
 
+    @JsonProperty("runners_token")
+    private String runnersToken;
+
     @JsonProperty("created_at")
     private Date createdAt;
 
@@ -226,6 +229,14 @@ public class GitlabProject {
 
     public void setPublicBuilds(boolean publicBuilds) {
         this.publicBuilds = publicBuilds;
+    }
+
+    public String getRunnersToken() {
+        return runnersToken;
+    }
+
+    public void setRunnersToken(String runnersToken) {
+        this.runnersToken = runnersToken;
     }
 
     public Date getCreatedAt() {
