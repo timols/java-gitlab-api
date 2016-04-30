@@ -48,6 +48,9 @@ public class GitlabProject {
     @JsonProperty("builds_enabled")
     private boolean buildsEnabled;
 
+    @JsonProperty("shared_runners_enabled")
+    private boolean sharedRunnersEnabled;
+
     @JsonProperty("created_at")
     private Date createdAt;
 
@@ -204,6 +207,14 @@ public class GitlabProject {
 
     public void setBuildsEnabled(boolean buildsEnabled) {
         this.buildsEnabled = buildsEnabled;
+    }
+
+    public boolean isSharedRunnersEnabled() {
+        return sharedRunnersEnabled;
+    }
+
+    public void setSharedRunnersEnabled(boolean sharedRunnersEnabled) {
+        this.sharedRunnersEnabled = sharedRunnersEnabled;
     }
 
     public Date getCreatedAt() {
