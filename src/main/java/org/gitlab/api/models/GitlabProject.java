@@ -45,6 +45,9 @@ public class GitlabProject {
     @JsonProperty("wiki_enabled")
     private boolean wikiEnabled;
 
+    @JsonProperty("builds_enabled")
+    private boolean buildsEnabled;
+
     @JsonProperty("created_at")
     private Date createdAt;
 
@@ -193,6 +196,14 @@ public class GitlabProject {
 
     public void setWikiEnabled(boolean wikiEnabled) {
         this.wikiEnabled = wikiEnabled;
+    }
+
+    public boolean isBuildsEnabled() {
+        return buildsEnabled;
+    }
+
+    public void setBuildsEnabled(boolean buildsEnabled) {
+        this.buildsEnabled = buildsEnabled;
     }
 
     public Date getCreatedAt() {
