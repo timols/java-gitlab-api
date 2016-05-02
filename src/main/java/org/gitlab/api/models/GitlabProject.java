@@ -45,6 +45,18 @@ public class GitlabProject {
     @JsonProperty("wiki_enabled")
     private boolean wikiEnabled;
 
+    @JsonProperty("builds_enabled")
+    private boolean buildsEnabled;
+
+    @JsonProperty("shared_runners_enabled")
+    private boolean sharedRunnersEnabled;
+
+    @JsonProperty("public_builds")
+    private boolean publicBuilds;
+
+    @JsonProperty("runners_token")
+    private String runnersToken;
+
     @JsonProperty("created_at")
     private Date createdAt;
 
@@ -193,6 +205,38 @@ public class GitlabProject {
 
     public void setWikiEnabled(boolean wikiEnabled) {
         this.wikiEnabled = wikiEnabled;
+    }
+
+    public boolean isBuildsEnabled() {
+        return buildsEnabled;
+    }
+
+    public void setBuildsEnabled(boolean buildsEnabled) {
+        this.buildsEnabled = buildsEnabled;
+    }
+
+    public boolean isSharedRunnersEnabled() {
+        return sharedRunnersEnabled;
+    }
+
+    public void setSharedRunnersEnabled(boolean sharedRunnersEnabled) {
+        this.sharedRunnersEnabled = sharedRunnersEnabled;
+    }
+
+    public boolean hasPublicBuilds() {
+        return publicBuilds;
+    }
+
+    public void setPublicBuilds(boolean publicBuilds) {
+        this.publicBuilds = publicBuilds;
+    }
+
+    public String getRunnersToken() {
+        return runnersToken;
+    }
+
+    public void setRunnersToken(String runnersToken) {
+        this.runnersToken = runnersToken;
     }
 
     public Date getCreatedAt() {
