@@ -25,7 +25,7 @@ public class GitlabProjectAccessLevel {
     }
 
     public void setNoficationLevel(int notificationLevel) {
-        this.accessLevel = notificationLevel;
+        this.notificationLevel = notificationLevel;
     }
 
 
