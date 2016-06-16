@@ -64,6 +64,12 @@ public class GitlabUser {
     @JsonProperty("avatar_url")
     private String _avatarUrl;
 
+    @JsonProperty("last_sign_in_at")
+    private Date _lastSignInAt;
+
+    @JsonProperty("current_sign_in_at")
+    private Date _currentSignInAt;
+
     public Integer getId() {
         return _id;
     }
@@ -254,5 +260,21 @@ public class GitlabUser {
 
     public void setPrivateToken(String privateToken) {
         this._privateToken = privateToken;
+    }
+
+    public Date getLastSignInAt() {
+        return _lastSignInAt;
+    }
+
+    public void setLastSignInAt(Date lastSignInAt) {
+        _lastSignInAt = lastSignInAt;
+    }
+
+    public Date getCurrentSignInAt() {
+        return _currentSignInAt;
+    }
+
+    public void setCurrentSignInAt(Date currentSignInAt) {
+        _currentSignInAt = currentSignInAt;
     }
 }
