@@ -1230,6 +1230,19 @@ public class GitlabAPI {
 
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
+    
+    /**
+     * Delete a Merge Request Note
+     *
+     * @param mergeRequest         The merge request
+     * @param noteToDelete         The note to delete
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteNote(GitlabMergeRequest mergeRequest, GitlabNote noteToDelete) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+				+ mergeRequest.getId() + GitlabNote.URL + "/" + noteToDelete.getId();
+		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
+	}
 
     public List<GitlabBranch> getBranches(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
@@ -1419,6 +1432,31 @@ public class GitlabAPI {
     public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
         return createNote(String.valueOf(issue.getProjectId()), issue.getId(), message);
     }
+
+    /**
+     * Delete an Issue Note
+     *
+     * @param projectId	           The project id
+     * @param issueId              The issue id
+     * @param noteToDelete         The note to delete
+     * @throws IOException on gitlab api call error
+     */
+	public void deleteNote(Serializable projectId, Integer issueId, GitlabNote noteToDelete) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/"
+				+ issueId + GitlabNote.URL + "/" + noteToDelete.getId();
+		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
+	}
+
+	/**
+     * Delete an Issue Note
+     *
+     * @param issue                The issue
+     * @param noteToDelete         The note to delete
+     * @throws IOException on gitlab api call error
+     */
+	public void deleteNote(GitlabIssue issue, GitlabNote noteToDelete) throws IOException {
+		deleteNote(String.valueOf(issue.getProjectId()), issue.getId(), noteToDelete);
+	}
 
     /**
      * Gets labels associated with a project.
