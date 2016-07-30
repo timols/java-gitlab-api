@@ -2008,4 +2008,174 @@ public class GitlabAPI {
       String tailUrl = GitlabProject.URL + "/" + project + GitlabTag.URL + "/" + tagName;
       retrieve().method("DELETE").to(tailUrl, Void.class);
     }
+
+    /**
+     * Get all awards for a merge request
+     *
+     * @param mergeRequest
+     * @throws IOException on gitlab api call error
+     */
+	public List<GitlabAward> getAllAwards(GitlabMergeRequest mergeRequest) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+				+ mergeRequest.getId() + GitlabAward.URL;
+
+		return retrieve().getAll(tailUrl, GitlabAward[].class);
+	}
+
+    /**
+     * Get a specific award for a merge request 
+     *
+     * @param mergeRequest
+     * @param awardId
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward getAward(GitlabMergeRequest mergeRequest, Integer awardId) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+				+ mergeRequest.getId() + GitlabAward.URL + "/" + awardId;
+
+		return retrieve().to(tailUrl, GitlabAward.class);
+	}
+
+    /**
+     * Create an award for a merge request 
+     *
+     * @param mergeRequest
+     * @param awardName
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward createAward(GitlabMergeRequest mergeRequest, String awardName) throws IOException {
+		Query query = new Query().append("name", awardName);
+		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+				+ mergeRequest.getId() + GitlabAward.URL + query.toString();
+		
+		return dispatch().to(tailUrl, GitlabAward.class);
+	}
+
+    /**
+     * Delete an award for a merge request 
+     *
+     * @param mergeRequest
+     * @param award
+     * @throws IOException on gitlab api call error
+     */
+	public void deleteAward(GitlabMergeRequest mergeRequest, GitlabAward award) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+				+ mergeRequest.getId() + GitlabAward.URL + "/" + award.getId();
+		
+		retrieve().method("DELETE").to(tailUrl, Void.class);
+	}
+
+    /**
+     * Get all awards for an issue
+     *
+     * @param issue
+     * @throws IOException on gitlab api call error
+     */
+	public List<GitlabAward> getAllAwards(GitlabIssue issue) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabAward.URL;
+
+		return retrieve().getAll(tailUrl, GitlabAward[].class);
+	}
+
+    /**
+     * Get a specific award for an issue
+     *
+     * @param issue
+     * @param awardId
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward getAward(GitlabIssue issue, Integer awardId) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabAward.URL + "/" + awardId;
+
+		return retrieve().to(tailUrl, GitlabAward.class);
+	}
+
+    /**
+     * Create an award for an issue 
+     *
+     * @param issue
+     * @param awardName
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward createAward(GitlabIssue issue, String awardName) throws IOException {
+		Query query = new Query().append("name", awardName);
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabAward.URL + query.toString();
+		
+		return dispatch().to(tailUrl, GitlabAward.class);
+	}
+
+    /**
+     * Delete an award for an issue
+     *
+     * @param issue
+     * @param award
+     * @throws IOException on gitlab api call error
+     */
+	public void deleteAward(GitlabIssue issue, GitlabAward award) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabAward.URL + "/" + award.getId();
+		retrieve().method("DELETE").to(tailUrl, Void.class);
+	}
+
+	/**
+     * Get all awards for an issue note
+     *
+     * @param issue
+     * @param noteId
+     * @throws IOException on gitlab api call error
+     */
+	public List<GitlabAward> getAllAwards(GitlabIssue issue, Integer noteId) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabNote.URL + noteId + GitlabAward.URL;
+
+		return retrieve().getAll(tailUrl, GitlabAward[].class);
+	}
+
+    /**
+     * Get a specific award for an issue note
+     *
+     * @param issue
+     * @param noteId
+     * @param awardId
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward getAward(GitlabIssue issue, Integer noteId, Integer awardId) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabNote.URL + noteId + GitlabAward.URL + "/" + awardId;
+
+		return retrieve().to(tailUrl, GitlabAward.class);
+	}
+
+    /**
+     * Create an award for an issue note
+     *
+     * @param issue
+     * @param noteId
+     * @param awardName
+     * @throws IOException on gitlab api call error
+     */
+	public GitlabAward createAward(GitlabIssue issue, Integer noteId, String awardName) throws IOException {
+		Query query = new Query().append("name", awardName);
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabNote.URL + noteId + GitlabAward.URL + query.toString();
+		
+		return dispatch().to(tailUrl, GitlabAward.class);
+	}
+
+	/**
+     * Delete an award for an issue note
+     *
+     * @param issue
+     * @param noteId
+     * @param award
+     * @throws IOException on gitlab api call error
+     */
+	public void deleteAward(GitlabIssue issue, Integer noteId, GitlabAward award) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+				+ GitlabNote.URL + noteId + GitlabAward.URL + "/" + award.getId();
+		retrieve().method("DELETE").to(tailUrl, Void.class);
+	}
 }
