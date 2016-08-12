@@ -1417,7 +1417,7 @@ public class GitlabAPI {
         }
     }
     
-    public GitlabNote getNote(Gitlabissue issue, Integer noteId) throws IOException {
+    public GitlabNote getNote(GitlabIssue issue, Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() +
                 GitlabIssue.URL + "/" + issue.getId() +
                 GitlabNote.URL + "/" + noteId;
