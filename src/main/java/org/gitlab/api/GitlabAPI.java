@@ -1416,6 +1416,13 @@ public class GitlabAPI {
             requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
         }
     }
+    
+    public GitlabNote getNote(Gitlabissue issue, Integer noteId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() +
+                GitlabIssue.URL + "/" + issue.getId() +
+                GitlabNote.URL + "/" + noteId;
+        return retrieve().to(tailUrl, GitlabNote.class);
+    }
 
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/"
