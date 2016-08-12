@@ -1389,6 +1389,13 @@ public class GitlabAPI {
 
         return requestor.to(tailUrl, GitlabIssue.class);
     }
+    
+    public GitlabIssue moveIssue(Integer projectId, Integer issueId, Integer toProjectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId + "/move";
+        GitlabHTTPRequestor requestor = dispatch();
+        requestor.with("to_project_id", toProjectId);
+        return requestor.to(tailUrl, GitlabIssue.class);
+    }
 
     public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
                                  String description, String title, GitlabIssue.Action action) throws IOException {
