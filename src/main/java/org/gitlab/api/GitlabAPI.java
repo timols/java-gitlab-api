@@ -689,8 +689,31 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
+        return createProject(name, null, namespaceId, description, issuesEnabled, wallEnabled, mergeRequestsEnabled, wikiEnabled, snippetsEnabled, publik, visibilityLevel, importUrl);
+    }
+
+    /**
+     * Creates a Project
+     *
+     * @param name                 The name of the project
+     * @param path                 The path of the project
+     * @param namespaceId          The Namespace for the new project, otherwise null indicates to use the GitLab default (user)
+     * @param description          A description for the project, null otherwise
+     * @param issuesEnabled        Whether Issues should be enabled, otherwise null indicates to use GitLab default
+     * @param wallEnabled          Whether The Wall should be enabled, otherwise null indicates to use GitLab default
+     * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
+     * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
+     * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
+     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
+     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param importUrl            The Import URL for the project, otherwise null
+     * @return the Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProject(String name, String path, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
+                .appendIf("path", path)
                 .appendIf("namespace_id", namespaceId)
                 .appendIf("description", description)
                 .appendIf("issues_enabled", issuesEnabled)
@@ -738,8 +761,32 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
+        return createUserProject(userId, name, null, description, defaultBranch, issuesEnabled, wallEnabled, mergeRequestsEnabled, wikiEnabled, snippetsEnabled, publik, visibilityLevel, importUrl);
+    }
+
+    /**
+     * Creates a Project for a specific User
+     *
+     * @param userId               The id of the user to create the project for
+     * @param name                 The name of the project
+     * @param path                 The path of the project
+     * @param description          A description for the project, null otherwise
+     * @param defaultBranch        The default branch for the project, otherwise null indicates to use GitLab default (master)
+     * @param issuesEnabled        Whether Issues should be enabled, otherwise null indicates to use GitLab default
+     * @param wallEnabled          Whether The Wall should be enabled, otherwise null indicates to use GitLab default
+     * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
+     * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
+     * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
+     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
+     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param importUrl            The Import URL for the project, otherwise null
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createUserProject(Integer userId, String name, String path, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
+                .appendIf("path", path)
                 .appendIf("description", description)
                 .appendIf("default_branch", defaultBranch)
                 .appendIf("issues_enabled", issuesEnabled)
@@ -787,8 +834,45 @@ public class GitlabAPI {
             Integer visibilityLevel)
         throws IOException
     {
+        return updateProject(projectId, name, null, description, defaultBranch, issuesEnabled, wallEnabled, mergeRequestsEnabled, wikiEnabled, snippetsEnabled, publik, visibilityLevel);
+    }
+
+    /**
+     * Updates a Project
+     *
+     * @param projectId            The id of the project to update
+     * @param name                 The name of the project
+     * @param path                 The path of the project
+     * @param description          A description for the project, null otherwise
+     * @param defaultBranch        The branch displayed in the Gitlab UI when a user navigates to the project
+     * @param issuesEnabled        Whether Issues should be enabled, otherwise null indicates to use GitLab default
+     * @param wallEnabled          Whether The Wall should be enabled, otherwise null indicates to use GitLab default
+     * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
+     * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
+     * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
+     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
+     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @return the Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject updateProject(
+            Integer projectId,
+            String  name,
+            String  path,
+            String  description,
+            String  defaultBranch,
+            Boolean issuesEnabled,
+            Boolean wallEnabled,
+            Boolean mergeRequestsEnabled,
+            Boolean wikiEnabled,
+            Boolean snippetsEnabled,
+            Boolean publik,
+            Integer visibilityLevel)
+        throws IOException
+    {
         Query query = new Query()
                 .appendIf("name", name)
+                .appendIf("path", path)
                 .appendIf("description", description)
                 .appendIf("default_branch", defaultBranch)
                 .appendIf("issues_enabled", issuesEnabled)
