@@ -2230,4 +2230,134 @@ public class GitlabAPI {
 				+ GitlabNote.URL + noteId + GitlabAward.URL + "/" + award.getId();
 		retrieve().method("DELETE").to(tailUrl, Void.class);
 	}
+
+    /**
+     * Gets build variables associated with a project.
+     * @param projectId The ID of the project.
+     * @return A non-null list of variables.
+     * @throws IOException
+     */
+    public List<GitlabBuildVariable> getBuildVariables(Integer projectId)
+            throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabBuildVariable.URL;
+        GitlabBuildVariable[] variables = retrieve().to(tailUrl, GitlabBuildVariable[].class);
+        return Arrays.asList(variables);
+    }
+
+    /**
+     * Gets build variables associated with a project.
+     * @param project The project associated with variables.
+     * @return A non-null list of variables.
+     * @throws IOException
+     */
+    public List<GitlabBuildVariable> getBuildVariables(GitlabProject project)
+            throws IOException {
+        return getBuildVariables(project.getId());
+    }
+
+    /**
+     * Gets build variable associated with a project and key.
+     * @param projectId The ID of the project.
+     * @param key The key of the variable.
+     * @return A variable.
+     * @throws IOException
+     */
+    public GitlabBuildVariable getBuildVariable(Integer projectId, String key)
+            throws IOException {
+        String tailUrl = GitlabProject.URL + "/" +
+                projectId +
+                GitlabBuildVariable.URL +
+                key;
+        return retrieve().to(tailUrl, GitlabBuildVariable.class);
+    }
+
+    /**
+     * Gets build variable associated with a project and key.
+     * @param project The project associated with the variable.
+     * @return A variable.
+     * @throws IOException
+     */
+    public GitlabBuildVariable getBuildVariable(GitlabProject project, String key)
+            throws IOException {
+        return getBuildVariable(project.getId(), key);
+    }
+
+    /**
+     * Creates a new build variable.
+     * @param projectId The ID of the project containing the new variable.
+     * @param key The key of the variable.
+     * @param value The value of the variable
+     * @return The newly created variable.
+     * @throws IOException
+     */
+    public GitlabBuildVariable createBuildVariable(
+            Integer projectId,
+            String key,
+            String value) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabBuildVariable.URL;
+        return dispatch().with("key", key)
+                .with("value", value)
+                .to(tailUrl, GitlabBuildVariable.class);
+    }
+
+    /**
+     * Creates a new variable.
+     * @param projectId The ID of the project containing the variable.
+     * @param variable The variable to create.
+     * @return The newly created variable.
+     */
+    public GitlabBuildVariable createBuildVariable(Integer projectId, GitlabBuildVariable variable)
+            throws IOException {
+        String key = variable.getKey();
+        String value = variable.getValue();
+        return createBuildVariable(projectId, key, value);
+    }
+
+    /**
+     * Deletes an existing variable.
+     * @param projectId The ID of the project containing the variable.
+     * @param key The key of the variable to delete.
+     * @throws IOException
+     */
+    public void deleteBuildVariable(Integer projectId, String key)
+            throws IOException {
+        String tailUrl = GitlabProject.URL + "/" +
+                projectId +
+                GitlabBuildVariable.URL +
+                key;
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+    /**
+     * Deletes an existing variable.
+     * @param projectId The ID of the project containing the variable.
+     * @param variable The variable to delete.
+     * @throws IOException
+     */
+    public void deleteBuildVariable(Integer projectId, GitlabBuildVariable variable)
+            throws IOException {
+        deleteBuildVariable(projectId, variable.getKey());
+    }
+
+    /**
+     * Updates an existing variable.
+     * @param projectId The ID of the project containing the variable.
+     * @param key The key of the variable to update.
+     * @param newValue The updated value.
+     * @return The updated, deserialized variable.
+     * @throws IOException
+     */
+    public GitlabBuildVariable updateBuildVariable(Integer projectId,
+                                   String key,
+                                   String newValue) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" +
+                projectId +
+                GitlabBuildVariable.URL +
+                key;
+        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        if (newValue != null) {
+            requestor = requestor.with("value", newValue);
+        }
+        return requestor.to(tailUrl, GitlabBuildVariable.class);
+    }
 }

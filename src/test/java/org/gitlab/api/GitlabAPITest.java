@@ -1,5 +1,7 @@
 package org.gitlab.api;
 
+import org.gitlab.api.models.GitlabBuildVariable;
+import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -65,6 +67,51 @@ public class GitlabAPITest {
     }
 
     @Test
+    public void testCreateUpdateDeleteVariable() throws IOException {
+        String key = randVal("key");
+        String value = randVal("value");
+        String newValue = randVal("new_value");
+        String projectName = randVal("project");
+
+        GitlabProject project = api.createProject(projectName);
+        assertNotNull(project);
+
+        GitlabBuildVariable variable = api.createBuildVariable(project.getId(), key, value);
+        assertNotNull(variable);
+
+        GitlabBuildVariable refetched = api.getBuildVariable(project.getId(), key);
+
+        assertNotNull(refetched);
+
+        assertEquals(refetched.getKey(), variable.getKey());
+        assertEquals(refetched.getValue(), variable.getValue());
+
+        api.updateBuildVariable(project.getId(), key, newValue);
+
+
+        GitlabBuildVariable postUpdate = api.getBuildVariable(project.getId(), key);
+
+
+        assertNotNull(postUpdate);
+        assertEquals(postUpdate.getKey(), variable.getKey());
+        assertNotEquals(postUpdate.getValue(), variable.getValue());
+        assertEquals(postUpdate.getValue(), newValue);
+
+
+        api.deleteBuildVariable(project.getId(), key);
+
+        // expect a 404, but we have no access to it
+        try {
+            GitlabBuildVariable shouldNotExist = api.getBuildVariable(project.getId(), key);
+            assertNull(shouldNotExist);
+        } catch (FileNotFoundException thisIsSoOddForAnRESTApiClient) {
+            assertTrue(true); // expected
+        }
+
+        api.deleteProject(project.getId());
+    }
+
+    @Test
     public void testCreateUpdateDeleteUser() throws IOException {
 
         String password = randVal("$%password");
@@ -120,6 +167,6 @@ public class GitlabAPITest {
     }
 
     private String randVal(String postfix) {
-        return rand + "-" + postfix;
+        return rand + "_" + postfix;
     }
 }
