@@ -8,6 +8,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class GitlabBuildVariable {
     public final static String URL = "/variables/";
 
+    public GitlabBuildVariable() {
+    }
+
+    public GitlabBuildVariable(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
     @JsonProperty("key")
     private String key;
 
