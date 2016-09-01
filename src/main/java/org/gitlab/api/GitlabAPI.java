@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
-
+import org.gitlab.api.queries.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -568,7 +568,22 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProject> getProjects() throws IOException {
-        String tailUrl = GitlabProject.URL;
+        return getProjects(null);
+    }
+
+    /**
+     *
+     * Get a list of projects accessible by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getProjects(ProjectQuery projectQuery) throws IOException {
+        Query query = new Query();
+        if (projectQuery != null) {
+            query.mergeWith(projectQuery.asQuery());
+        }
+        String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
@@ -580,8 +595,22 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProject> getProjectsViaSudo(GitlabUser user) throws IOException {
+        return getProjectsViaSudo(user);
+    }
+
+    /**
+     *
+     * Get a list of projects accessible by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getProjectsViaSudo(GitlabUser user, ProjectQuery projectQuery) throws IOException {
         Query query = new Query()
                 .appendIf(PARAM_SUDO, user.getId());
+        if (projectQuery != null) {
+            query.mergeWith(projectQuery.asQuery());
+        }
         String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
@@ -594,7 +623,22 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProject> getAllProjects() throws IOException {
-        String tailUrl = GitlabProject.URL + "/all";
+        return getAllProjects(null);
+    }
+
+    /**
+     *
+     * Get's all projects in Gitlab, requires sudo user
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getAllProjects(ProjectQuery projectQuery) throws IOException {
+        Query query = new Query();
+        if (projectQuery != null) {
+            query.mergeWith(projectQuery.asQuery());
+        }
+        String tailUrl = GitlabProject.URL + "/all" + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
@@ -2075,7 +2119,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Get a specific award for a merge request 
+     * Get a specific award for a merge request
      *
      * @param mergeRequest
      * @param awardId
@@ -2089,7 +2133,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Create an award for a merge request 
+     * Create an award for a merge request
      *
      * @param mergeRequest
      * @param awardName
@@ -2104,7 +2148,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Delete an award for a merge request 
+     * Delete an award for a merge request
      *
      * @param mergeRequest
      * @param award

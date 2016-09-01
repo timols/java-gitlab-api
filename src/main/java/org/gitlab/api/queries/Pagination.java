@@ -1,10 +1,10 @@
-package org.gitlab.api;
+package org.gitlab.api.queries;
 
 import org.gitlab.api.http.Query;
 
 import java.io.UnsupportedEncodingException;
 
-public class Pagination {
+public class Pagination implements QueryType {
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_PER_PAGE = "per_page";
     public static final int MAX_ITEMS_PER_PAGE = 100;
