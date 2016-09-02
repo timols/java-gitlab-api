@@ -2,6 +2,7 @@ package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabBuildVariable;
 import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabGroup;
 import org.gitlab.api.models.GitlabUser;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -164,6 +165,27 @@ public class GitlabAPITest {
         }
 
 
+    }
+
+    @Test
+    public void testGetGroupByPath() throws IOException {
+        // Given
+        String name = "groupName";
+        String path = "groupPath";
+
+        GitlabGroup originalGroup = api.createGroup(name, path);
+
+        // When
+        GitlabGroup group = api.getGroup(path);
+
+        // Then:
+        assertNotNull(group);
+        assertEquals(originalGroup.getId(), group.getId());
+        assertEquals(originalGroup.getName(), group.getName());
+        assertEquals(originalGroup.getPath(), group.getPath());
+
+        // Cleanup
+        api.deleteGroup(group.getId());
     }
 
     private String randVal(String postfix) {

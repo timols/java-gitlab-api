@@ -343,7 +343,18 @@ public class GitlabAPI {
     }
 
     public GitlabGroup getGroup(Integer groupId) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + groupId;
+        return getGroup(groupId.toString());
+    }
+
+    /**
+     * Get a group by path
+     *
+     * @param path Path of the group
+     * @return
+     * @throws IOException
+     */
+    public GitlabGroup getGroup(String path) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + path;
         return retrieve().to(tailUrl, GitlabGroup.class);
     }
 
