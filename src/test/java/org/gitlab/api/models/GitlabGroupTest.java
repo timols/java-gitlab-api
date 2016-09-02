@@ -2,6 +2,8 @@ package org.gitlab.api.models;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+
 /**
  * Tests for {@link GitlabGroup}
  */
@@ -17,6 +19,6 @@ public class GitlabGroupTest {
     public void getLdapAccessHandlesNull() {
         GitlabGroup group = new GitlabGroup();
         group.setLdapAccess(null);
-        group.getLdapAccess();
+        assertNull( group.getLdapAccess() );
     }
 }
