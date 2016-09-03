@@ -759,7 +759,19 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createProject(String name) throws IOException {
-        return createProject(name, null, null, null, null, null, null, null, null, null, null);
+        return createProject(new CreateProjectQuery(name));
+    }
+
+    /**
+     * Creates a private Project
+     *
+     * @param createProjectQuery the parameters used to create this project
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProject(CreateProjectQuery createProjectQuery) throws IOException {
+        String tailUrl = GitlabProject.URL + createProjectQuery.toString();
+        return dispatch().to(tailUrl, GitlabProject.class);
     }
 
     /**
@@ -780,22 +792,19 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
-        QueryBuilder queryBuilder = new QueryBuilder()
-                .append("name", name)
-                .appendIf("namespace_id", namespaceId)
-                .appendIf("description", description)
-                .appendIf("issues_enabled", issuesEnabled)
-                .appendIf("wall_enabled", wallEnabled)
-                .appendIf("merge_requests_enabled", mergeRequestsEnabled)
-                .appendIf("wiki_enabled", wikiEnabled)
-                .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel)
-                .appendIf("import_url", importUrl);
-
-        String tailUrl = GitlabProject.URL + queryBuilder.toString();
-
-        return dispatch().to(tailUrl, GitlabProject.class);
+        CreateProjectQuery createProjectQuery = new CreateProjectQuery()
+                .setName(name)
+                .setNamespaceId(namespaceId)
+                .setDescription(description)
+                .setIssuesEnabled(issuesEnabled)
+                .setWallEnabled(wallEnabled)
+                .setMergeRequestEnabled(mergeRequestsEnabled)
+                .setWikiEnabled(wikiEnabled)
+                .setSnippetsEnabled(snippetsEnabled)
+                .setPublic(publik)
+                .setVisibilityLevel(visibilityLevel)
+                .setImportUrl(importUrl);
+        return createProject(createProjectQuery);
     }
 
     /**
@@ -807,7 +816,20 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name) throws IOException {
-        return createUserProject(userId, name, null, null, null, null, null, null, null, null, null, null);
+        return createUserProject(userId, new CreateProjectQuery(name));
+    }
+
+    /**
+     * Creates a Project for a specific User
+     *
+     * @param userId The id of the user to create the project for
+     * @param createProjectQuery   The param used to create this project
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createUserProject(Integer userId, CreateProjectQuery createProjectQuery) throws IOException {
+        String tailUrl = GitlabProject.URL + "/user/" + userId + createProjectQuery.toString();
+        return dispatch().to(tailUrl, GitlabProject.class);
     }
 
     /**
@@ -829,22 +851,18 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
-        QueryBuilder queryBuilder = new QueryBuilder()
-                .append("name", name)
-                .appendIf("description", description)
-                .appendIf("default_branch", defaultBranch)
-                .appendIf("issues_enabled", issuesEnabled)
-                .appendIf("wall_enabled", wallEnabled)
-                .appendIf("merge_requests_enabled", mergeRequestsEnabled)
-                .appendIf("wiki_enabled", wikiEnabled)
-                .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel)
-                .appendIf("import_url", importUrl);
-
-        String tailUrl = GitlabProject.URL + "/user/" + userId + queryBuilder.toString();
-
-        return dispatch().to(tailUrl, GitlabProject.class);
+        CreateProjectQuery createProjectQuery = new CreateProjectQuery()
+                .setName(name)
+                .setDescription(description)
+                .setIssuesEnabled(issuesEnabled)
+                .setWallEnabled(wallEnabled)
+                .setMergeRequestEnabled(mergeRequestsEnabled)
+                .setWikiEnabled(wikiEnabled)
+                .setSnippetsEnabled(snippetsEnabled)
+                .setPublic(publik)
+                .setVisibilityLevel(visibilityLevel)
+                .setImportUrl(importUrl);
+        return createUserProject(userId, createProjectQuery);
     }
 
     /**
@@ -878,20 +896,29 @@ public class GitlabAPI {
             Integer visibilityLevel)
         throws IOException
     {
-        QueryBuilder queryBuilder = new QueryBuilder()
-                .appendIf("name", name)
-                .appendIf("description", description)
-                .appendIf("default_branch", defaultBranch)
-                .appendIf("issues_enabled", issuesEnabled)
-                .appendIf("wall_enabled", wallEnabled)
-                .appendIf("merge_requests_enabled", mergeRequestsEnabled)
-                .appendIf("wiki_enabled", wikiEnabled)
-                .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel);
+        CreateProjectQuery createProjectQuery = new CreateProjectQuery()
+                .setName(name)
+                .setDescription(description)
+                .setIssuesEnabled(issuesEnabled)
+                .setWallEnabled(wallEnabled)
+                .setMergeRequestEnabled(mergeRequestsEnabled)
+                .setWikiEnabled(wikiEnabled)
+                .setSnippetsEnabled(snippetsEnabled)
+                .setPublic(publik)
+                .setVisibilityLevel(visibilityLevel);
 
-        String tailUrl = GitlabProject.URL + "/" + projectId + queryBuilder.toString();
+        return updateProject(projectId, createProjectQuery);
+    }
 
+    /**
+     * Updates a Project
+     *
+     * @param createProjectQuery the params used to update the project
+     * @return the Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject updateProject(Integer projectId, CreateProjectQuery createProjectQuery) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + createProjectQuery.toString();
         return retrieve().method("PUT").to(tailUrl, GitlabProject.class);
     }
 
