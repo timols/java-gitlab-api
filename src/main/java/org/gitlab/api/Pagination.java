@@ -1,18 +1,19 @@
-package org.gitlab.api.queries;
+package org.gitlab.api;
 
-import org.gitlab.api.http.Query;
+import org.gitlab.api.queries.Query;
+import org.gitlab.api.queries.QueryBuilder;
 
 import java.io.UnsupportedEncodingException;
 
-public class Pagination implements QueryType {
+public class Pagination implements Query {
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_PER_PAGE = "per_page";
     public static final int MAX_ITEMS_PER_PAGE = 100;
-    private final Query paginationQuery = new Query();
+    private final QueryBuilder queryBuilder = new QueryBuilder();
 
     public void setPage(int page) {
         try {
-            paginationQuery.append(PARAM_PAGE, String.valueOf(page));
+            queryBuilder.append(PARAM_PAGE, String.valueOf(page));
         } catch (UnsupportedEncodingException ignored) {
         }
     }
@@ -22,17 +23,17 @@ public class Pagination implements QueryType {
             throw new IllegalArgumentException("Max value for perPage is " + MAX_ITEMS_PER_PAGE);
         }
         try {
-            paginationQuery.append(PARAM_PER_PAGE, String.valueOf(perPage));
+            queryBuilder.append(PARAM_PER_PAGE, String.valueOf(perPage));
         } catch (UnsupportedEncodingException ignored) {
         }
     }
 
-    public Query asQuery() {
-        return paginationQuery;
+    public QueryBuilder asBuilder() {
+        return queryBuilder;
     }
 
     @Override
     public String toString() {
-        return paginationQuery.toString();
+        return queryBuilder.toString();
     }
 }

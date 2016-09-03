@@ -1,4 +1,4 @@
-package org.gitlab.api.http;
+package org.gitlab.api.queries;
 
 import org.gitlab.api.models.GitlabAccessLevel;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * Models the Query
  * aspect of a URL
  */
-public class Query {
+public class QueryBuilder {
 
     private class Tuple<T1, T2> {
         T1 _1;
@@ -37,7 +37,7 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query append(final String name, final String value) throws UnsupportedEncodingException {
+    public QueryBuilder append(final String name, final String value) throws UnsupportedEncodingException {
         params.add(new Tuple<String, Tuple<String, String>>(name, new Tuple<String, String>(value, URLEncoder.encode(value, "UTF-8"))));
         return this;
     }
@@ -51,7 +51,7 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query appendIf(final String name, final String value) throws UnsupportedEncodingException {
+    public QueryBuilder appendIf(final String name, final String value) throws UnsupportedEncodingException {
         if (value != null) {
             append(name, value);
         }
@@ -67,7 +67,7 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query appendIf(final String name, final Integer value) throws UnsupportedEncodingException {
+    public QueryBuilder appendIf(final String name, final Integer value) throws UnsupportedEncodingException {
         if (value != null) {
             append(name, value.toString());
         }
@@ -83,7 +83,7 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query appendIf(final String name, final Boolean value) throws UnsupportedEncodingException {
+    public QueryBuilder appendIf(final String name, final Boolean value) throws UnsupportedEncodingException {
         if (value != null) {
             append(name, value.toString());
         }
@@ -99,15 +99,15 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query appendIf(final String name, final GitlabAccessLevel value) throws UnsupportedEncodingException {
+    public QueryBuilder appendIf(final String name, final GitlabAccessLevel value) throws UnsupportedEncodingException {
         if (value != null) {
             append(name, Integer.toString(value.accessValue));
         }
         return this;
     }
 
-    public boolean mergeWith(Query query) {
-        return params.addAll(query.params);
+    public boolean mergeWith(QueryBuilder queryBuilder) {
+        return params.addAll(queryBuilder.params);
     }
 
     /**
