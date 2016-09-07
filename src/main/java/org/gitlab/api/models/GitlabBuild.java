@@ -13,7 +13,7 @@ public class GitlabBuild {
     private String createdAt;
     @JsonProperty("download_url")
     private String downloadUrl;
-    @JsonProperty("finishedAt")
+    @JsonProperty("finished_at")
     private String finishedAt;
     private Integer id;
     private String name;

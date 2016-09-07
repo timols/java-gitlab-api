@@ -11,7 +11,7 @@ public class GitlabCommit {
 
     private String id;
     private String title;
-    private String description;
+    private String message;
 
     @JsonProperty("short_id")
     private String shortId;
@@ -58,12 +58,12 @@ public class GitlabCommit {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMessage() {
+        return message;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getAuthorName() {
