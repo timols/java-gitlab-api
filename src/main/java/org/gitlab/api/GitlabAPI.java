@@ -2374,4 +2374,59 @@ public class GitlabAPI {
         }
         return requestor.to(tailUrl, GitlabBuildVariable.class);
     }
+    
+    /**
+     * Gets email-on-push service setup for a projectId.
+     * @param projectId The ID of the project containing the variable.
+     * @throws IOException
+     */
+    public GitlabServiceEmailOnPush getEmailsOnPush(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL;
+        return retrieve().to(tailUrl, GitlabServiceEmailOnPush.class);
+    }
+    
+    /**
+     * Update recipients for email-on-push service for a projectId.
+     * @param projectId The ID of the project containing the variable.
+     * @param emailAddress The emailaddress of the recipent who is going to receive push notification.
+     * @return 
+     * @throws IOException
+     */
+    public boolean updateEmailsOnPush(Integer projectId, String emailAddress) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL;
+
+        GitlabServiceEmailOnPush emailOnPush = this.getEmailsOnPush(projectId);
+        GitlabEmailonPushProperties properties = emailOnPush.getProperties();
+        String appendedRecipients = properties.getRecipients();
+        if(appendedRecipients != "")
+        {
+        	if(appendedRecipients.contains(emailAddress))
+          		return true;
+        	appendedRecipients = appendedRecipients + " " + emailAddress;
+        }
+        else
+        	appendedRecipients = emailAddress;
+  	    
+        Query query = new Query()
+        .appendIf("active", true)
+        .appendIf("recipients", appendedRecipients);
+
+        tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL + query.toString();
+        return retrieve().method("PUT").to(tailUrl, Boolean.class);
+    }
+    
+    /**
+    *
+    * Get a list of projects accessible by the authenticated user by search.
+    *
+    * @return A list of gitlab projects
+    * @throws IOException
+    */
+   public List<GitlabProject> searchProjects(String query) throws IOException {
+	   List<GitlabProject> projects = new ArrayList<GitlabProject>();
+       String tailUrl = GitlabProject.URL + "/search/" + query;
+       GitlabProject[] response = retrieve().to(tailUrl, GitlabProject[].class);
+       projects = Arrays.asList(response);
+       return projects;
+   }
 }
