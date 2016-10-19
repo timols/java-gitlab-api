@@ -585,6 +585,18 @@ public class GitlabAPI {
 
     /**
      *
+     * Get a list of projects owned by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getOwnedProjects() throws IOException {
+        String tailUrl = GitlabProject.URL + "/owned";
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     *
      * Get a list of projects accessible by the authenticated user.
      *
      * @return A list of gitlab projects
