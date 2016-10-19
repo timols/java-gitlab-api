@@ -2386,4 +2386,22 @@ public class GitlabAPI {
         }
         return requestor.to(tailUrl, GitlabBuildVariable.class);
     }
+
+    /**
+     * Returns the list of build triggers for a project.
+     *
+     * @param project the project
+     * @return list of build triggers
+     * @throws IllegalStateException if builds are not enabled for the project
+     * @throws IOException
+     */
+    public List<GitlabTrigger> getBuildTriggers(GitlabProject project) throws IOException {
+        if (!project.isBuildsEnabled()) {
+            // if the project has not allowed builds, you will only get a 403 forbidden message which is
+            // not helpful.
+            throw new IllegalStateException("Builds are not enabled for " + project.getNameWithNamespace() );
+        } else {
+            return retrieve().getAll(GitlabProject.URL + "/" + project.getId() + GitlabTrigger.URL, GitlabTrigger[].class);
+        }
+    }
 }
