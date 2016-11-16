@@ -1,11 +1,6 @@
 package org.gitlab.api;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.http.Query;
-import org.gitlab.api.models.*;
-
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,11 +13,50 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
+import org.gitlab.api.models.CommitComment;
+import org.gitlab.api.models.GitlabAccessLevel;
+import org.gitlab.api.models.GitlabAward;
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabBuild;
+import org.gitlab.api.models.GitlabBuildVariable;
+import org.gitlab.api.models.GitlabCommit;
+import org.gitlab.api.models.GitlabCommitComparison;
+import org.gitlab.api.models.GitlabCommitDiff;
+import org.gitlab.api.models.GitlabCommitStatus;
+import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabGroupMember;
+import org.gitlab.api.models.GitlabIssue;
+import org.gitlab.api.models.GitlabLabel;
+import org.gitlab.api.models.GitlabMergeRequest;
+import org.gitlab.api.models.GitlabMilestone;
+import org.gitlab.api.models.GitlabNamespace;
+import org.gitlab.api.models.GitlabNote;
+import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabProjectHook;
+import org.gitlab.api.models.GitlabProjectMember;
+import org.gitlab.api.models.GitlabRepositoryTree;
+import org.gitlab.api.models.GitlabSSHKey;
+import org.gitlab.api.models.GitlabSession;
+import org.gitlab.api.models.GitlabSystemHook;
+import org.gitlab.api.models.GitlabTag;
+import org.gitlab.api.models.GitlabTrigger;
+import org.gitlab.api.models.GitlabUpload;
+import org.gitlab.api.models.GitlabUser;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * Gitlab API Wrapper class
  *
  * @author &#064;timols (Tim O)
+ */
+/**
+ * @author tunim
+ *
  */
 @SuppressWarnings("unused")
 public class GitlabAPI {
@@ -621,6 +655,19 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
+	/**
+	 * Uploads a file to a project
+	 * 
+	 * @param project
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public GitlabUpload uploadFile(GitlabProject project, File file) throws IOException {
+		String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabUpload.URL;
+		return dispatch().withAttachment("file", file).to(tailUrl, GitlabUpload.class);
+	}
+    
     /**
      *
      * Gets a list of a project's builds in Gitlab
