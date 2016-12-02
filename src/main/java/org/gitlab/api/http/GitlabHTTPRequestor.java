@@ -11,30 +11,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.net.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.AuthMethod;
@@ -170,7 +153,7 @@ public class GitlabHTTPRequestor {
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
         HttpURLConnection connection = null;
         try {
-        	connection = setupConnection(root.getAPIUrl(tailAPIUrl));
+            connection = setupConnection(root.getAPIUrl(tailAPIUrl));
             if (hasAttachments()) {
                 submitAttachments(connection);
             } else if (hasOutput()) {
@@ -312,42 +295,42 @@ public class GitlabHTTPRequestor {
     }
 
     private void submitAttachments(HttpURLConnection connection) throws IOException {
-    	String boundary = Long.toHexString(System.currentTimeMillis()); // Just generate some unique random value.
-    	connection.setDoOutput(true);
-    	connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        String boundary = Long.toHexString(System.currentTimeMillis()); // Just generate some unique random value.
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         String charset = "UTF-8";
-    	String CRLF = "\r\n"; // Line separator required by multipart/form-data.
-    	OutputStream output = connection.getOutputStream();
-	    PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-    	try {
-		    for(Map.Entry<String, Object> paramEntry : data.entrySet()){
-		    	String paramName = paramEntry.getKey();
-		    	String param = GitlabAPI.MAPPER.writeValueAsString(paramEntry.getValue());
-		    	writer.append("--" + boundary).append(CRLF);
-			    writer.append("Content-Disposition: form-data; name=\"" + paramName + "\"").append(CRLF);
-			    writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
-			    writer.append(CRLF).append(param).append(CRLF).flush();
-		    }
-		    for(Map.Entry<String, File> attachMentEntry : attachments.entrySet()){
-		    	File binaryFile = attachMentEntry.getValue();
-			    writer.append("--" + boundary).append(CRLF);
-			    writer.append("Content-Disposition: form-data; name=\""+ attachMentEntry.getKey() +"\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
-			    writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
-			    writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-			    writer.append(CRLF).flush();
-			    Reader fileReader = new FileReader(binaryFile);
-			    try{
-			    	IOUtils.copy(fileReader, output);
-			    }finally{
-			    	fileReader.close();
-			    }
-			    output.flush(); // Important before continuing with writer!
-			    writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
-		    }
-		    writer.append("--" + boundary + "--").append(CRLF).flush();
-		}finally{
-			writer.close();
-		}
+        String CRLF = "\r\n"; // Line separator required by multipart/form-data.
+        OutputStream output = connection.getOutputStream();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+        try {
+            for(Map.Entry<String, Object> paramEntry : data.entrySet()){
+                String paramName = paramEntry.getKey();
+                String param = GitlabAPI.MAPPER.writeValueAsString(paramEntry.getValue());
+                writer.append("--" + boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\"" + paramName + "\"").append(CRLF);
+                writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
+                writer.append(CRLF).append(param).append(CRLF).flush();
+            }
+            for(Map.Entry<String, File> attachMentEntry : attachments.entrySet()){
+                File binaryFile = attachMentEntry.getValue();
+                writer.append("--" + boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\""+ attachMentEntry.getKey() +"\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
+                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
+                writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+                writer.append(CRLF).flush();
+                Reader fileReader = new FileReader(binaryFile);
+                try{
+                    IOUtils.copy(fileReader, output);
+                }finally{
+                    fileReader.close();
+                }
+                output.flush(); // Important before continuing with writer!
+                writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
+            }
+            writer.append("--" + boundary + "--").append(CRLF).flush();
+        }finally{
+            writer.close();
+        }
     }
     
     private void submitData(HttpURLConnection connection) throws IOException {
