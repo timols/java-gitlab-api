@@ -630,18 +630,18 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
-	/**
-	 * Uploads a file to a project
-	 * 
-	 * @param project
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-	public GitlabUpload uploadFile(GitlabProject project, File file) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabUpload.URL;
-		return dispatch().withAttachment("file", file).to(tailUrl, GitlabUpload.class);
-	}
+    /**
+     * Uploads a file to a project
+     * 
+     * @param project
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public GitlabUpload uploadFile(GitlabProject project, File file) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabUpload.URL;
+        return dispatch().withAttachment("file", file).to(tailUrl, GitlabUpload.class);
+    }
     
     /**
      *
