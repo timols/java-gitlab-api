@@ -1256,7 +1256,7 @@ public class GitlabAPI {
 
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
-    
+
     /**
      * Delete a Merge Request Note
      *
@@ -1407,7 +1407,7 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabIssue.class);
     }
 
-    public GitlabIssue createIssue(int projectId, int assigneeId, int milestoneId, String labels,
+    public GitlabIssue createIssue(int projectId, int assigneeId, Integer milestoneId, String labels,
                                    String description, String title) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
         GitlabHTTPRequestor requestor = dispatch();
@@ -1415,7 +1415,7 @@ public class GitlabAPI {
 
         return requestor.to(tailUrl, GitlabIssue.class);
     }
-    
+
     public GitlabIssue moveIssue(Integer projectId, Integer issueId, Integer toProjectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId + "/move";
         GitlabHTTPRequestor requestor = dispatch();
@@ -1437,7 +1437,7 @@ public class GitlabAPI {
     }
 
     private void applyIssue(GitlabHTTPRequestor requestor, int projectId,
-                            int assigneeId, int milestoneId, String labels, String description,
+                            int assigneeId, Integer milestoneId, String labels, String description,
                             String title) {
 
         requestor.with("title", title)
@@ -1449,7 +1449,7 @@ public class GitlabAPI {
             requestor.with("assignee_id", assigneeId == -1 ? 0 : assigneeId);
         }
     }
-    
+
     public GitlabNote getNote(GitlabIssue issue, Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() +
                 GitlabIssue.URL + "/" + issue.getId() +
@@ -1805,7 +1805,7 @@ public class GitlabAPI {
     	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL + pagination.asQuery();
         return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
-    
+
     /**
      * This will fail, if the given namespace is a user and not a group
      *
@@ -2101,7 +2101,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Get a specific award for a merge request 
+     * Get a specific award for a merge request
      *
      * @param mergeRequest
      * @param awardId
@@ -2115,7 +2115,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Create an award for a merge request 
+     * Create an award for a merge request
      *
      * @param mergeRequest
      * @param awardName
@@ -2125,12 +2125,12 @@ public class GitlabAPI {
 		Query query = new Query().append("name", awardName);
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
 				+ mergeRequest.getId() + GitlabAward.URL + query.toString();
-		
+
 		return dispatch().to(tailUrl, GitlabAward.class);
 	}
 
     /**
-     * Delete an award for a merge request 
+     * Delete an award for a merge request
      *
      * @param mergeRequest
      * @param award
@@ -2139,7 +2139,7 @@ public class GitlabAPI {
 	public void deleteAward(GitlabMergeRequest mergeRequest, GitlabAward award) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
 				+ mergeRequest.getId() + GitlabAward.URL + "/" + award.getId();
-		
+
 		retrieve().method("DELETE").to(tailUrl, Void.class);
 	}
 
@@ -2171,7 +2171,7 @@ public class GitlabAPI {
 	}
 
     /**
-     * Create an award for an issue 
+     * Create an award for an issue
      *
      * @param issue
      * @param awardName
@@ -2181,7 +2181,7 @@ public class GitlabAPI {
 		Query query = new Query().append("name", awardName);
 		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
 				+ GitlabAward.URL + query.toString();
-		
+
 		return dispatch().to(tailUrl, GitlabAward.class);
 	}
 
@@ -2239,7 +2239,7 @@ public class GitlabAPI {
 		Query query = new Query().append("name", awardName);
 		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
 				+ GitlabNote.URL + noteId + GitlabAward.URL + query.toString();
-		
+
 		return dispatch().to(tailUrl, GitlabAward.class);
 	}
 
