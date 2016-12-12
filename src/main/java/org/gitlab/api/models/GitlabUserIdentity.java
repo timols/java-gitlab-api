@@ -7,8 +7,8 @@ public class GitlabUserIdentity {
     @JsonProperty("provider")
     private String _provider;
 
-    @JsonProperty("extern_uuid")
-    private String _externUuid;
+    @JsonProperty("extern_uid")
+    private String _externUid;
 
     public String getProvider() {
         return _provider;
@@ -18,11 +18,11 @@ public class GitlabUserIdentity {
         this._provider = provider;
     }
 
-    public String getExternUuid() {
-        return _externUuid;
+    public String getExternUid() {
+        return _externUid;
     }
 
-    public void setExternUuid(String externUuid) {
-        this._externUuid = externUuid;
+    public void setExternUuid(String externUid) {
+        this._externUid = externUid;
     }
 }
