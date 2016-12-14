@@ -1,6 +1,7 @@
 package org.gitlab.api.models;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -22,6 +23,7 @@ public class GitlabUser {
     private String _provider;
     private String _state;
     private boolean _blocked;
+    private List<GitlabUserIdentity> _identities;
 
     @JsonProperty("private_token")
     private String _privateToken;
@@ -288,5 +290,13 @@ public class GitlabUser {
 
     public void setProjectsLimit(Integer projectsLimit) {
         this._projectsLimit = projectsLimit;
+    }
+
+    public List<GitlabUserIdentity> getIdentities() {
+        return _identities;
+    }
+
+    public void setIdentities(List<GitlabUserIdentity> identities) {
+        this._identities = identities;
     }
 }
