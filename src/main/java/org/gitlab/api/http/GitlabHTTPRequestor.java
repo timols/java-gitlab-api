@@ -303,7 +303,7 @@ public class GitlabHTTPRequestor {
         OutputStream output = connection.getOutputStream();
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
         try {
-            for(Map.Entry<String, Object> paramEntry : data.entrySet()){
+            for (Map.Entry<String, Object> paramEntry : data.entrySet()) {
                 String paramName = paramEntry.getKey();
                 String param = GitlabAPI.MAPPER.writeValueAsString(paramEntry.getValue());
                 writer.append("--" + boundary).append(CRLF);
@@ -311,7 +311,7 @@ public class GitlabHTTPRequestor {
                 writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
                 writer.append(CRLF).append(param).append(CRLF).flush();
             }
-            for(Map.Entry<String, File> attachMentEntry : attachments.entrySet()){
+            for (Map.Entry<String, File> attachMentEntry : attachments.entrySet()) {
                 File binaryFile = attachMentEntry.getValue();
                 writer.append("--" + boundary).append(CRLF);
                 writer.append("Content-Disposition: form-data; name=\""+ attachMentEntry.getKey() +"\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
@@ -319,16 +319,16 @@ public class GitlabHTTPRequestor {
                 writer.append("Content-Transfer-Encoding: binary").append(CRLF);
                 writer.append(CRLF).flush();
                 Reader fileReader = new FileReader(binaryFile);
-                try{
+                try {
                     IOUtils.copy(fileReader, output);
-                }finally{
+                } finally {
                     fileReader.close();
                 }
                 output.flush(); // Important before continuing with writer!
                 writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
             }
             writer.append("--" + boundary + "--").append(CRLF).flush();
-        }finally{
+        } finally {
             writer.close();
         }
     }
