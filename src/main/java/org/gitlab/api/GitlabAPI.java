@@ -1,11 +1,6 @@
 package org.gitlab.api;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.http.Query;
-import org.gitlab.api.models.*;
-
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,6 +12,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
+import org.gitlab.api.models.*;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
+import org.gitlab.api.models.*;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -621,6 +630,19 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
+    /**
+     * Uploads a file to a project
+     * 
+     * @param project
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public GitlabUpload uploadFile(GitlabProject project, File file) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabUpload.URL;
+        return dispatch().withAttachment("file", file).to(tailUrl, GitlabUpload.class);
+    }
+    
     /**
      *
      * Gets a list of a project's builds in Gitlab

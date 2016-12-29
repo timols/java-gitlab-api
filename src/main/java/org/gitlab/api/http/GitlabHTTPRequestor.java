@@ -1,23 +1,30 @@
 package org.gitlab.api.http;
 
-import org.apache.commons.io.IOUtils;
-import org.gitlab.api.AuthMethod;
-import org.gitlab.api.GitlabAPI;
-import org.gitlab.api.GitlabAPIException;
-import org.gitlab.api.TokenType;
-import org.gitlab.api.models.GitlabCommit;
-
-import javax.net.ssl.*;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
+import javax.net.ssl.*;
+
+import org.apache.commons.io.IOUtils;
+import org.gitlab.api.AuthMethod;
+import org.gitlab.api.GitlabAPI;
+import org.gitlab.api.GitlabAPIException;
+import org.gitlab.api.TokenType;
+import org.gitlab.api.models.GitlabCommit;
 
 /**
  * Gitlab HTTP Requestor
@@ -33,6 +40,7 @@ public class GitlabHTTPRequestor {
 
     private String method = "GET"; // Default to GET requests
     private Map<String, Object> data = new HashMap<String, Object>();
+    private Map<String, File> attachments = new HashMap<String, File>();
 
     private String apiToken;
     private TokenType tokenType;
@@ -75,7 +83,7 @@ public class GitlabHTTPRequestor {
         this.authMethod = method;
         return this;
     }
-
+    
     /**
      * Sets the HTTP Request method for the request.
      * Has a fluent api for method chaining.
@@ -107,6 +115,21 @@ public class GitlabHTTPRequestor {
         }
         return this;
     }
+    
+    /**
+     * Sets the HTTP Form Post parameters for the request
+     * Has a fluent api for method chaining
+     *
+     * @param key       Form parameter Key
+     * @param value     Form parameter Value
+     * @return this
+     */
+    public GitlabHTTPRequestor withAttachment(String key, File file) {
+        if (file != null && key != null) {
+            attachments.put(key, file);
+        }
+        return this;
+    }
 
     public <T> T to(String tailAPIUrl, T instance) throws IOException {
         return to(tailAPIUrl, null, instance);
@@ -131,8 +154,9 @@ public class GitlabHTTPRequestor {
         HttpURLConnection connection = null;
         try {
             connection = setupConnection(root.getAPIUrl(tailAPIUrl));
-
-            if (hasOutput()) {
+            if (hasAttachments()) {
+                submitAttachments(connection);
+            } else if (hasOutput()) {
                  submitData(connection);
             } else if ("PUT".equals(method)) {
                 // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
@@ -270,12 +294,55 @@ public class GitlabHTTPRequestor {
         };
     }
 
+    private void submitAttachments(HttpURLConnection connection) throws IOException {
+        String boundary = Long.toHexString(System.currentTimeMillis()); // Just generate some unique random value.
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        String charset = "UTF-8";
+        String CRLF = "\r\n"; // Line separator required by multipart/form-data.
+        OutputStream output = connection.getOutputStream();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+        try {
+            for (Map.Entry<String, Object> paramEntry : data.entrySet()) {
+                String paramName = paramEntry.getKey();
+                String param = GitlabAPI.MAPPER.writeValueAsString(paramEntry.getValue());
+                writer.append("--" + boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\"" + paramName + "\"").append(CRLF);
+                writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
+                writer.append(CRLF).append(param).append(CRLF).flush();
+            }
+            for (Map.Entry<String, File> attachMentEntry : attachments.entrySet()) {
+                File binaryFile = attachMentEntry.getValue();
+                writer.append("--" + boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\""+ attachMentEntry.getKey() +"\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
+                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
+                writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+                writer.append(CRLF).flush();
+                Reader fileReader = new FileReader(binaryFile);
+                try {
+                    IOUtils.copy(fileReader, output);
+                } finally {
+                    fileReader.close();
+                }
+                output.flush(); // Important before continuing with writer!
+                writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
+            }
+            writer.append("--" + boundary + "--").append(CRLF).flush();
+        } finally {
+            writer.close();
+        }
+    }
+    
     private void submitData(HttpURLConnection connection) throws IOException {
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/json");
         GitlabAPI.MAPPER.writeValue(connection.getOutputStream(), data);
     }
 
+    private boolean hasAttachments() {
+        return !attachments.isEmpty();
+    }
+    
     private boolean hasOutput() {
         return method.equals("POST") || method.equals("PUT") && !data.isEmpty();
     }
