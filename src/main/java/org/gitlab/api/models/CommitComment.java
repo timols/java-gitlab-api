@@ -2,6 +2,8 @@ package org.gitlab.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 public class CommitComment {
 
 	public static final String URL = "/comments";
@@ -13,6 +15,9 @@ public class CommitComment {
 
 	@JsonProperty("line_type")
 	private String lineType;
+
+	@JsonProperty("created_at")
+	private Date createdAt;
 
 	public GitlabUser getAuthor() {
 		return author;
@@ -52,5 +57,13 @@ public class CommitComment {
 
 	public void setLineType(String lineType) {
 		this.lineType = lineType;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 }
