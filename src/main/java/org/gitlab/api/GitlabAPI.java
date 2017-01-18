@@ -1243,10 +1243,11 @@ public class GitlabAPI {
      * @param ref_name The name of a repository branch or tag or if not given the default branch (optional)
      * @throws IOException on gitlab api call error
      */
-    public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name) throws IOException {
+    public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name, boolean recursive) throws IOException {
         Query query = new Query()
                 .appendIf("path", path)
-                .appendIf("ref_name", ref_name);
+                .appendIf("ref_name", ref_name)
+                .appendIf("recursive", recursive);
 
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL + query.toString();
         GitlabRepositoryTree[] tree = retrieve().to(tailUrl, GitlabRepositoryTree[].class);
