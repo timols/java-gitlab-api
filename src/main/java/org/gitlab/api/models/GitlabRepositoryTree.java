@@ -7,6 +7,7 @@ public class GitlabRepositoryTree {
 	private String type;
 	private String mode;
 	private String id;
+	private String path;
 
 	public String getName() {
 		return name;
@@ -40,4 +41,11 @@ public class GitlabRepositoryTree {
 		this.id = id;
 	}
 
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
 }
