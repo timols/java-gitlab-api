@@ -2,6 +2,8 @@ package org.gitlab.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class GitlabGroup {
 
     public static final String URL = "/groups";
@@ -15,6 +17,9 @@ public class GitlabGroup {
 
     @JsonProperty("ldap_access")
     private Integer ldapAccess;
+
+    @JsonProperty("shared_projects")
+    private List<GitlabProject> sharedProjects;
 
     public Integer getId() {
         return id;
@@ -59,5 +64,13 @@ public class GitlabGroup {
         if (ldapGitlabAccessLevel != null) {
             this.ldapAccess = ldapGitlabAccessLevel.accessValue;
         }
+    }
+
+    public List<GitlabProject> getSharedProjects() {
+        return sharedProjects;
+    }
+
+    public void setSharedProjects(List<GitlabProject> sharedProjects) {
+        this.sharedProjects = sharedProjects;
     }
 }

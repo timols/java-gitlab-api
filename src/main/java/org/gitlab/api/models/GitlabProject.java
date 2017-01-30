@@ -95,6 +95,9 @@ public class GitlabProject {
     @JsonProperty("tag_list")
     private List<String> tagList;
 
+    @JsonProperty("shared_with_groups")
+    private List<GitlabProjectSharedGroup> sharedWithGroups;
+
     public Integer getId() {
         return id;
     }
@@ -349,5 +352,13 @@ public class GitlabProject {
 
     public void setTagList(List<String> tagList) {
         this.tagList = tagList;
+    }
+
+    public List<GitlabProjectSharedGroup> getSharedWithGroups() {
+        return sharedWithGroups;
+    }
+
+    public void setSharedWithGroups(List<GitlabProjectSharedGroup> sharedWithGroups) {
+        this.sharedWithGroups = sharedWithGroups;
     }
 }
