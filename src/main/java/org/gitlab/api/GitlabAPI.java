@@ -48,6 +48,7 @@ public class GitlabAPI {
     private AuthMethod authMethod;
     private boolean ignoreCertificateErrors = false;
     private int requestTimeout = 0;
+    private String userAgent = GitlabAPI.class.getCanonicalName() + "/" + System.getProperty("java.version");
 
     private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
         this.hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
@@ -2482,4 +2483,17 @@ public class GitlabAPI {
        projects = Arrays.asList(response);
        return projects;
    }
+
+    /**
+     * Set the User-Agent header for the requests.
+     *
+     * @param userAgent
+     */
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
 }

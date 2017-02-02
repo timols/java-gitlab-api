@@ -380,7 +380,7 @@ public class GitlabHTTPRequestor {
                 throw (IOException) new IOException("Failed to set the custom verb").initCause(x);
             }
         }
-
+        connection.setRequestProperty("User-Agent", root.getUserAgent());
         connection.setRequestProperty("Accept-Encoding", "gzip");
         return connection;
     }
