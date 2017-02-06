@@ -98,6 +98,22 @@ public class GitlabCommit {
         this.parentIds = parentIds;
     }
 
+    public Date getCommittedDate() {
+        return committedDate;
+    }
+
+    public void setCommittedDate(Date committedDate) {
+        this.committedDate = committedDate;
+    }
+
+    public Date getAuthoredDate() {
+        return authoredDate;
+    }
+
+    public void setAuthoredDate(Date authoredDate) {
+        this.authoredDate = authoredDate;
+    }
+
     @Override
     public boolean equals(Object obj) {
         // we say that two commit objects are equal iff they have the same ID
