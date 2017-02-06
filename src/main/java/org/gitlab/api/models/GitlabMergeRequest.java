@@ -53,6 +53,9 @@ public class GitlabMergeRequest {
     @JsonProperty("merge_status")
     private String mergeStatus;
 
+    @JsonProperty("web_url")
+    private String webUrl;
+
     public Integer getId() {
         return id;
     }
@@ -242,4 +245,12 @@ public class GitlabMergeRequest {
     public String getMergeStatus() { return mergeStatus; }
 
     public void setMergeStatus(String mergeStatus) { this.mergeStatus = mergeStatus; }
+
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
+    }
 }
