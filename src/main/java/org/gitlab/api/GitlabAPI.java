@@ -1359,9 +1359,13 @@ public class GitlabAPI {
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
-    public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName);
+    public GitlabBranch getBranch(Serializable projectId, String branchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + sanitizeBranch(branchName);
         return retrieve().to(tailUrl, GitlabBranch.class);
+    }
+
+    public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
+        return getBranch(project.getId(),branchName);
     }
 
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
