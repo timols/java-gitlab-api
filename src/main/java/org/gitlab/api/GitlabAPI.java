@@ -2496,4 +2496,8 @@ public class GitlabAPI {
     public String getUserAgent() {
         return userAgent;
     }
+
+    public GitlabVersion getVersion() throws IOException {
+        return retrieve().to("version",GitlabVersion.class);
+    }
 }
