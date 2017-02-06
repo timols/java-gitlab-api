@@ -21,6 +21,9 @@ public class GitlabGroup {
     @JsonProperty("shared_projects")
     private List<GitlabProject> sharedProjects;
 
+    @JsonProperty("web_url")
+    private String webUrl;
+
     public Integer getId() {
         return id;
     }
@@ -72,5 +75,13 @@ public class GitlabGroup {
 
     public void setSharedProjects(List<GitlabProject> sharedProjects) {
         this.sharedProjects = sharedProjects;
+    }
+
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
     }
 }
