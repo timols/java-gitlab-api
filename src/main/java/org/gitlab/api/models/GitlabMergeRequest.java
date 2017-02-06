@@ -56,6 +56,8 @@ public class GitlabMergeRequest {
     @JsonProperty("web_url")
     private String webUrl;
 
+    private String sha;
+
     public Integer getId() {
         return id;
     }
@@ -252,5 +254,13 @@ public class GitlabMergeRequest {
 
     public void setWebUrl(String webUrl) {
         this.webUrl = webUrl;
+    }
+
+    public String getSha() {
+        return sha;
+    }
+
+    public void setSha(String sha) {
+        this.sha = sha;
     }
 }
