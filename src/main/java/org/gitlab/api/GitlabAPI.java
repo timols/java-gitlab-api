@@ -1255,6 +1255,15 @@ public class GitlabAPI {
         return Arrays.asList(tree);
 	}
 
+    public GitlabRepositoryFile getRepositoryFile(GitlabProject project, String path, String ref) throws IOException {
+        Query query = new Query()
+                .append("file_path", path)
+                .append("ref", ref);
+
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files" + query.toString();
+        return retrieve().to(tailUrl, GitlabRepositoryFile.class);
+    }
+
     /**
      * Update a Merge Request Note
      *
