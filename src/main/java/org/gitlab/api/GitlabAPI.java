@@ -1255,6 +1255,15 @@ public class GitlabAPI {
         return Arrays.asList(tree);
 	}
 
+    public GitlabRepositoryFile getRepositoryFile(GitlabProject project, String path, String ref) throws IOException {
+        Query query = new Query()
+                .append("file_path", path)
+                .append("ref", ref);
+
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files" + query.toString();
+        return retrieve().to(tailUrl, GitlabRepositoryFile.class);
+    }
+
     /**
      * Update a Merge Request Note
      *
@@ -1346,22 +1355,26 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteBranch(Serializable projectId, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + sanitizeBranch(branchName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizeBranch(branchName);
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
-    public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName);
+    public GitlabBranch getBranch(Serializable projectId, String branchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizeBranch(branchName);
         return retrieve().to(tailUrl, GitlabBranch.class);
     }
 
+    public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
+        return getBranch(project.getId(),branchName);
+    }
+
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName) + "/protect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizeBranch(branchName) + "/protect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + sanitizeBranch(branchName) + "/unprotect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizeBranch(branchName) + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
@@ -2495,5 +2508,9 @@ public class GitlabAPI {
 
     public String getUserAgent() {
         return userAgent;
+    }
+
+    public GitlabVersion getVersion() throws IOException {
+        return retrieve().to("version",GitlabVersion.class);
     }
 }
