@@ -405,7 +405,7 @@ public class GitlabAPI {
      */
     public List<GitlabProject> getGroupProjects(Integer groupId) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabProject.URL;
-        return Arrays.asList(retrieve().to(tailUrl, GitlabProject[].class));
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
     /**
