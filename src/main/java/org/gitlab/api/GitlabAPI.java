@@ -1,10 +1,12 @@
 package org.gitlab.api;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gitlab.api.http.GitlabHTTPRequestor;
+import org.gitlab.api.http.Query;
+import org.gitlab.api.models.*;
+
+import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -12,20 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.http.Query;
-import org.gitlab.api.models.*;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.gitlab.api.http.GitlabHTTPRequestor;
-import org.gitlab.api.http.Query;
-import org.gitlab.api.models.*;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -578,6 +566,14 @@ public class GitlabAPI {
 
     public GitlabProject getProject(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
+        return retrieve().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
+     * use namespace & project name to get project
+     */
+    public GitlabProject getProject(String namespace, String projectName) throws IOException{
+        String tailUrl = GitlabProject.URL + "/" + namespace + "%2F" + projectName;
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
