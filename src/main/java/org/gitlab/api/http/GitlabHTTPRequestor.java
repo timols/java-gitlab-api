@@ -358,7 +358,7 @@ public class GitlabHTTPRequestor {
             url = new URL(urlWithAuth);
         }
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = root.getProxy() != null ? (HttpURLConnection) url.openConnection(root.getProxy()) : (HttpURLConnection) url.openConnection();
         if (apiToken != null && authMethod == AuthMethod.HEADER) {
             connection.setRequestProperty(tokenType.getTokenHeaderName(), String.format(tokenType.getTokenHeaderFormat(), apiToken));
         }

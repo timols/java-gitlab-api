@@ -7,6 +7,7 @@ import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
 
 import java.io.*;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ public class GitlabAPI {
     private final TokenType tokenType;
     private AuthMethod authMethod;
     private boolean ignoreCertificateErrors = false;
+    private Proxy proxy;
     private int requestTimeout = 0;
     private String userAgent = GitlabAPI.class.getCanonicalName() + "/" + System.getProperty("java.version");
 
@@ -69,6 +71,11 @@ public class GitlabAPI {
         return this;
     }
 
+    public GitlabAPI proxy(Proxy proxy) {
+        this.proxy = proxy;
+        return this;
+    }
+
     public int getRequestTimeout() {
         return requestTimeout;
     }
@@ -88,6 +95,10 @@ public class GitlabAPI {
 
     public boolean isIgnoreCertificateErrors() {
         return ignoreCertificateErrors;
+    }
+
+    public Proxy getProxy() {
+        return proxy;
     }
 
     public URL getAPIUrl(String tailAPIUrl) throws IOException {
