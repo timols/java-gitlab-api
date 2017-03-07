@@ -60,4 +60,10 @@ public class PaginationTest {
         assertEquals(expectedQuery.toString(), pagination.toString());
         assertEquals(expectedQuery.toString(), pagination.asQuery().toString());
     }
+    
+    @Test
+    public void maxItemsPerPage() throws Exception {
+        Pagination pagination = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE);
+        assertEquals(String.format("?%s=%d", Pagination.PARAM_PER_PAGE, Pagination.MAX_ITEMS_PER_PAGE), pagination.toString());
+    }
 }
