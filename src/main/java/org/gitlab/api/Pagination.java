@@ -26,6 +26,16 @@ public class Pagination {
         } catch (UnsupportedEncodingException ignored) {
         }
     }
+    
+    public Pagination withPage(int page) {
+        setPage(page);
+        return this;
+    }
+    
+    public Pagination withPerPage(int perPage) {
+        setPerPage(perPage);
+        return this;
+    }
 
     public Query asQuery() {
         return paginationQuery;
