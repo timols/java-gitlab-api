@@ -727,6 +727,45 @@ public class GitlabAPI {
     }
 
     /**
+     * Creates a group Project
+     *
+     * @param name  The name of the project
+     * @param group The group for which the project should be crated
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProjectForGroup(String name, GitlabGroup group) throws IOException {
+        return createProjectForGroup(name, group, null);
+    }
+
+    /**
+     * Creates a group Project
+     *
+     * @param name        The name of the project
+     * @param group       The group for which the project should be crated
+     * @param description The project description
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProjectForGroup(String name, GitlabGroup group, String description) throws IOException {
+        return createProjectForGroup(name, group, description, null);
+    }
+
+    /**
+     * Creates a group Project
+     *
+     * @param name            The name of the project
+     * @param group           The group for which the project should be crated
+     * @param description     The project description
+     * @param visibilityLevel The project visibility level (private: 0, internal: 10, public: 20)
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProjectForGroup(String name, GitlabGroup group, String description, Integer visibilityLevel) throws IOException {
+        return createProject(name, group.getId(), description, null, null, null, null, null, null, visibilityLevel, null);
+    }
+
+    /**
      * Creates a Project
      *
      * @param name                 The name of the project
