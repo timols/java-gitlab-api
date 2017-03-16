@@ -1417,6 +1417,14 @@ public class GitlabAPI {
         return dispatch().to(tailUrl, GitlabProjectHook.class);
     }
 
+    public GitlabProjectHook addProjectHook(GitlabProject project, String url, String token) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabProjectHook.URL;
+        return dispatch()
+                .with("url", url)
+                .with("token", token)
+                .to(tailUrl, GitlabProjectHook.class);
+    }
+
     public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean tagPushEvents, boolean sslVerification) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
