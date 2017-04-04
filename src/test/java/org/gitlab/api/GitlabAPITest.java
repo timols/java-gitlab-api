@@ -123,7 +123,7 @@ public class GitlabAPITest {
                 randVal("userName"),
                 randVal("fullName"),
                 randVal("skypeId"),
-                randVal("linledin"),
+                randVal("linkedin"),
                 randVal("twitter"),
                 "http://" + randVal("url.com"),
                 10,
