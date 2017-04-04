@@ -393,7 +393,7 @@ public class GitlabHTTPRequestor {
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             String data = IOUtils.toString(reader);
-            if (type != null) {
+            if (type != null && type != Void.class) {
                 return GitlabAPI.MAPPER.readValue(data, type);
             } else if (instance != null) {
                 return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(data);
