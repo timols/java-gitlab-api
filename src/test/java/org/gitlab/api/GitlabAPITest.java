@@ -47,7 +47,7 @@ public class GitlabAPITest {
 
     @Test
     public void testAllProjects() throws IOException {
-        api.getAllProjects();
+        api.getProjects();
     }
 
     @Test
