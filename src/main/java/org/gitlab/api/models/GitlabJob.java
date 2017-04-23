@@ -3,9 +3,9 @@ package org.gitlab.api.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GitlabBuild {
+public class GitlabJob {
 
-    public final static String URL = "/builds";
+    public final static String URL = "/jobs";
 
     private GitlabCommit commit;
     private Float coverage;

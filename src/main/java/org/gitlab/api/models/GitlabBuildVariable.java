@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Vitezslav Zak
  */
 public class GitlabBuildVariable {
-    public final static String URL = "/variables/";
+    public final static String URL = "/variables";
 
     public GitlabBuildVariable() {
     }
