@@ -15,20 +15,15 @@ import static org.junit.Assume.assumeNoException;
 
 public class GitlabAPIIT {
 
-    static GitlabAPI api;
+    static GitlabAPI api = APIForIntegrationTestingHolder.INSTANCE.getApi();
 
     private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") + ":" + System.getProperty("gitlab.port", "18080");
     String rand = createRandomString();
 
-    @BeforeClass
-    public static void setup() throws IOException {
+    @Test
+    public void Check_invalid_credentials() throws IOException {
         try {
-            GitlabSession session = GitlabAPI.connect(TEST_URL, "root", "password");
-            String privateToken = session.getPrivateToken();
-            api = GitlabAPI.connect(TEST_URL, privateToken);
             api.dispatch().with("login", "INVALID").with("password", createRandomString()).to("session", GitlabUser.class);
-        } catch (ConnectException e) {
-            assumeNoException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
         } catch (GitlabAPIException e) {
             final String message = e.getMessage();
             if (!message.equals("{\"message\":\"401 Unauthorized\"}")) {
@@ -38,8 +33,6 @@ public class GitlabAPIIT {
             }
         }
     }
-
-
     @Test
     public void testAllProjects() throws IOException {
         api.getProjects();
