@@ -4,6 +4,7 @@ import org.gitlab.api.models.GitlabBuildVariable;
 import org.gitlab.api.models.GitlabGroup;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -15,10 +16,15 @@ import static org.junit.Assert.*;
 
 public class GitlabAPIIT {
 
-    static GitlabAPI api = APIForIntegrationTestingHolder.INSTANCE.getApi();
+    static GitlabAPI api;
 
     private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") + ":" + System.getProperty("gitlab.port", "18080");
     String rand = createRandomString();
+
+    @BeforeClass
+    public static void getApi() {
+        api = APIForIntegrationTestingHolder.INSTANCE.getApi();
+    }
 
     @Test
     public void Check_invalid_credentials() throws IOException {

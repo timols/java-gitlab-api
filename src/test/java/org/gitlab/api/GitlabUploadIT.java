@@ -4,13 +4,20 @@ import org.apache.commons.io.IOUtils;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUpload;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
 
 public class GitlabUploadIT {
 
-    static GitlabAPI api = APIForIntegrationTestingHolder.INSTANCE.getApi();
+    static GitlabAPI api;
+
+    @BeforeClass
+    public static void getApi() {
+        api = APIForIntegrationTestingHolder.INSTANCE.getApi();
+    }
+
 
     @Test
     public void testUploadToProject() throws Exception {

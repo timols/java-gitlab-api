@@ -2,7 +2,6 @@ package org.gitlab.api;
 
 
 import org.gitlab.api.models.GitlabSession;
-import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class APIForIntegrationTestingHolder {
 
     public static APIForIntegrationTestingHolder INSTANCE = new APIForIntegrationTestingHolder();
 
-    private final GitlabAPI api;
+    private Object api;
 
     private APIForIntegrationTestingHolder(){
         final GitlabSession session;
@@ -31,11 +30,14 @@ public class APIForIntegrationTestingHolder {
             String privateToken = session.getPrivateToken();
             api = GitlabAPI.connect(TEST_URL, privateToken);
         } catch (IOException e) {
-            throw new AssumptionViolatedException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
+            api = e;
         }
     }
 
     public GitlabAPI getApi() {
-        return api;
+        if (api instanceof IOException) {
+            throw new AssumptionViolatedException("GITLAB not running on '" + TEST_URL + "', skipping...", (IOException)api);
+        }
+        return (GitlabAPI)api;
     }
 }
