@@ -1,11 +1,7 @@
 package org.gitlab.api;
 
-import org.gitlab.api.models.GitlabBuildVariable;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabGroup;
-import org.gitlab.api.models.GitlabUser;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.gitlab.api.models.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -17,22 +13,20 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeNoException;
 
-@Ignore
-public class GitlabAPITest {
+public class GitlabAPIIT {
 
-    GitlabAPI api;
+    static GitlabAPI api;
 
-    private static final String TEST_URL = System.getProperty("TEST_URL", "http://localhost");
-    private static final String TEST_TOKEN = System.getProperty("TEST_TOKEN", "y0E5b9761b7y4qk");
+    private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") + ":" + System.getProperty("gitlab.port", "18080");
+    String rand = createRandomString();
 
-    String rand = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-
-
-    @Before
-    public void setup() throws IOException {
-        api = GitlabAPI.connect(TEST_URL, TEST_TOKEN);
+    @BeforeClass
+    public static void setup() throws IOException {
         try {
-            api.dispatch().with("login", "INVALID").with("password", rand).to("session", GitlabUser.class);
+            GitlabSession session = GitlabAPI.connect(TEST_URL, "root", "password");
+            String privateToken = session.getPrivateToken();
+            api = GitlabAPI.connect(TEST_URL, privateToken);
+            api.dispatch().with("login", "INVALID").with("password", createRandomString()).to("session", GitlabUser.class);
         } catch (ConnectException e) {
             assumeNoException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
         } catch (GitlabAPIException e) {
@@ -44,6 +38,7 @@ public class GitlabAPITest {
             }
         }
     }
+
 
     @Test
     public void testAllProjects() throws IOException {
@@ -57,7 +52,7 @@ public class GitlabAPITest {
 
     @Test
     public void testGetAPIUrl() throws IOException {
-        URL expected = new URL(TEST_URL + "/api/v3/");
+        URL expected = new URL(TEST_URL + "/api/v4/");
         assertEquals(expected, api.getAPIUrl(""));
     }
 
@@ -113,7 +108,7 @@ public class GitlabAPITest {
     }
 
     @Test
-    public void testCreateUpdateDeleteUser() throws IOException {
+    public void testCreateUpdateDeleteUser() throws IOException, InterruptedException {
 
         String password = randVal("$%password");
 
@@ -155,7 +150,8 @@ public class GitlabAPITest {
 
 
         api.deleteUser(postUpdate.getId());
-
+        // This is odd, but it seems the user is deleted asynchronously...
+        Thread.sleep(1000);
         // expect a 404, but we have no access to it
         try {
             GitlabUser shouldNotExist = api.getUser(postUpdate.getId());
@@ -190,5 +186,9 @@ public class GitlabAPITest {
 
     private String randVal(String postfix) {
         return rand + "_" + postfix;
+    }
+
+    private static String createRandomString() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 }
