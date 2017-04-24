@@ -1,17 +1,17 @@
 package org.gitlab.api;
 
-import org.gitlab.api.models.*;
-import org.junit.BeforeClass;
+import org.gitlab.api.models.GitlabBuildVariable;
+import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabProject;
+import org.gitlab.api.models.GitlabUser;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URL;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeNoException;
 
 public class GitlabAPIIT {
 
