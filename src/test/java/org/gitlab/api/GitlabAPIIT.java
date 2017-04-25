@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -132,7 +133,6 @@ public class GitlabAPIIT {
         GitlabUser refetched = api.getUserViaSudo(gitUser.getUsername());
 
         assertNotNull(refetched);
-
         assertEquals(refetched.getUsername(), gitUser.getUsername());
 
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
@@ -147,6 +147,9 @@ public class GitlabAPIIT {
         assertNotNull(postUpdate);
         assertEquals(postUpdate.getSkype(), "newSkypeId");
 
+        // block
+        api.blockUser(refetched.getId());
+        api.unblockUser(refetched.getId());
 
         api.deleteUser(postUpdate.getId());
         // This is odd, but it seems the user is deleted asynchronously...
@@ -181,6 +184,18 @@ public class GitlabAPIIT {
 
         // Cleanup
         api.deleteGroup(group.getId());
+    }
+
+    @Test
+    public void Check_get_owned_projects() throws IOException {
+        final List<GitlabProject> ownedProjects = api.getOwnedProjects();
+        assertEquals(0, ownedProjects.size());
+    }
+
+    @Test
+    public void Check_search_projects() throws IOException {
+        final List<GitlabProject> searchedProjects = api.searchProjects("foo");
+        assertEquals(0, searchedProjects.size());
     }
 
     private String randVal(String postfix) {

@@ -268,7 +268,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.BLOCK_URL;
 
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        retrieve().method("POST").to(tailUrl, Void.class);
     }
 
     /**
@@ -281,7 +281,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.UNBLOCK_URL;
 
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        retrieve().method("POST").to(tailUrl, Void.class);
     }
 
     /**
@@ -1405,8 +1405,15 @@ public class GitlabAPI {
     }
 
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
+        protectBranchWithDeveloperOptions(project, branchName, false, false);
+    }
+
+    public void protectBranchWithDeveloperOptions(GitlabProject project, String branchName, boolean developers_can_push, boolean developers_can_merge) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizePath(branchName) + "/protect";
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        final Query query = new Query()
+                .append("developers_can_push", Boolean.toString(developers_can_push))
+                .append("developers_can_merge", Boolean.toString(developers_can_merge));
+        retrieve().method("PUT").to(tailUrl + query.toString(), Void.class);
     }
 
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
@@ -1932,14 +1939,33 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabSSHKey createDeployKey(Integer targetProjectId, String title, String key) throws IOException {
+        return createDeployKey(targetProjectId, title, key, false);
+    }
+
+    /**
+     * Create a new deploy key for the project which can push.
+     *
+     * @param targetProjectId The id of the Gitlab project
+     * @param title        The title of the ssh key
+     * @param key          The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey createPushDeployKey(Integer targetProjectId, String title, String key) throws IOException {
+        return createDeployKey(targetProjectId, title, key, true);
+    }
+
+    private GitlabSSHKey createDeployKey(Integer targetProjectId, String title, String key, boolean canPush) throws IOException {
         Query query = new Query()
                 .append("title", title)
-                .append("key", key);
+                .append("key", key)
+                .append("can_push", Boolean.toString(canPush));
 
-        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.DEPLOY_KEYS_URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
+
 
     /**
      * Delete a deploy key for a project
