@@ -1,40 +1,36 @@
 package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabBuildVariable;
-import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeNoException;
 
-@Ignore
-public class GitlabAPITest {
+public class GitlabAPIIT {
 
-    GitlabAPI api;
+    static GitlabAPI api;
 
-    private static final String TEST_URL = System.getProperty("TEST_URL", "http://localhost");
-    private static final String TEST_TOKEN = System.getProperty("TEST_TOKEN", "y0E5b9761b7y4qk");
+    private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") + ":" + System.getProperty("gitlab.port", "18080");
+    String rand = createRandomString();
 
-    String rand = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    @BeforeClass
+    public static void getApi() {
+        api = APIForIntegrationTestingHolder.INSTANCE.getApi();
+    }
 
-
-    @Before
-    public void setup() throws IOException {
-        api = GitlabAPI.connect(TEST_URL, TEST_TOKEN);
+    @Test
+    public void Check_invalid_credentials() throws IOException {
         try {
-            api.dispatch().with("login", "INVALID").with("password", rand).to("session", GitlabUser.class);
-        } catch (ConnectException e) {
-            assumeNoException("GITLAB not running on '" + TEST_URL + "', skipping...", e);
+            api.dispatch().with("login", "INVALID").with("password", createRandomString()).to("session", GitlabUser.class);
         } catch (GitlabAPIException e) {
             final String message = e.getMessage();
             if (!message.equals("{\"message\":\"401 Unauthorized\"}")) {
@@ -44,10 +40,9 @@ public class GitlabAPITest {
             }
         }
     }
-
     @Test
     public void testAllProjects() throws IOException {
-        api.getAllProjects();
+        api.getProjects();
     }
 
     @Test
@@ -57,7 +52,7 @@ public class GitlabAPITest {
 
     @Test
     public void testGetAPIUrl() throws IOException {
-        URL expected = new URL(TEST_URL + "/api/v3/");
+        URL expected = new URL(TEST_URL + "/api/v4/");
         assertEquals(expected, api.getAPIUrl(""));
     }
 
@@ -113,7 +108,7 @@ public class GitlabAPITest {
     }
 
     @Test
-    public void testCreateUpdateDeleteUser() throws IOException {
+    public void testCreateUpdateDeleteUser() throws IOException, InterruptedException {
 
         String password = randVal("$%password");
 
@@ -138,7 +133,6 @@ public class GitlabAPITest {
         GitlabUser refetched = api.getUserViaSudo(gitUser.getUsername());
 
         assertNotNull(refetched);
-
         assertEquals(refetched.getUsername(), gitUser.getUsername());
 
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
@@ -153,9 +147,13 @@ public class GitlabAPITest {
         assertNotNull(postUpdate);
         assertEquals(postUpdate.getSkype(), "newSkypeId");
 
+        // block
+        api.blockUser(refetched.getId());
+        api.unblockUser(refetched.getId());
 
         api.deleteUser(postUpdate.getId());
-
+        // This is odd, but it seems the user is deleted asynchronously...
+        Thread.sleep(1000);
         // expect a 404, but we have no access to it
         try {
             GitlabUser shouldNotExist = api.getUser(postUpdate.getId());
@@ -188,7 +186,23 @@ public class GitlabAPITest {
         api.deleteGroup(group.getId());
     }
 
+    @Test
+    public void Check_get_owned_projects() throws IOException {
+        final List<GitlabProject> ownedProjects = api.getOwnedProjects();
+        assertEquals(0, ownedProjects.size());
+    }
+
+    @Test
+    public void Check_search_projects() throws IOException {
+        final List<GitlabProject> searchedProjects = api.searchProjects("foo");
+        assertEquals(0, searchedProjects.size());
+    }
+
     private String randVal(String postfix) {
         return rand + "_" + postfix;
+    }
+
+    private static String createRandomString() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 }

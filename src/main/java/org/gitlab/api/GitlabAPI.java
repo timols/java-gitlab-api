@@ -27,7 +27,7 @@ public class GitlabAPI {
 
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    private static final String API_NAMESPACE = "/api/v3";
+    private static final String API_NAMESPACE = "/api/v4";
     private static final String PARAM_SUDO = "sudo";
     private static final String PARAM_MAX_ITEMS_PER_PAGE = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).toString();
     
@@ -268,7 +268,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.BLOCK_URL;
 
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        retrieve().method("POST").to(tailUrl, Void.class);
     }
 
     /**
@@ -281,7 +281,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.UNBLOCK_URL;
 
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        retrieve().method("POST").to(tailUrl, Void.class);
     }
 
     /**
@@ -609,7 +609,21 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabProject> getOwnedProjects() throws IOException {
-        String tailUrl = GitlabProject.URL + "/owned" + PARAM_MAX_ITEMS_PER_PAGE;
+        Query query = new Query().append("owner", "true");
+        String tailUrl = GitlabProject.URL + query.toString() + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     *
+     * Get a list of projects starred by the authenticated user.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getStarredProjects() throws IOException {
+        Query query = new Query().append("starred", "true");
+        String tailUrl = GitlabProject.URL + query.toString() + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
@@ -629,18 +643,6 @@ public class GitlabAPI {
     }
 
     /**
-     *
-     * Get's all projects in Gitlab, requires sudo user
-     *
-     * @return A list of gitlab projects
-     * @throws IOException
-     */
-    public List<GitlabProject> getAllProjects() throws IOException {
-        String tailUrl = GitlabProject.URL + "/all" + PARAM_MAX_ITEMS_PER_PAGE;
-        return retrieve().getAll(tailUrl, GitlabProject[].class);
-    }
-
-    /**
      * Uploads a file to a project
      * 
      * @param project
@@ -655,27 +657,27 @@ public class GitlabAPI {
     
     /**
      *
-     * Gets a list of a project's builds in Gitlab
+     * Gets a list of a project's jobs in Gitlab
      *
      * @param project the project
-     * @return A list of project builds
+     * @return A list of project jobs
      * @throws IOException
      */
-    public List<GitlabBuild> getProjectBuilds(GitlabProject project) throws IOException {
-        return getProjectBuilds(project.getId());
+    public List<GitlabJob> getProjectJobs(GitlabProject project) throws IOException {
+        return getProjectJobs(project.getId());
     }
 
     /**
      *
-     * Gets a list of a project's builds in Gitlab
+     * Gets a list of a project's jobs in Gitlab
      *
      * @param projectId the project id
-     * @return A list of project builds
+     * @return A list of project jobs
      * @throws IOException
      */
-    public List<GitlabBuild> getProjectBuilds(Integer projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL + PARAM_MAX_ITEMS_PER_PAGE;
-        return retrieve().getAll(tailUrl, GitlabBuild[].class);
+    public List<GitlabJob> getProjectJobs(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabJob[].class);
     }
 
     /**
@@ -683,35 +685,35 @@ public class GitlabAPI {
      * Gets a build for a project
      *
      * @param projectId the project id
-     * @param buildId the build id
-     * @return A list of project builds
+     * @param jobId the build id
+     * @return A list of project jobs
      * @throws IOException
      */
-    public GitlabBuild getProjectBuild(Integer projectId, Integer buildId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL + "/" + buildId;
-        return retrieve().to(tailUrl, GitlabBuild.class);
+    public GitlabJob getProjectJob(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId;
+        return retrieve().to(tailUrl, GitlabJob.class);
     }
 
     /**
      * Get build artifacts of a project build
      *
      * @param project The Project
-     * @param build The build
+     * @param job The build
      * @throws IOException on gitlab api call error
      */
-    public byte[] getBuildArtifact(GitlabProject project, GitlabBuild build) throws IOException {
-        return getBuildArtifact(project.getId(), build.getId());
+    public byte[] getJobArtifact(GitlabProject project, GitlabJob job) throws IOException {
+        return getJobArtifact(project.getId(), job.getId());
     }
 
     /**
      * Get build artifacts of a project build
      *
      * @param projectId The Project's Id
-     * @param buildId The build's Id
+     * @param jobId The build's Id
      * @throws IOException on gitlab api call error
      */
-    public byte[] getBuildArtifact(Integer projectId, Integer buildId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBuild.URL + "/" + buildId + "/artifacts";
+    public byte[] getJobArtifact(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId + "/artifacts";
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -757,12 +759,12 @@ public class GitlabAPI {
      * @param name            The name of the project
      * @param group           The group for which the project should be crated
      * @param description     The project description
-     * @param visibilityLevel The project visibility level (private: 0, internal: 10, public: 20)
+     * @param visibility      The project visibility level (private: 0, internal: 10, public: 20)
      * @return The GitLab Project
      * @throws IOException on gitlab api call error
      */
-    public GitlabProject createProjectForGroup(String name, GitlabGroup group, String description, Integer visibilityLevel) throws IOException {
-        return createProject(name, group.getId(), description, null, null, null, null, null, null, visibilityLevel, null);
+    public GitlabProject createProjectForGroup(String name, GitlabGroup group, String description, String visibility) throws IOException {
+        return createProject(name, group.getId(), description, null, null, null, null, null, null, visibility, null);
     }
 
     /**
@@ -776,14 +778,13 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
-     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param visibility           The visibility level of the project, otherwise null indicates to use GitLab default
      * @param importUrl            The Import URL for the project, otherwise null
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
      */
     @Deprecated
-    public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
+    public GitlabProject createProject(String name, Integer namespaceId, String description, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, String visibility, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
                 .appendIf("namespace_id", namespaceId)
@@ -793,8 +794,7 @@ public class GitlabAPI {
                 .appendIf("merge_requests_enabled", mergeRequestsEnabled)
                 .appendIf("wiki_enabled", wikiEnabled)
                 .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel)
+                .appendIf("visibility", visibility)
                 .appendIf("import_url", importUrl);
 
         String tailUrl = GitlabProject.URL + query.toString();
@@ -811,7 +811,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createUserProject(Integer userId, String name) throws IOException {
-        return createUserProject(userId, name, null, null, null, null, null, null, null, null, null, null);
+        return createUserProject(userId, name, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -826,14 +826,13 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
-     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param visibility           The visibility level of the project, otherwise null indicates to use GitLab default
      * @param importUrl            The Import URL for the project, otherwise null
      * @return The GitLab Project
      * @throws IOException on gitlab api call error
      */
     @Deprecated
-    public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, Boolean publik, Integer visibilityLevel, String importUrl) throws IOException {
+    public GitlabProject createUserProject(Integer userId, String name, String description, String defaultBranch, Boolean issuesEnabled, Boolean wallEnabled, Boolean mergeRequestsEnabled, Boolean wikiEnabled, Boolean snippetsEnabled, String visibility, String importUrl) throws IOException {
         Query query = new Query()
                 .append("name", name)
                 .appendIf("description", description)
@@ -843,8 +842,7 @@ public class GitlabAPI {
                 .appendIf("merge_requests_enabled", mergeRequestsEnabled)
                 .appendIf("wiki_enabled", wikiEnabled)
                 .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel)
+                .appendIf("visibility", visibility)
                 .appendIf("import_url", importUrl);
 
         String tailUrl = GitlabProject.URL + "/user/" + userId + query.toString();
@@ -864,7 +862,6 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param publik               Whether the project is public or private, if true same as setting visibilityLevel = 20, otherwise null indicates to use GitLab default
      * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
@@ -880,8 +877,7 @@ public class GitlabAPI {
             Boolean mergeRequestsEnabled,
             Boolean wikiEnabled,
             Boolean snippetsEnabled,
-            Boolean publik,
-            Integer visibilityLevel)
+            String visibility)
         throws IOException
     {
         Query query = new Query()
@@ -893,8 +889,7 @@ public class GitlabAPI {
                 .appendIf("merge_requests_enabled", mergeRequestsEnabled)
                 .appendIf("wiki_enabled", wikiEnabled)
                 .appendIf("snippets_enabled", snippetsEnabled)
-                .appendIf("public", publik)
-                .appendIf("visibility_level", visibilityLevel);
+                .appendIf("visibility", visibility);
 
         String tailUrl = GitlabProject.URL + "/" + projectId + query.toString();
 
@@ -970,12 +965,12 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest getMergeRequestChanges(Serializable projectId, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_request/" + mergeRequestId + "/changes";
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_requests/" + mergeRequestId + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_requests/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
@@ -1093,17 +1088,6 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash;
         return retrieve().to(tailUrl, GitlabCommit.class);
     }
-
-
-    public List<GitlabBuild> getCommitBuilds(GitlabProject projectId, String commitHash) throws IOException {
-        return getCommitBuilds(projectId.getId(), commitHash);
-    }
-
-    public List<GitlabBuild> getCommitBuilds(Serializable projectId, String commitHash) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash + GitlabBuild.URL + PARAM_MAX_ITEMS_PER_PAGE;
-        return retrieve().getAll(tailUrl, GitlabBuild[].class);
-    }
-
 
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest) throws IOException {
         return getCommits(mergeRequest, new Pagination());
@@ -1260,9 +1244,9 @@ public class GitlabAPI {
      */
     public byte[] getRawFileContent(Integer projectId, String sha, String filepath) throws IOException {
         Query query = new Query()
-                .append("filepath", filepath);
+                .append("ref", sha);
 
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/blobs/" + sha + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/files/" + sanitizePath(filepath) + "/raw" + query.toString();
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -1294,13 +1278,13 @@ public class GitlabAPI {
      *
      * @param project The Project
      * @param path The path inside the repository. Used to get content of subdirectories (optional)
-     * @param ref_name The name of a repository branch or tag or if not given the default branch (optional)
+     * @param ref The name of a repository branch or tag or if not given the default branch (optional)
      * @throws IOException on gitlab api call error
      */
-    public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref_name, boolean recursive) throws IOException {
+    public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref, boolean recursive) throws IOException {
         Query query = new Query()
                 .appendIf("path", path)
-                .appendIf("ref_name", ref_name)
+                .appendIf("ref", ref)
                 .appendIf("recursive", recursive);
 
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL + query.toString();
@@ -1310,10 +1294,9 @@ public class GitlabAPI {
 
     public GitlabRepositoryFile getRepositoryFile(GitlabProject project, String path, String ref) throws IOException {
         Query query = new Query()
-                .append("file_path", path)
                 .append("ref", ref);
 
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files" + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path) + query.toString();
         return retrieve().to(tailUrl, GitlabRepositoryFile.class);
     }
 
@@ -1397,7 +1380,7 @@ public class GitlabAPI {
      */
     public void createBranch(Serializable projectId, String branchName, String ref) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
-        dispatch().with("branch_name", branchName).with("ref", ref).to(tailUrl, Void.class);
+        dispatch().with("branch", branchName).with("ref", ref).to(tailUrl, Void.class);
     }
 
     /**
@@ -1408,12 +1391,12 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteBranch(Serializable projectId, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizeBranch(branchName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizePath(branchName);
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     public GitlabBranch getBranch(Serializable projectId, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizeBranch(branchName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizePath(branchName);
         return retrieve().to(tailUrl, GitlabBranch.class);
     }
 
@@ -1422,12 +1405,19 @@ public class GitlabAPI {
     }
 
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizeBranch(branchName) + "/protect";
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        protectBranchWithDeveloperOptions(project, branchName, false, false);
+    }
+
+    public void protectBranchWithDeveloperOptions(GitlabProject project, String branchName, boolean developers_can_push, boolean developers_can_merge) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizePath(branchName) + "/protect";
+        final Query query = new Query()
+                .append("developers_can_push", Boolean.toString(developers_can_push))
+                .append("developers_can_merge", Boolean.toString(developers_can_merge));
+        retrieve().method("PUT").to(tailUrl + query.toString(), Void.class);
     }
 
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizeBranch(branchName) + "/unprotect";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizePath(branchName) + "/unprotect";
         retrieve().method("PUT").to(tailUrl, Void.class);
     }
 
@@ -1949,14 +1939,33 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabSSHKey createDeployKey(Integer targetProjectId, String title, String key) throws IOException {
+        return createDeployKey(targetProjectId, title, key, false);
+    }
+
+    /**
+     * Create a new deploy key for the project which can push.
+     *
+     * @param targetProjectId The id of the Gitlab project
+     * @param title        The title of the ssh key
+     * @param key          The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey createPushDeployKey(Integer targetProjectId, String title, String key) throws IOException {
+        return createDeployKey(targetProjectId, title, key, true);
+    }
+
+    private GitlabSSHKey createDeployKey(Integer targetProjectId, String title, String key, boolean canPush) throws IOException {
         Query query = new Query()
                 .append("title", title)
-                .append("key", key);
+                .append("key", key)
+                .append("can_push", Boolean.toString(canPush));
 
-        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.DEPLOY_KEYS_URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
+
 
     /**
      * Delete a deploy key for a project
@@ -1966,7 +1975,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteDeployKey(Integer targetProjectId, Integer targetKeyId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.DEPLOY_KEYS_URL + "/" + targetKeyId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
@@ -1978,7 +1987,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabSSHKey> getDeployKeys(Integer targetProjectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.KEYS_URL;
+        String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.DEPLOY_KEYS_URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabSSHKey[].class));
     }
 
@@ -2041,7 +2050,7 @@ public class GitlabAPI {
         }
     }
 
-    private String sanitizeBranch(String branch){
+    private String sanitizePath(String branch){
         try {
             return URLEncoder.encode(branch, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -2390,7 +2399,7 @@ public class GitlabAPI {
             throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
                 projectId +
-                GitlabBuildVariable.URL +
+                GitlabBuildVariable.URL + "/" +
                 key;
         return retrieve().to(tailUrl, GitlabBuildVariable.class);
     }
@@ -2447,7 +2456,7 @@ public class GitlabAPI {
             throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
                 projectId +
-                GitlabBuildVariable.URL +
+                GitlabBuildVariable.URL + "/" +
                 key;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
@@ -2476,7 +2485,7 @@ public class GitlabAPI {
                                    String newValue) throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
                 projectId +
-                GitlabBuildVariable.URL +
+                GitlabBuildVariable.URL + "/" +
                 key;
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
         if (newValue != null) {
@@ -2490,14 +2499,14 @@ public class GitlabAPI {
      *
      * @param project the project
      * @return list of build triggers
-     * @throws IllegalStateException if builds are not enabled for the project
+     * @throws IllegalStateException if jobs are not enabled for the project
      * @throws IOException
      */
-    public List<GitlabTrigger> getBuildTriggers(GitlabProject project) throws IOException {
-        if (!project.isBuildsEnabled()) {
-            // if the project has not allowed builds, you will only get a 403 forbidden message which is
+    public List<GitlabTrigger> getPipelineTriggers(GitlabProject project) throws IOException {
+        if (!project.isJobsEnabled()) {
+            // if the project has not allowed jobs, you will only get a 403 forbidden message which is
             // not helpful.
-            throw new IllegalStateException("Builds are not enabled for " + project.getNameWithNamespace() );
+            throw new IllegalStateException("Jobs are not enabled for " + project.getNameWithNamespace() );
         } else {
             return retrieve().getAll(GitlabProject.URL + "/" + project.getId() + GitlabTrigger.URL + PARAM_MAX_ITEMS_PER_PAGE, GitlabTrigger[].class);
         }
@@ -2550,12 +2559,12 @@ public class GitlabAPI {
     * @return A list of gitlab projects
     * @throws IOException
     */
-   public List<GitlabProject> searchProjects(String query) throws IOException {
-	   List<GitlabProject> projects = new ArrayList<GitlabProject>();
-       String tailUrl = GitlabProject.URL + "/search/" + query;
+   public List<GitlabProject> searchProjects(String search) throws IOException {
+	   Query query = new Query()
+               .append("search", search);
+       String tailUrl = GitlabProject.URL + query.toString();
        GitlabProject[] response = retrieve().to(tailUrl, GitlabProject[].class);
-       projects = Arrays.asList(response);
-       return projects;
+       return Arrays.asList(response);
    }
 
     /**

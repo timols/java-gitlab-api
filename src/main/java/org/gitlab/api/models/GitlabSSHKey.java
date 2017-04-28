@@ -3,6 +3,7 @@ package org.gitlab.api.models;
 
 public class GitlabSSHKey {
     public static String KEYS_URL = "/keys";
+    public static String DEPLOY_KEYS_URL = "/deploy_keys";
 
     private Integer _id;
     private String _title;

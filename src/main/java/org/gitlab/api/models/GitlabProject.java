@@ -45,14 +45,14 @@ public class GitlabProject {
     @JsonProperty("wiki_enabled")
     private boolean wikiEnabled;
 
-    @JsonProperty("builds_enabled")
-    private boolean buildsEnabled;
+    @JsonProperty("jobs_enabled")
+    private boolean jobsEnabled;
 
     @JsonProperty("shared_runners_enabled")
     private boolean sharedRunnersEnabled;
 
-    @JsonProperty("public_builds")
-    private boolean publicBuilds;
+    @JsonProperty("public_jobs")
+    private boolean publicJobs;
 
     @JsonProperty("runners_token")
     private String runnersToken;
@@ -210,12 +210,12 @@ public class GitlabProject {
         this.wikiEnabled = wikiEnabled;
     }
 
-    public boolean isBuildsEnabled() {
-        return buildsEnabled;
+    public boolean isJobsEnabled() {
+        return jobsEnabled;
     }
 
-    public void setBuildsEnabled(boolean buildsEnabled) {
-        this.buildsEnabled = buildsEnabled;
+    public void setJobsEnabled(boolean jobsEnabled) {
+        this.jobsEnabled = jobsEnabled;
     }
 
     public boolean isSharedRunnersEnabled() {
@@ -226,12 +226,12 @@ public class GitlabProject {
         this.sharedRunnersEnabled = sharedRunnersEnabled;
     }
 
-    public boolean hasPublicBuilds() {
-        return publicBuilds;
+    public boolean hasPublicJobs() {
+        return publicJobs;
     }
 
-    public void setPublicBuilds(boolean publicBuilds) {
-        this.publicBuilds = publicBuilds;
+    public void setPublicJobs(boolean publicJobs) {
+        this.publicJobs = publicJobs;
     }
 
     public String getRunnersToken() {

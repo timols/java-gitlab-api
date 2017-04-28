@@ -1,10 +1,10 @@
 language: java
-sudo: false
+sudo: required
+services:
+  - docker
 jdk:
 - oraclejdk7
 install:
-- ./gradlew assemble
+- ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip
 script:
-- ./gradlew check
-before_deploy:
-- ./gradlew deployZip
+- ./mvnw -B -V -Pdocker-gitlab verify
