@@ -2,7 +2,6 @@ package org.gitlab.api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
@@ -1308,19 +1307,19 @@ public class GitlabAPI {
      * @param path The file path inside the repository
      * @param branchName The name of a repository branch
      * @param commitMsg The commit message
-     * @param content The content of the file
+     * @param content The base64 encoded content of the file
      * @throws IOException on gitlab api call error
      */
-    public GitlabSimpleRepositoryFile createRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, byte[] content) throws IOException {
+    public GitlabSimpleRepositoryFile createRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        GitlabHTTPRequestor requestor = dispatch();
 
         return requestor
             .with("file_path", sanitizePath(path))
             .with("branch_name", branchName)
             .with("encoding", "base64")
             .with("commit_message", commitMsg)
-            .with("content", new Base64().encodeBase64String(content))
+            .with("content", content)
             .to(tailUrl, GitlabSimpleRepositoryFile.class);
     }
 
@@ -1331,24 +1330,24 @@ public class GitlabAPI {
      * @param path The file path inside the repository
      * @param branchName The name of a repository branch
      * @param commitMsg The commit message
-     * @param content The content of the file
+     * @param content The base64 encoded content of the file
      * @throws IOException on gitlab api call error
      */
-    public GitlabSimpleRepositoryFile updateRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, byte[] content) throws IOException {
+    public GitlabSimpleRepositoryFile updateRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
-        GitlabHTTPRequestor requestor = dispatch();
+        GitlabHTTPRequestor requestor = retrieve().method("PUT");
 
         return requestor
             .with("file_path", sanitizePath(path))
             .with("branch_name", branchName)
             .with("encoding", "base64")
             .with("commit_message", commitMsg)
-            .with("content", new Base64().encodeBase64String(content))
+            .with("content", content)
             .to(tailUrl, GitlabSimpleRepositoryFile.class);
     }
 
     /**
-     * Deletes the content of an existing file in the repository
+     * Deletes an existing file in the repository
      *
      * @param project The Project
      * @param path The file path inside the repository
