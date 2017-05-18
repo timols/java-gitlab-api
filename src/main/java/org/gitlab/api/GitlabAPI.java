@@ -1027,7 +1027,7 @@ public class GitlabAPI {
                 .appendIf("state_event", stateEvent)
                 .appendIf("labels", labels);
 
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_request/" + mergeRequestId + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_requests/" + mergeRequestId + query.toString();
 
         return retrieve().method("PUT").to(tailUrl, GitlabMergeRequest.class);
     }
@@ -1040,7 +1040,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId + "/merge";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_requests/" + mergeRequestId + "/merge";
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
         requestor.with("id", project.getId());
         requestor.with("merge_request_id", mergeRequestId);
