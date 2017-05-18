@@ -1012,15 +1012,13 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabCommit cherryPick(Serializable projectId, String sha, String targetBranchName) throws IOException {
-        Query query = new Query().append("branch", targetBranchName);
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/respository/commits/" + sha + "/cherry_pick" + query.toString();
-        return retrieve().to(tailUrl, GitlabCommit.class);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + "/cherry_pick";
+        return retrieve().with("branch", targetBranchName).to(tailUrl, GitlabCommit.class);
     }
     
     public GitlabCommit cherryPick(GitlabProject project, String sha, String targetBranchName) throws IOException {
-        Query query = new Query().append("branch", targetBranchName);
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/respository/commits/" + sha + "/cherry_pick" + query.toString();
-        return retrieve().to(tailUrl, GitlabCommit.class);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/commits/" + sha + "/cherry_pick";
+        return dispatch().with("branch", targetBranchName).to(tailUrl, GitlabCommit.class);
     }
     
     /**
