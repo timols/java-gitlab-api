@@ -1002,6 +1002,12 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
+    public GitlabCommit cherryPick(Serializable projectId, String sha, String targetBranchName) throws IOException {
+        Query query = new Query().append("branch", targetBranchName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/respository/commits/" + sha + "/cherry_pick" + query.toString();
+        return retrieve().to(tailUrl, GitlabCommit.class);
+    }
+    
     /**
      * Return Merge Request.
      *
