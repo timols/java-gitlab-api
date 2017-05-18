@@ -1002,9 +1002,24 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
+    /**
+     * Cherry picks a commit.
+     * 
+     * @param projectId         The id of the project
+     * @param sha               The sha of the commit
+     * @param targetBranchName  The branch on which the commit must be cherry-picked
+     * @return the commit of the cherry-pick.
+     * @throws IOException on gitlab api call error
+     */
     public GitlabCommit cherryPick(Serializable projectId, String sha, String targetBranchName) throws IOException {
         Query query = new Query().append("branch", targetBranchName);
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/respository/commits/" + sha + "/cherry_pick" + query.toString();
+        return retrieve().to(tailUrl, GitlabCommit.class);
+    }
+    
+    public GitlabCommit cherryPick(GitlabProject project, String sha, String targetBranchName) throws IOException {
+        Query query = new Query().append("branch", targetBranchName);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/respository/commits/" + sha + "/cherry_pick" + query.toString();
         return retrieve().to(tailUrl, GitlabCommit.class);
     }
     
