@@ -24,12 +24,23 @@ public class GitlabGroup {
     @JsonProperty("web_url")
     private String webUrl;
 
+    @JsonProperty("parent_id")
+    private Integer parentId;
+
     public Integer getId() {
         return id;
     }
 
+    public Integer getParentId() {
+        return parentId;
+    }
+
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     public String getName() {
