@@ -593,7 +593,7 @@ public class GitlabAPI {
                 return gp;
             }
         }
-        return null;
+        throw new FileNotFoundException("Project not found: "+fullName);
     }
 
     /**
