@@ -921,6 +921,28 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(Serializable projectId, String status) throws IOException {
+        return getMergeRequestsWithStatus(projectId, status, new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE));
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(Serializable projectId, String status, Pagination pagination) throws IOException {
+        Query query = pagination.asQuery();
+        query.append("state", status);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(GitlabProject project, String status) throws IOException {
+        return getMergeRequestsWithStatus(project, status, new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE));
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(GitlabProject project, String status, Pagination pagination) throws IOException {
+        Query query = pagination.asQuery();
+        query.append("state", status);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + query;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+    
     public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
