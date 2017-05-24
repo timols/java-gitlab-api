@@ -488,6 +488,35 @@ public class GitlabAPI {
     /**
      * Creates a Group
      *
+     * @param request  The project-creation request
+     * @param sudoUser The user to create the group on behalf of
+     *
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroup(CreateGroupRequest request, GitlabUser sudoUser) throws IOException {
+
+        Query query = new Query()
+                .append("name", request.getName())
+                .append("path", request.getPath())
+                .appendIf("ldap_cn", request.getLdapCn())
+                .appendIf("description", request.getDescription())
+                .appendIf("membershipLock", request.getMembershipLock())
+                .appendIf("share_with_group_lock", request.getShareWithGroupLock())
+                .appendIf("visibility", request.getVisibility())
+                .appendIf("lfs_enabled", request.getLfsEnabled())
+                .appendIf("request_access_enabled", request.getRequestAccessEnabled())
+                .appendIf("parent_id", request.getParentId())
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+
+        String tailUrl = GitlabGroup.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+
+    /**
+     * Creates a Group
+     *
      * @param name       The name of the group
      * @param path       The path for the group
      * @param ldapCn     LDAP Group Name to sync with, null otherwise
