@@ -994,12 +994,12 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest getMergeRequestChanges(Serializable projectId, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_requests/" + mergeRequestId + "/changes";
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_requests/" + mergeRequestId;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
@@ -1056,7 +1056,7 @@ public class GitlabAPI {
                 .appendIf("state_event", stateEvent)
                 .appendIf("labels", labels);
 
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/merge_request/" + mergeRequestId + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + query.toString();
 
         return retrieve().method("PUT").to(tailUrl, GitlabMergeRequest.class);
     }
@@ -1069,7 +1069,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/merge_request/" + mergeRequestId + "/merge";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
         requestor.with("id", project.getId());
         requestor.with("merge_request_id", mergeRequestId);
