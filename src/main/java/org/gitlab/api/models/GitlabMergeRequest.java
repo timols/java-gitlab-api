@@ -49,13 +49,16 @@ public class GitlabMergeRequest {
     @JsonProperty("created_at")
     private Date createdAt;
 
-
+    @JsonProperty("merge_commit_sha")
+    private String mergeCommitSHA;
+    
     @JsonProperty("merge_status")
     private String mergeStatus;
 
     @JsonProperty("web_url")
     private String webUrl;
 
+    @JsonProperty("sha")
     private String sha;
 
     public Integer getId() {
@@ -244,9 +247,21 @@ public class GitlabMergeRequest {
         this.changes = changes;
     }
 
-    public String getMergeStatus() { return mergeStatus; }
+    public String getMergeCommitSHA() {
+        return mergeCommitSHA;
+    }
 
-    public void setMergeStatus(String mergeStatus) { this.mergeStatus = mergeStatus; }
+    public void setMergeCommitSHA(String mergeCommitSHA) {
+        this.mergeCommitSHA = mergeCommitSHA;
+    }
+
+    public String getMergeStatus() { 
+        return mergeStatus; 
+    }
+
+    public void setMergeStatus(String mergeStatus) { 
+        this.mergeStatus = mergeStatus; 
+    }
 
     public String getWebUrl() {
         return webUrl;
