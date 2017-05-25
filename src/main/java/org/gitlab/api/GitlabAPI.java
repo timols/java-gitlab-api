@@ -908,51 +908,51 @@ public class GitlabAPI {
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "opened");
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_OPENED);
     }
     
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "opened", pagination);
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_OPENED, pagination);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
-        return getMergeRequestsWithStatus(project, "opened");
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_OPENED);
     }
     
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(project, "opened", pagination);
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_OPENED, pagination);
     }
     
     public List<GitlabMergeRequest> getMergedMergeRequests(Serializable projectId) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "merged");
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_MERGED);
     }
     
     public List<GitlabMergeRequest> getMergedMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "merged", pagination);
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_MERGED, pagination);
     }
 
     public List<GitlabMergeRequest> getMergedMergeRequests(GitlabProject project) throws IOException {
-        return getMergeRequestsWithStatus(project, "merged");
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_MERGED);
     }
     
     public List<GitlabMergeRequest> getMergedMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(project, "merged", pagination);
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_MERGED, pagination);
     }
     
     public List<GitlabMergeRequest> getClosedMergeRequests(Serializable projectId) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "closed");
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_CLOSED);
     }
     
     public List<GitlabMergeRequest> getClosedMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(projectId, "closed", pagination);
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_CLOSED, pagination);
     }
 
     public List<GitlabMergeRequest> getClosedMergeRequests(GitlabProject project) throws IOException {
-        return getMergeRequestsWithStatus(project, "closed");
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_CLOSED);
     }
     
     public List<GitlabMergeRequest> getClosedMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
-        return getMergeRequestsWithStatus(project, "closed", pagination);
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_CLOSED, pagination);
     }
 
     public List<GitlabMergeRequest> getMergeRequestsWithStatus(Serializable projectId, String status) throws IOException {
