@@ -768,7 +768,7 @@ public class GitlabAPI {
                 .appendIf("container_registry_enabled", project.isContainerRegistryEnabled())
                 .appendIf("shared_runners_enabled", project.isSharedRunnersEnabled())
 
-                .appendIf("visibility", project.getVisibilityLevel())
+                .appendIf("visibility", project.getVisibility())
                 .appendIf("public_jobs", project.hasPublicJobs())
                 .appendIf("import_url", project.getImportUrl())
 
@@ -935,7 +935,7 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param visibility      The visibility level of the project, otherwise null indicates to use GitLab default
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
      */

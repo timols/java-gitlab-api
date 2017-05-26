@@ -24,8 +24,8 @@ public class GitlabProject {
     private Boolean publicProject;
     private String path;
 
-    @JsonProperty("visibility_level")
-    private Integer visibilityLevel;
+    @JsonProperty("visibility")
+    private String visibility;
 
     @JsonProperty("path_with_namespace")
     private String pathWithNamespace;
@@ -162,12 +162,12 @@ public class GitlabProject {
         this.defaultBranch = defaultBranch;
     }
 
-    public Integer getVisibilityLevel() {
-        return visibilityLevel;
+    public String getVisibility() {
+        return visibility;
     }
 
-    public void setVisibilityLevel(Integer visibilityLevel) {
-        this.visibilityLevel = visibilityLevel;
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
     public GitlabUser getOwner() {
