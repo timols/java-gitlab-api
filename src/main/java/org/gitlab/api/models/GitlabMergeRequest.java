@@ -7,7 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
-
+    public static final String STATUS_OPENED = "opened";
+    public static final String STATUS_MERGED = "merged";
+    public static final String STATUS_CLOSED = "closed";
+    
     private Integer id;
     private Integer iid;
     private String title;

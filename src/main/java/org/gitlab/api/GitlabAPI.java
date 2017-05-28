@@ -937,21 +937,82 @@ public class GitlabAPI {
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
-        Query query = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery();
-        query.append("state", "opened");
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query;
-        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_OPENED);
+    }
+    
+    public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_OPENED, pagination);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project) throws IOException {
-        Query query = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery();
-        query.append("state", "opened");
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_OPENED);
+    }
+    
+    public List<GitlabMergeRequest> getOpenMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_OPENED, pagination);
+    }
+    
+    public List<GitlabMergeRequest> getMergedMergeRequests(Serializable projectId) throws IOException {
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_MERGED);
+    }
+    
+    public List<GitlabMergeRequest> getMergedMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_MERGED, pagination);
+    }
+
+    public List<GitlabMergeRequest> getMergedMergeRequests(GitlabProject project) throws IOException {
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_MERGED);
+    }
+    
+    public List<GitlabMergeRequest> getMergedMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_MERGED, pagination);
+    }
+    
+    public List<GitlabMergeRequest> getClosedMergeRequests(Serializable projectId) throws IOException {
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_CLOSED);
+    }
+    
+    public List<GitlabMergeRequest> getClosedMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_CLOSED, pagination);
+    }
+
+    public List<GitlabMergeRequest> getClosedMergeRequests(GitlabProject project) throws IOException {
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_CLOSED);
+    }
+    
+    public List<GitlabMergeRequest> getClosedMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
+        return getMergeRequestsWithStatus(project, GitlabMergeRequest.STATUS_CLOSED, pagination);
+    }
+
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(Serializable projectId, String status) throws IOException {
+        return getMergeRequestsWithStatus(projectId, status, new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE));
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(Serializable projectId, String state, Pagination pagination) throws IOException {
+        Query query = pagination.asQuery();
+        query.append("state", state);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(GitlabProject project, String status) throws IOException {
+        return getMergeRequestsWithStatus(project, status, new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE));
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequestsWithStatus(GitlabProject project, String state, Pagination pagination) throws IOException {
+        Query query = pagination.asQuery();
+        query.append("state", state);
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + query;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
-
+    
     public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+    
+    public List<GitlabMergeRequest> getMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + pagination.toString();
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
@@ -959,12 +1020,36 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
-
-    public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
+    
+    public List<GitlabMergeRequest> getMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + pagination.toString();
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
+    public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
+        return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
+    }
+
+    /**
+     * Cherry picks a commit.
+     * 
+     * @param projectId         The id of the project
+     * @param sha               The sha of the commit
+     * @param targetBranchName  The branch on which the commit must be cherry-picked
+     * @return the commit of the cherry-pick.
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabCommit cherryPick(Serializable projectId, String sha, String targetBranchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + "/cherry_pick";
+        return retrieve().with("branch", targetBranchName).to(tailUrl, GitlabCommit.class);
+    }
+    
+    public GitlabCommit cherryPick(GitlabProject project, String sha, String targetBranchName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/commits/" + sha + "/cherry_pick";
+        return dispatch().with("branch", targetBranchName).to(tailUrl, GitlabCommit.class);
+    }
+    
     /**
      * Return Merge Request.
      *
