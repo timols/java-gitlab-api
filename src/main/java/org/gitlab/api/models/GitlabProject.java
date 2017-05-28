@@ -21,38 +21,38 @@ public class GitlabProject {
     private String defaultBranch;
 
     private GitlabUser owner;
-    private boolean publicProject;
+    private Boolean publicProject;
     private String path;
 
-    @JsonProperty("visibility_level")
-    private Integer visibilityLevel;
+    @JsonProperty("visibility")
+    private String visibility;
 
     @JsonProperty("path_with_namespace")
     private String pathWithNamespace;
 
     @JsonProperty("issues_enabled")
-    private boolean issuesEnabled;
+    private Boolean issuesEnabled;
 
     @JsonProperty("merge_requests_enabled")
-    private boolean mergeRequestsEnabled;
+    private Boolean mergeRequestsEnabled;
 
     @JsonProperty("snippets_enabled")
-    private boolean snippetsEnabled;
+    private Boolean snippetsEnabled;
 
     @JsonProperty("wall_enabled")
     private boolean wallEnabled;
 
     @JsonProperty("wiki_enabled")
-    private boolean wikiEnabled;
+    private Boolean wikiEnabled;
 
     @JsonProperty("jobs_enabled")
-    private boolean jobsEnabled;
+    private Boolean jobsEnabled;
 
     @JsonProperty("shared_runners_enabled")
-    private boolean sharedRunnersEnabled;
+    private Boolean sharedRunnersEnabled;
 
     @JsonProperty("public_jobs")
-    private boolean publicJobs;
+    private Boolean publicJobs;
 
     @JsonProperty("runners_token")
     private String runnersToken;
@@ -98,6 +98,30 @@ public class GitlabProject {
     @JsonProperty("shared_with_groups")
     private List<GitlabProjectSharedGroup> sharedWithGroups;
 
+    @JsonProperty("container_registry_enabled")
+    private boolean containerRegistryEnabled;
+
+    @JsonProperty("only_allow_merge_if_pipeline_succeeds")
+    private Boolean onlyAllowMergeIfPipelineSucceeds;
+
+    @JsonProperty("only_allow_merge_if_all_discussions_are_resolved")
+    private Boolean onlyAllowMergeIfAllDiscussionsAreResolved;
+
+    @JsonProperty("lfs_enabled")
+    private Boolean lfsEnabled;
+
+    @JsonProperty("request_access_enabled")
+    private Boolean requestAccessEnabled;
+
+    @JsonProperty("repository_storage")
+    private String repositoryStorage;
+
+    @JsonProperty("approvals_before_merge")
+    private Integer approvalsBeforeMerge;
+
+    @JsonProperty("import_url")
+    private String importUrl;
+
     public Integer getId() {
         return id;
     }
@@ -138,12 +162,12 @@ public class GitlabProject {
         this.defaultBranch = defaultBranch;
     }
 
-    public Integer getVisibilityLevel() {
-        return visibilityLevel;
+    public String getVisibility() {
+        return visibility;
     }
 
-    public void setVisibilityLevel(Integer visibilityLevel) {
-        this.visibilityLevel = visibilityLevel;
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
     public GitlabUser getOwner() {
@@ -218,12 +242,52 @@ public class GitlabProject {
         this.jobsEnabled = jobsEnabled;
     }
 
-    public boolean isSharedRunnersEnabled() {
+    public Boolean isRequestAccessEnabled() {
+        return requestAccessEnabled;
+    }
+
+    public void setRequestAccessEnabled(Boolean requestAccessEnabled) {
+        this.requestAccessEnabled = requestAccessEnabled;
+    }
+
+    public Boolean isLfsEnabled() {
+        return lfsEnabled;
+    }
+
+    public void setLfsEnabled(Boolean lfsEnabled) {
+        this.lfsEnabled = lfsEnabled;
+    }
+
+    public Boolean isSharedRunnersEnabled() {
         return sharedRunnersEnabled;
     }
 
-    public void setSharedRunnersEnabled(boolean sharedRunnersEnabled) {
+    public void setSharedRunnersEnabled(Boolean sharedRunnersEnabled) {
         this.sharedRunnersEnabled = sharedRunnersEnabled;
+    }
+
+    public boolean getOnlyAllowMergeIfPipelineSucceeds() {
+        return onlyAllowMergeIfPipelineSucceeds;
+    }
+
+    public void setOnlyAllowMergeIfPipelineSucceeds(boolean onlyAllowMergeIfPipelineSucceeds) {
+        this.onlyAllowMergeIfPipelineSucceeds = onlyAllowMergeIfPipelineSucceeds;
+    }
+
+    public boolean getOnlyAllowMergeIfAllDiscussionsAreResolved() {
+        return onlyAllowMergeIfAllDiscussionsAreResolved;
+    }
+
+    public void setOnlyAllowMergeIfAllDiscussionsAreResolved(boolean onlyAllowMergeIfAllDiscussionsAreResolved) {
+        this.onlyAllowMergeIfAllDiscussionsAreResolved = onlyAllowMergeIfAllDiscussionsAreResolved;
+    }
+
+    public boolean isContainerRegistryEnabled() {
+        return containerRegistryEnabled;
+    }
+
+    public void setContainerRegistryEnabled(boolean containerRegistryEnabled) {
+        this.containerRegistryEnabled = containerRegistryEnabled;
     }
 
     public boolean hasPublicJobs() {
@@ -360,5 +424,29 @@ public class GitlabProject {
 
     public void setSharedWithGroups(List<GitlabProjectSharedGroup> sharedWithGroups) {
         this.sharedWithGroups = sharedWithGroups;
+    }
+
+    public String getRepositoryStorage() {
+        return repositoryStorage;
+    }
+
+    public void setRepositoryStorage(String repositoryStorage) {
+        this.repositoryStorage = repositoryStorage;
+    }
+
+    public Integer getApprovalsBeforeMerge() {
+        return approvalsBeforeMerge;
+    }
+
+    public void setApprovalsBeforeMerge(Integer approvalsBeforeMerge) {
+        this.approvalsBeforeMerge = approvalsBeforeMerge;
+    }
+
+    public String getImportUrl() {
+        return importUrl;
+    }
+
+    public void setImportUrl(String importUrl) {
+        this.importUrl = importUrl;
     }
 }

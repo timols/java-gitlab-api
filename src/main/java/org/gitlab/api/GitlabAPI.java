@@ -747,6 +747,50 @@ public class GitlabAPI {
     }
 
     /**
+     * Creates a Project
+     *
+     * @param project The project to create
+     * @return The GitLab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createProject(GitlabProject project) throws IOException {
+        Query query = new Query()
+                .appendIf("name", project.getName())
+                .appendIf("path", project.getPath())
+                .appendIf("default_branch", project.getDefaultBranch())
+                .appendIf("description", project.getDescription())
+                .appendIf("issues_enabled", project.isIssuesEnabled())
+                .appendIf("merge_requests_enabled", project.isMergeRequestsEnabled())
+                .appendIf("jobs_enabled", project.isJobsEnabled())
+                .appendIf("wiki_enabled", project.isWikiEnabled())
+                .appendIf("snippets_enabled", project.isSnippetsEnabled())
+
+                .appendIf("container_registry_enabled", project.isContainerRegistryEnabled())
+                .appendIf("shared_runners_enabled", project.isSharedRunnersEnabled())
+
+                .appendIf("visibility", project.getVisibility())
+                .appendIf("public_jobs", project.hasPublicJobs())
+                .appendIf("import_url", project.getImportUrl())
+
+                .appendIf("only_allow_merge_if_pipeline_succeeds", project.getOnlyAllowMergeIfPipelineSucceeds())
+                .appendIf("only_allow_merge_if_all_discussions_are_resolved", project.getOnlyAllowMergeIfAllDiscussionsAreResolved())
+                .appendIf("lfs_enabled", project.isLfsEnabled())
+                .appendIf("request_enabled", project.isRequestAccessEnabled())
+                .appendIf("repository_storage", project.getRepositoryStorage())
+                .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge());
+
+        GitlabNamespace namespace = project.getNamespace();
+        if (namespace != null) {
+                query.appendIf("namespace_id", namespace.getId());
+        }
+
+
+        String tailUrl = GitlabProject.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
      * Creates a private Project
      *
      * @param name The name of the project
@@ -891,7 +935,7 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param visibilityLevel      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param visibility      The visibility level of the project, otherwise null indicates to use GitLab default
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
      */
