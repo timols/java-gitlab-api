@@ -585,15 +585,15 @@ public class GitlabAPI {
      * use namespace & project name to get project
      */
     public GitlabProject getProject(String namespace, String projectName) throws IOException{
-        String fullName = namespace+" / "+projectName;
         String tailUrl = GitlabProject.URL + "?search=" + projectName;
         GitlabProject[] projects = retrieve().to(tailUrl, GitlabProject[].class);
         for(GitlabProject gp : projects) {
-            if(gp.getNameWithNamespace().equals(fullName)) {
+            String pNamespace = gp.getNamespace().getName();
+            if(pNamespace.equals(namespace)) {
                 return gp;
             }
         }
-        throw new FileNotFoundException("Project not found: "+fullName);
+        throw new FileNotFoundException("Project not found: "+namespace+" / "+projectName);
     }
 
     /**
