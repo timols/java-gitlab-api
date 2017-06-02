@@ -40,7 +40,7 @@ public class GitlabProject {
     private Boolean snippetsEnabled;
 
     @JsonProperty("wall_enabled")
-    private boolean wallEnabled;
+    private Boolean wallEnabled;
 
     @JsonProperty("wiki_enabled")
     private Boolean wikiEnabled;
@@ -73,7 +73,7 @@ public class GitlabProject {
     private Date lastActivityAt;
 
     @JsonProperty("archived")
-    private boolean archived;
+    private Boolean archived;
 
     private GitlabNamespace namespace;
 
@@ -99,7 +99,7 @@ public class GitlabProject {
     private List<GitlabProjectSharedGroup> sharedWithGroups;
 
     @JsonProperty("container_registry_enabled")
-    private boolean containerRegistryEnabled;
+    private Boolean containerRegistryEnabled;
 
     @JsonProperty("only_allow_merge_if_pipeline_succeeds")
     private Boolean onlyAllowMergeIfPipelineSucceeds;
@@ -194,51 +194,51 @@ public class GitlabProject {
         this.pathWithNamespace = pathWithNamespace;
     }
 
-    public boolean isIssuesEnabled() {
+    public Boolean isIssuesEnabled() {
         return issuesEnabled;
     }
 
-    public void setIssuesEnabled(boolean issuesEnabled) {
+    public void setIssuesEnabled(Boolean issuesEnabled) {
         this.issuesEnabled = issuesEnabled;
     }
 
-    public boolean isMergeRequestsEnabled() {
+    public Boolean isMergeRequestsEnabled() {
         return mergeRequestsEnabled;
     }
 
-    public void setMergeRequestsEnabled(boolean mergeRequestsEnabled) {
+    public void setMergeRequestsEnabled(Boolean mergeRequestsEnabled) {
         this.mergeRequestsEnabled = mergeRequestsEnabled;
     }
 
-    public boolean isSnippetsEnabled() {
+    public Boolean isSnippetsEnabled() {
         return snippetsEnabled;
     }
 
-    public void setSnippetsEnabled(boolean snippetsEnabled) {
+    public void setSnippetsEnabled(Boolean snippetsEnabled) {
         this.snippetsEnabled = snippetsEnabled;
     }
 
-    public boolean isWallEnabled() {
+    public Boolean isWallEnabled() {
         return wallEnabled;
     }
 
-    public void setWallEnabled(boolean wallEnabled) {
+    public void setWallEnabled(Boolean wallEnabled) {
         this.wallEnabled = wallEnabled;
     }
 
-    public boolean isWikiEnabled() {
+    public Boolean isWikiEnabled() {
         return wikiEnabled;
     }
 
-    public void setWikiEnabled(boolean wikiEnabled) {
+    public void setWikiEnabled(Boolean wikiEnabled) {
         this.wikiEnabled = wikiEnabled;
     }
 
-    public boolean isJobsEnabled() {
+    public Boolean isJobsEnabled() {
         return jobsEnabled;
     }
 
-    public void setJobsEnabled(boolean jobsEnabled) {
+    public void setJobsEnabled(Boolean jobsEnabled) {
         this.jobsEnabled = jobsEnabled;
     }
 
@@ -266,35 +266,35 @@ public class GitlabProject {
         this.sharedRunnersEnabled = sharedRunnersEnabled;
     }
 
-    public boolean getOnlyAllowMergeIfPipelineSucceeds() {
+    public Boolean getOnlyAllowMergeIfPipelineSucceeds() {
         return onlyAllowMergeIfPipelineSucceeds;
     }
 
-    public void setOnlyAllowMergeIfPipelineSucceeds(boolean onlyAllowMergeIfPipelineSucceeds) {
+    public void setOnlyAllowMergeIfPipelineSucceeds(Boolean onlyAllowMergeIfPipelineSucceeds) {
         this.onlyAllowMergeIfPipelineSucceeds = onlyAllowMergeIfPipelineSucceeds;
     }
 
-    public boolean getOnlyAllowMergeIfAllDiscussionsAreResolved() {
+    public Boolean getOnlyAllowMergeIfAllDiscussionsAreResolved() {
         return onlyAllowMergeIfAllDiscussionsAreResolved;
     }
 
-    public void setOnlyAllowMergeIfAllDiscussionsAreResolved(boolean onlyAllowMergeIfAllDiscussionsAreResolved) {
+    public void setOnlyAllowMergeIfAllDiscussionsAreResolved(Boolean onlyAllowMergeIfAllDiscussionsAreResolved) {
         this.onlyAllowMergeIfAllDiscussionsAreResolved = onlyAllowMergeIfAllDiscussionsAreResolved;
     }
 
-    public boolean isContainerRegistryEnabled() {
+    public Boolean isContainerRegistryEnabled() {
         return containerRegistryEnabled;
     }
 
-    public void setContainerRegistryEnabled(boolean containerRegistryEnabled) {
+    public void setContainerRegistryEnabled(Boolean containerRegistryEnabled) {
         this.containerRegistryEnabled = containerRegistryEnabled;
     }
 
-    public boolean hasPublicJobs() {
+    public Boolean hasPublicJobs() {
         return publicJobs;
     }
 
-    public void setPublicJobs(boolean publicJobs) {
+    public void setPublicJobs(Boolean publicJobs) {
         this.publicJobs = publicJobs;
     }
 
@@ -346,19 +346,19 @@ public class GitlabProject {
         this.namespace = namespace;
     }
 
-    public boolean isPublic() {
+    public Boolean isPublic() {
         return publicProject;
     }
 
-    public void setPublic(boolean aPublic) {
+    public void setPublic(Boolean aPublic) {
         publicProject = aPublic;
     }
 
-    public boolean isArchived() {
+    public Boolean isArchived() {
         return archived;
     }
 
-    public void setArchived(boolean archived) {
+    public void setArchived(Boolean archived) {
         this.archived = archived;
     }
 
