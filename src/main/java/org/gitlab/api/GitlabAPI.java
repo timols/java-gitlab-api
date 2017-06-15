@@ -2813,12 +2813,23 @@ public class GitlabAPI {
     /**
      * Delete a shared project link within a group.
      *
-     * @param group   The group
-     * @param project The project
+     * @param group   The group.
+     * @param project The project.
      * @throws IOException on gitlab api call error
      */
     public void deleteSharedProjectGroupLink(GitlabGroup group, GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/share/" + group.getId();
+        deleteSharedProjectGroupLink(group.getId(), project.getId());
+    }
+
+    /**
+     * Delete a shared project link within a group.
+     *
+     * @param groupId   The group id number.
+     * @param projectId The project id number.
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteSharedProjectGroupLink(int groupId, int projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/share/" + groupId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
