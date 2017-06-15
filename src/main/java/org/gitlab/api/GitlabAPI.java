@@ -2792,6 +2792,37 @@ public class GitlabAPI {
    }
 
     /**
+     * Share a project with a group.
+     *
+     * @param accessLevel The permissions level to grant the group.
+     * @param group       The group to share with.
+     * @param project     The project to be shared.
+     * @param expiration  Share expiration date in ISO 8601 format: 2016-09-26 or {@code null}.
+     * @throws IOException on gitlab api call error
+     */
+    public void shareProjectWithGroup(GitlabAccessLevel accessLevel, String expiration, GitlabGroup group, GitlabProject project) throws IOException {
+        Query query = new Query()
+                .append("group_id", group.getId().toString())
+                .append("group_access", String.valueOf(accessLevel.accessValue))
+                .appendIf("expires_at", expiration);
+
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/share" + query.toString();
+        dispatch().to(tailUrl, Void.class);
+    }
+
+    /**
+     * Delete a shared project link within a group.
+     *
+     * @param group   The group
+     * @param project The project
+     * @throws IOException on gitlab api call error
+     */
+    public void deleteSharedProjectGroupLink(GitlabGroup group, GitlabProject project) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/share/" + group.getId();
+        retrieve().method("DELETE").to(tailUrl, Void.class);
+    }
+
+    /**
      * Set the User-Agent header for the requests.
      *
      * @param userAgent
