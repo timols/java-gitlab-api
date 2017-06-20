@@ -2777,6 +2777,65 @@ public class GitlabAPI {
     }
     
     /**
+     * Get JIRA service settings for a project.
+     * https://docs.gitlab.com/ce/api/services.html#get-jira-service-settings
+     * 
+     * @param projectId The ID of the project containing the variable.
+     * @return
+     * @throws IOException
+     */
+    public GitlabServiceJira getJiraService(Integer projectId) throws IOException{
+    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL;
+    	return retrieve().to(tailUrl, GitlabServiceJira.class);
+    }
+    
+    /**
+     * Remove all previously JIRA settings from a project.
+     * https://docs.gitlab.com/ce/api/services.html#delete-jira-service
+     * 
+     * @param projectId The ID of the project containing the variable.
+     * @return
+     * @throws IOException
+     */
+    public boolean deleteJiraService(Integer projectId) throws IOException{
+    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL;
+    	return retrieve().method("DELETE").to(tailUrl, Boolean.class);
+    }
+    
+    /**
+     * Set JIRA service for a project.
+     * https://docs.gitlab.com/ce/api/services.html#create-edit-jira-service
+     * 
+     * @param projectId The ID of the project containing the variable.
+     * @param jiraPropties
+     * @return
+     * @throws IOException
+     */
+    public boolean createOrEditJiraService(Integer projectId, GitlabJiraProperties jiraPropties) throws IOException{
+    	
+    	Query query = new Query()
+    			.appendIf("url", jiraPropties.getUrl())
+    			.appendIf("project_key", jiraPropties.getProjectKey());
+    	
+    	if(!jiraPropties.getUsername().isEmpty()){
+    		query.appendIf("username", jiraPropties.getUsername());
+    	}
+    	
+    	if(!jiraPropties.getPassword().isEmpty()){
+    		query.appendIf("password", jiraPropties.getPassword());
+    	}
+    	
+    	if(jiraPropties.getIssueTransitionId() != null){
+    		query.appendIf("jira_issue_transition_id", jiraPropties.getIssueTransitionId());
+    	}
+    			
+    	
+    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL+ query.toString();
+    	return retrieve().method("PUT").to(tailUrl, Boolean.class);
+    	
+    }
+    
+    /**
     *
     * Get a list of projects accessible by the authenticated user by search.
     *
