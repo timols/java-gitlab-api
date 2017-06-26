@@ -1440,14 +1440,13 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref, boolean recursive) throws IOException {
-        Query query = new Query()
+        Query query = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery()
                 .appendIf("path", path)
                 .appendIf("ref", ref)
                 .appendIf("recursive", recursive);
 
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL + query.toString();
-        GitlabRepositoryTree[] tree = retrieve().to(tailUrl, GitlabRepositoryTree[].class);
-        return Arrays.asList(tree);
+        return retrieve().getAll(tailUrl, GitlabRepositoryTree[].class);
 	}
 
     public GitlabRepositoryFile getRepositoryFile(GitlabProject project, String path, String ref) throws IOException {
@@ -1564,15 +1563,13 @@ public class GitlabAPI {
 	}
 
     public List<GitlabBranch> getBranches(Serializable projectId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL;
-        GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
-        return Arrays.asList(branches);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabBranch[].class);
     }
 
     public List<GitlabBranch> getBranches(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL;
-        GitlabBranch[] branches = retrieve().to(tailUrl, GitlabBranch[].class);
-        return Arrays.asList(branches);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabBranch[].class);
     }
 
     /**
@@ -2334,9 +2331,8 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabTag> getTags(Serializable projectId) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL;
-      GitlabTag[] tags = retrieve().to(tailUrl, GitlabTag[].class);
-      return Arrays.asList(tags);
+      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
+      return retrieve().getAll(tailUrl, GitlabTag[].class);
     }
 
     /**
@@ -2347,9 +2343,8 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabTag> getTags(GitlabProject project) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
-      GitlabTag[] tags = retrieve().to(tailUrl, GitlabTag[].class);
-      return Arrays.asList(tags);
+      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
+      return retrieve().getAll(tailUrl, GitlabTag[].class);
     }
 
     /**
