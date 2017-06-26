@@ -775,7 +775,7 @@ public class GitlabAPI {
                 .appendIf("only_allow_merge_if_pipeline_succeeds", project.getOnlyAllowMergeIfPipelineSucceeds())
                 .appendIf("only_allow_merge_if_all_discussions_are_resolved", project.getOnlyAllowMergeIfAllDiscussionsAreResolved())
                 .appendIf("lfs_enabled", project.isLfsEnabled())
-                .appendIf("request_enabled", project.isRequestAccessEnabled())
+                .appendIf("request_access_enabled", project.isRequestAccessEnabled())
                 .appendIf("repository_storage", project.getRepositoryStorage())
                 .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge());
 
