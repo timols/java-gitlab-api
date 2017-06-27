@@ -747,6 +747,29 @@ public class GitlabAPI {
     }
 
     /**
+     * Get build trace of a project build
+     *
+     * @param project The Project
+     * @param job The build
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getJobTrace(GitlabProject project, GitlabJob job) throws IOException {
+        return getJobArtifact(project.getId(), job.getId());
+    }
+
+    /**
+     * Get build trace of a project build
+     *
+     * @param projectId The Project's Id
+     * @param jobId The build's Id
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getJobTrace(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId + "/trace";
+        return retrieve().to(tailUrl, byte[].class);
+    }
+
+    /**
      * Creates a Project
      *
      * @param project The project to create
