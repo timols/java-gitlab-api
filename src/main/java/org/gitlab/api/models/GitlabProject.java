@@ -122,6 +122,9 @@ public class GitlabProject {
     @JsonProperty("import_url")
     private String importUrl;
 
+    @JsonProperty("is_printing_merge_request_link_enabled")
+    private Boolean printingMergeRequestLinkEnabled;
+
     public Integer getId() {
         return id;
     }
@@ -449,4 +452,13 @@ public class GitlabProject {
     public void setImportUrl(String importUrl) {
         this.importUrl = importUrl;
     }
+
+    public Boolean isPrintingMergeRequestLinkEnabled() {
+	return printingMergeRequestLinkEnabled;
+    }
+
+    public void setPrintingMergeRequestLinkEnabled(Boolean printingMergeRequestLinkEnabled) {
+        this.printingMergeRequestLinkEnabled = printingMergeRequestLinkEnabled;
+    }
+
 }
