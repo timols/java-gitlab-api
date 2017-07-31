@@ -364,7 +364,7 @@ public class GitlabAPI {
      * @throws IOException
      */
     public GitlabGroup getGroup(String path) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + path;
+        String tailUrl = GitlabGroup.URL + "/" + URLEncoder.encode(path, "UTF-8");
         return retrieve().to(tailUrl, GitlabGroup.class);
     }
 
