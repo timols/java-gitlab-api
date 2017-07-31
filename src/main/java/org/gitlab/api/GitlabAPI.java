@@ -2,6 +2,7 @@ package org.gitlab.api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
@@ -364,7 +365,7 @@ public class GitlabAPI {
      * @throws IOException
      */
     public GitlabGroup getGroup(String path) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + path;
+        String tailUrl = GitlabGroup.URL + "/" + URLEncoder.encode(path, "UTF-8");
         return retrieve().to(tailUrl, GitlabGroup.class);
     }
 
@@ -488,27 +489,16 @@ public class GitlabAPI {
     /**
      * Creates a Group
      *
-     * @param request  The project-creation request
-     * @param sudoUser The user to create the group on behalf of
+     * @param request  An object that represents the parameters for the request.
+     * @param sudoUser The user for whom we're creating the group
      *
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
      */
-    public GitlabGroup createGroup(CreateGroupRequest request, GitlabUser sudoUser) throws IOException {
-
-        Query query = new Query()
-                .append("name", request.getName())
-                .append("path", request.getPath())
-                .appendIf("ldap_cn", request.getLdapCn())
-                .appendIf("description", request.getDescription())
-                .appendIf("membershipLock", request.getMembershipLock())
-                .appendIf("share_with_group_lock", request.getShareWithGroupLock())
-                .appendIf("visibility", request.getVisibility())
-                .appendIf("lfs_enabled", request.getLfsEnabled())
-                .appendIf("request_access_enabled", request.getRequestAccessEnabled())
-                .appendIf("parent_id", request.getParentId())
-                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
-
+    public GitlabGroup createGroup(CreateGroupRequest request, GitlabUser sudoUser) throws IOException {      
+        Query query = request.toQuery();
+        query.appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+        
         String tailUrl = GitlabGroup.URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabGroup.class);

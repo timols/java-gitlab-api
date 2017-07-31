@@ -1,15 +1,21 @@
 package org.gitlab.api.models;
 
+import java.io.UnsupportedEncodingException;
+import org.gitlab.api.http.Query;
 
+/**
+ * The model for custom group-creation requests.
+ *
+ */
 public class CreateGroupRequest {
 
     public CreateGroupRequest(String name) {
-	this(name, name);
+      this(name, name);
     }
 
     public CreateGroupRequest(String name, String path) {
-	this.name = name;
-	this.path = path;
+      this.name = name;
+      this.path = path;
     }
 
     private String name;
@@ -18,10 +24,29 @@ public class CreateGroupRequest {
     private String description;
     private Boolean membershipLock;
     private Boolean shareWithGroupLock;
-    private Boolean visibility;
+    private GitlabVisibility visibility;
     private Boolean lfsEnabled;
     private Boolean requestAccessEnabled;
     private Integer parentId;
+    
+    /**
+     * Generates query representing this request's properties.
+     * @return {@link Query}
+     * @throws UnsupportedEncodingException 
+     */
+    public Query toQuery() throws UnsupportedEncodingException{
+      return new Query()
+          .append("name", name)
+          .append("path", path)
+          .appendIf("ldap_cn", ldapCn)
+          .appendIf("description", description)
+          .appendIf("membershipLock", membershipLock)
+          .appendIf("share_with_group_lock", shareWithGroupLock)
+          .appendIf("visibility", visibility != null ? visibility.toString() : null)
+          .appendIf("lfs_enabled", lfsEnabled)
+          .appendIf("request_access_enabled", requestAccessEnabled)
+          .appendIf("parent_id", parentId);
+    }
 
     public String getName() {
         return name;
@@ -76,11 +101,11 @@ public class CreateGroupRequest {
         return this;
     }
 
-    public Boolean getVisibility() {
+    public GitlabVisibility getVisibility() {
         return visibility;
     }
 
-    public CreateGroupRequest setVisibility(Boolean visibility) {
+    public CreateGroupRequest setVisibility(GitlabVisibility visibility) {
         this.visibility = visibility;
         return this;
     }
