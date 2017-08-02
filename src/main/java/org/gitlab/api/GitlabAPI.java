@@ -207,6 +207,17 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabUser.class);
     }
+    
+    /**
+     * Create a new user. This may succeed only if the requester is an administrator.
+     * @param request An object that represents the parameters for the request.
+     * @return {@link GitlabUser}
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabUser createUser(CreateUserRequest request) throws IOException {
+      String tailUrl = GitlabUser.USERS_URL + request.toQuery().toString();
+      return dispatch().to(tailUrl, GitlabUser.class);
+    }
 
 
     /**
