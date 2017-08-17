@@ -1510,14 +1510,12 @@ public class GitlabAPI {
      * @param commitMsg The commit message
      * @throws IOException on gitlab api call error
      */
-    public GitlabSimpleRepositoryFile deleteRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
-        GitlabHTTPRequestor requestor = retrieve().method("DELETE");
-
-        return requestor
-            .with("branch", branchName)
-            .with("commit_message", commitMsg)
-            .to(tailUrl, GitlabSimpleRepositoryFile.class);
+    public void deleteRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg) throws IOException {
+        Query query = new Query()
+            .append("branch", branchName)
+            .append("commit_message", commitMsg);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path) + query.toString();
+        retrieve().method("DELETE").to(tailUrl, Void.class);
     }
 
     /**
