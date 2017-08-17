@@ -1468,12 +1468,11 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabSimpleRepositoryFile createRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
         GitlabHTTPRequestor requestor = dispatch();
 
         return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
+            .with("branch", branchName)
             .with("encoding", "base64")
             .with("commit_message", commitMsg)
             .with("content", content)
@@ -1491,12 +1490,11 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabSimpleRepositoryFile updateRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
 
         return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
+            .with("branch", branchName)
             .with("encoding", "base64")
             .with("commit_message", commitMsg)
             .with("content", content)
@@ -1513,12 +1511,11 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabSimpleRepositoryFile deleteRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
         GitlabHTTPRequestor requestor = retrieve().method("DELETE");
 
         return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
+            .with("branch", branchName)
             .with("commit_message", commitMsg)
             .to(tailUrl, GitlabSimpleRepositoryFile.class);
     }
