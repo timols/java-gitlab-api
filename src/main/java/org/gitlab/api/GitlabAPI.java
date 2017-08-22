@@ -1711,6 +1711,13 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
 
+    public List<GitlabIssue> getIssues(GitlabGroup group, GitlabMilestone milestone) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(group.getId())
+                + GitlabMilestone.URL + "/" + sanitizeMilestoneId(milestone.getId())
+                + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabIssue[].class);
+    }
+
     public GitlabIssue getIssue(Serializable projectId, Integer issueId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + "/" + issueId;
         return retrieve().to(tailUrl, GitlabIssue.class);
@@ -2274,6 +2281,10 @@ public class GitlabAPI {
 
     private String sanitizeGroupId(Serializable groupId) {
         return sanitizeId(groupId, "groupId");
+    }
+
+    private String sanitizeMilestoneId(Serializable milestoneId) {
+        return sanitizeId(milestoneId, "milestoneId");
     }
 
     private String sanitizeId(Serializable id, String parameterName) {
