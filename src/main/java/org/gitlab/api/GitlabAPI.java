@@ -1716,6 +1716,11 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabIssue.class);
     }
 
+    public GitlabIssueTimeStats getIssueTimeStats(Serializable projectId, Integer issueId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + "/" + issueId + GitlabIssueTimeStats.URL;
+        return retrieve().to(tailUrl, GitlabIssueTimeStats.class);
+    }
+
     public GitlabIssue createIssue(int projectId, int assigneeId, Integer milestoneId, String labels,
                                    String description, String title) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL;
