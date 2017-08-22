@@ -201,6 +201,7 @@ public class GitlabAPIIT {
 
     /**
      * There is at least one namespace for the user
+     *
      * @throws IOException
      */
     @Test
@@ -233,10 +234,12 @@ public class GitlabAPIIT {
                 false);
 
 
-        GitlabProject project = api.createUserProject(gitUser.getId(),projectName);
+        GitlabProject project = api.createUserProject(gitUser.getId(), projectName);
         GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
 
         assertNotNull(fork);
+
+        assertEquals(project.getId(), fork.getForkedFrom().getId());
 
         api.deleteProject(project.getId());
         api.deleteProject(fork.getId());

@@ -88,4 +88,24 @@ public class GitlabNamespace {
         this.membersCountWithDescendants = membersCountWithDescendants;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GitlabNamespace that = (GitlabNamespace) o;
+
+        if (id != null || that.id != null) {
+            return id != null && id.equals(that.id);
+        } else {
+            return name != null ? name.equals(that.name) : that.name == null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
 }

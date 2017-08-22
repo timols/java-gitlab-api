@@ -674,10 +674,11 @@ public class GitlabAPI {
     /**
      * Get a list of the namespaces of the authenticated user.
      * If the user is an administrator, a list of all namespaces in the GitLab instance is shown.
+     *
      * @return A list of gitlab namespace
      * @throws IOException
      */
-    public List<GitlabNamespace> getNamespaces() throws IOException{
+    public List<GitlabNamespace> getNamespaces() throws IOException {
         String tailUrl = GitlabNamespace.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabNamespace[].class);
     }
@@ -935,23 +936,21 @@ public class GitlabAPI {
     }
 
     /**
-     *
      * @param namespace The namespace of the fork
      * @param projectId ProjectId of the project forked
      * @return The new Gitlab Project
      * @throws IOException on gitlab api call error
      */
-    public GitlabProject createFork(String namespace,Integer projectId) throws IOException{
+    public GitlabProject createFork(String namespace, Integer projectId) throws IOException {
         Query query = new Query()
                 .appendIf("id", projectId)
                 .append("namespace", namespace);
-        String tailUrl = GitlabProject.URL+"/" + projectId + "/fork";
-        return dispatch().to(tailUrl,GitlabProject.class);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork";
+        return dispatch().to(tailUrl, GitlabProject.class);
     }
 
     /**
-     *
-     * @param namespace The namespace of the fork
+     * @param namespace     The namespace of the fork
      * @param gitlabProject The project forked
      * @return The new Gitlab Project
      * @throws IOException on gitlab api call error
