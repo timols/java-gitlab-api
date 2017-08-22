@@ -1916,10 +1916,10 @@ public class GitlabAPI {
     }
 
     public List<GitlabMilestone> getMilestones(GitlabProject project) throws IOException {
-        return getMilestones(String.valueOf(project.getId()));
+        return getProjectMilestones(String.valueOf(project.getId()));
     }
 
-    public List<GitlabMilestone> getMilestones(Serializable projectId) throws IOException {
+    public List<GitlabMilestone> getProjectMilestones(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
     }
