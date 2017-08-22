@@ -1919,8 +1919,17 @@ public class GitlabAPI {
         return getProjectMilestones(String.valueOf(project.getId()));
     }
 
+    public List<GitlabMilestone> getMilestones(GitlabGroup group) throws IOException {
+        return getGroupMilestones(String.valueOf(group.getId()));
+    }
+
     public List<GitlabMilestone> getProjectMilestones(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
+    }
+
+    public List<GitlabMilestone> getGroupMilestones(Serializable groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(groupId) + GitlabMilestone.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabMilestone[].class));
     }
 
@@ -2260,12 +2269,20 @@ public class GitlabAPI {
     }
 
     private String sanitizeProjectId(Serializable projectId) {
-        if (!(projectId instanceof String) && !(projectId instanceof Number)) {
-            throw new IllegalArgumentException("projectId needs to be of type String or Number");
+        return sanitizeId(projectId, "projectId");
+    }
+
+    private String sanitizeGroupId(Serializable groupId) {
+        return sanitizeId(groupId, "groupId");
+    }
+
+    private String sanitizeId(Serializable id, String parameterName) {
+        if (!(id instanceof String) && !(id instanceof Number)) {
+            throw new IllegalArgumentException(parameterName + " needs to be of type String or Number");
         }
 
         try {
-            return URLEncoder.encode(String.valueOf(projectId), "UTF-8");
+            return URLEncoder.encode(String.valueOf(id), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException((e));
         }
