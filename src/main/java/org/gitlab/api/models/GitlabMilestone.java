@@ -15,6 +15,9 @@ public class GitlabMilestone {
     @JsonProperty("project_id")
     private int projectId;
 
+    @JsonProperty("group_id")
+    private int groupId;
+
     private String title;
 
     private String description;
@@ -52,6 +55,14 @@ public class GitlabMilestone {
 
     public void setProjectId(int projectId) {
         this.projectId = projectId;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public String getTitle() {
