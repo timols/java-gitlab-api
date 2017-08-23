@@ -935,6 +935,32 @@ public class GitlabAPI {
     }
 
     /**
+     *
+     * @param namespace The namespace of the fork
+     * @param projectId ProjectId of the project forked
+     * @return The new Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createFork(String namespace,Integer projectId) throws IOException{
+        Query query = new Query()
+                .appendIf("id", projectId)
+                .append("namespace", namespace);
+        String tailUrl = GitlabProject.URL+"/" + projectId + "/fork";
+        return dispatch().to(tailUrl,GitlabProject.class);
+    }
+
+    /**
+     *
+     * @param namespace The namespace of the fork
+     * @param gitlabProject The project forked
+     * @return The new Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createFork(String namespace, GitlabProject gitlabProject) throws IOException {
+        return createFork(namespace, gitlabProject.getId());
+    }
+
+    /**
      * Updates a Project
      *
      * @param projectId            The id of the project to update

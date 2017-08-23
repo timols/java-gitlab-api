@@ -209,6 +209,41 @@ public class GitlabAPIIT {
         assertTrue(gitlabNamespaces.size() > 0);
     }
 
+    @Test
+    public void testCreateDeleteFork() throws IOException {
+        String projectName = randVal("Fork-me");
+
+        String password = randVal("$%password");
+
+
+        GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
+                password,
+                randVal("userName"),
+                randVal("fullName"),
+                randVal("skypeId"),
+                randVal("linkedin"),
+                randVal("twitter"),
+                "http://" + randVal("url.com"),
+                10,
+                randVal("externuid"),
+                randVal("externprovidername"),
+                randVal("bio"),
+                false,
+                false,
+                false);
+
+
+        GitlabProject project = api.createUserProject(gitUser.getId(),projectName);
+        GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
+
+        assertNotNull(fork);
+
+        api.deleteProject(project.getId());
+        api.deleteProject(fork.getId());
+
+        api.deleteUser(gitUser.getId());
+    }
+
     private String randVal(String postfix) {
         return rand + "_" + postfix;
     }
