@@ -672,6 +672,17 @@ public class GitlabAPI {
     }
 
     /**
+     * Get a list of the namespaces of the authenticated user.
+     * If the user is an administrator, a list of all namespaces in the GitLab instance is shown.
+     * @return A list of gitlab namespace
+     * @throws IOException
+     */
+    public List<GitlabNamespace> getNamespaces() throws IOException{
+        String tailUrl = GitlabNamespace.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabNamespace[].class);
+    }
+
+    /**
      * Uploads a file to a project
      * 
      * @param project
@@ -2134,7 +2145,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
-        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
+        String tailUrl = GitlabGroup.URL + "/" + namespaceId + GitlabProjectMember.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 
@@ -2146,7 +2157,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void transfer(Integer namespaceId, Integer projectId) throws IOException {
-        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
+        String tailUrl = GitlabGroup.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
         dispatch().to(tailUrl, Void.class);
     }
 

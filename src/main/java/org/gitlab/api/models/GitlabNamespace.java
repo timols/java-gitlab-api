@@ -5,21 +5,24 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabNamespace {
-    public static final String URL = "/groups";
+    public static final String URL = "/namespaces";
 
     private Integer id;
     private String name;
     private String path;
-    private String description;
+    private String kind;
+    private String plan;
 
-    @JsonProperty("created_at")
-    private Date createdAt;
+    @JsonProperty("full_path")
+    private String fullPath;
 
-    @JsonProperty("updated_at")
-    private Date updatedAt;
+    @JsonProperty("parent_id")
+    private String parentId;
 
-    @JsonProperty("owner_id")
-    private Integer ownerId;
+    @JsonProperty("members_count_with_descendants")
+    private Integer membersCountWithDescendants;
+
+
 
     public Integer getId() {
         return id;
@@ -27,30 +30,6 @@ public class GitlabNamespace {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Integer getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Integer ownerId) {
-        this.ownerId = ownerId;
     }
 
     public String getName() {
@@ -69,11 +48,44 @@ public class GitlabNamespace {
         this.path = path;
     }
 
-    public String getDescription() {
-        return description;
+    public String getKind() {
+        return kind;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setKind(String kind) {
+        this.kind = kind;
     }
+
+    public String getPlan() {
+        return plan;
+    }
+
+    public void setPlan(String plan) {
+        this.plan = plan;
+    }
+
+    public String getFullPath() {
+        return fullPath;
+    }
+
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public Integer getMembersCountWithDescendants() {
+        return membersCountWithDescendants;
+    }
+
+    public void setMembersCountWithDescendants(Integer membersCountWithDescendants) {
+        this.membersCountWithDescendants = membersCountWithDescendants;
+    }
+
 }

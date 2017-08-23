@@ -2,6 +2,7 @@ package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabBuildVariable;
 import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
 import org.junit.BeforeClass;
@@ -196,6 +197,16 @@ public class GitlabAPIIT {
     public void Check_search_projects() throws IOException {
         final List<GitlabProject> searchedProjects = api.searchProjects("foo");
         assertEquals(0, searchedProjects.size());
+    }
+
+    /**
+     * There is at least one namespace for the user
+     * @throws IOException
+     */
+    @Test
+    public void testGetNamespace() throws IOException {
+        final List<GitlabNamespace> gitlabNamespaces = api.getNamespaces();
+        assertTrue(gitlabNamespaces.size() > 0);
     }
 
     private String randVal(String postfix) {
