@@ -1711,6 +1711,13 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
 
+    public List<GitlabIssue> getIssues(GitlabProject project, GitlabMilestone milestone) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId())
+                + GitlabMilestone.URL + "/" + sanitizeMilestoneId(milestone.getId())
+                + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabIssue[].class);
+    }
+
     public List<GitlabIssue> getIssues(GitlabGroup group, GitlabMilestone milestone) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(group.getId())
                 + GitlabMilestone.URL + "/" + sanitizeMilestoneId(milestone.getId())
