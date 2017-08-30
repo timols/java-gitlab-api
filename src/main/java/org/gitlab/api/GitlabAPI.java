@@ -1103,15 +1103,8 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest getMergeRequestByIid(Serializable projectId, Integer mergeRequestIid) throws IOException {
-        Query query = new Query()
-                .append("iid", mergeRequestIid.toString());
-        query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + query.toString();
-        List<GitlabMergeRequest> ls = retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
-        if (ls.size() == 0) {
-            throw new FileNotFoundException();
-        }
-        return ls.get(0);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMergeRequest.URL + "/" + mergeRequestIid;
+        return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
     /**
