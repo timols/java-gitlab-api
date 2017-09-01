@@ -76,6 +76,9 @@ public class GitlabUser {
     @JsonProperty("projects_limit")
     private Integer _projectsLimit;
 
+    @JsonProperty("last_activity_on")
+    private Date _lastActivityOn;
+
     public Integer getId() {
         return _id;
     }
@@ -298,5 +301,13 @@ public class GitlabUser {
 
     public void setIdentities(List<GitlabUserIdentity> identities) {
         this._identities = identities;
+    }
+
+    public Date getLastActivityOn() {
+        return _lastActivityOn;
+    }
+
+    public void setLastActivityOn(Date _lastActivityOn) {
+        this._lastActivityOn = _lastActivityOn;
     }
 }
