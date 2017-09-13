@@ -77,6 +77,9 @@ public class GitlabProject {
 
     private GitlabNamespace namespace;
 
+    @JsonProperty("forked_from_project")
+    private GitlabProject forkedFromProject;
+
     @JsonProperty("permissions")
     private GitlabPermission permissions;
 
@@ -448,5 +451,19 @@ public class GitlabProject {
 
     public void setImportUrl(String importUrl) {
         this.importUrl = importUrl;
+    }
+
+    
+    public GitlabProject getForkedFromProject () {
+        return forkedFromProject;
+    }
+
+    
+    public void setForkedFromProject (GitlabProject forkedFromProject) {
+        this.forkedFromProject = forkedFromProject;
+    }
+    
+    public boolean isForkedFromProject() {
+        return (forkedFromProject != null);
     }
 }
