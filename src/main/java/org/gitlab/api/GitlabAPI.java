@@ -1932,6 +1932,7 @@ public class GitlabAPI {
      * @param title The title of the milestone.
      * @param description The description of the milestone. (Optional)
      * @param dueDate The date the milestone is due. (Optional)
+     * @param startDate The start date of the milestone. (Optional)
      * @return The newly created, de-serialized milestone.
      * @throws IOException
      */
@@ -1939,16 +1940,19 @@ public class GitlabAPI {
             Serializable projectId,
             String title,
             String description,
-            Date dueDate) throws IOException {
+            Date dueDate,
+            Date startDate) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMilestone.URL;
         GitlabHTTPRequestor requestor = dispatch().with("title", title);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (description != null) {
             requestor = requestor.with("description", description);
         }
         if (dueDate != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            String formatted = formatter.format(dueDate);
-            requestor = requestor.with("due_date", formatted);
+            requestor = requestor.with("due_date", formatter.format(dueDate));
+        }
+        if (startDate != null) {
+            requestor = requestor.with("start_date", formatter.format(startDate));
         }
         return requestor.to(tailUrl, GitlabMilestone.class);
     }
@@ -1966,7 +1970,8 @@ public class GitlabAPI {
         String title = milestone.getTitle();
         String description = milestone.getDescription();
         Date dateDue = milestone.getDueDate();
-        return createMilestone(projectId, title, description, dateDue);
+        Date dateStart = milestone.getStartDate();
+        return createMilestone(projectId, title, description, dateDue, dateStart);
     }
 
     /**
@@ -1976,6 +1981,7 @@ public class GitlabAPI {
      * @param title The title of the milestone. (Optional)
      * @param description The description of the milestone. (Optional)
      * @param dueDate The date the milestone is due. (Optional)
+     * @param startDate The start date of the milestone. (Optional)
      * @param stateEvent A value used to update the state of the milestone.
      *                   (Optional) (activate | close)
      * @return The updated, de-serialized milestone.
@@ -1987,12 +1993,14 @@ public class GitlabAPI {
             String title,
             String description,
             Date dueDate,
+            Date startDate,
             String stateEvent) throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
                 projectId +
                 GitlabMilestone.URL + "/" +
                 milestoneId;
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (title != null) {
             requestor.with("title", title);
         }
@@ -2000,9 +2008,10 @@ public class GitlabAPI {
             requestor = requestor.with("description", description);
         }
         if (dueDate != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            String formatted = formatter.format(dueDate);
-            requestor = requestor.with("due_date", formatted);
+            requestor = requestor.with("due_date", formatter.format(dueDate));
+        }
+        if (startDate != null) {
+            requestor = requestor.with("start_date", formatter.format(startDate));
         }
         if (stateEvent != null) {
             requestor.with("state_event", stateEvent);
@@ -2028,6 +2037,7 @@ public class GitlabAPI {
                 edited.getTitle(),
                 edited.getDescription(),
                 edited.getDueDate(),
+                edited.getStartDate(),
                 stateEvent);
     }
 
