@@ -22,7 +22,7 @@ public class GitlabUser {
     private String _twitter;
     private String _provider;
     private String _state;
-    private boolean _blocked;
+    private Boolean _blocked;
     private List<GitlabUserIdentity> _identities;
 
     @JsonProperty("private_token")

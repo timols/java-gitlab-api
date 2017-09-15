@@ -15,12 +15,18 @@ public class GitlabMilestone {
     @JsonProperty("project_id")
     private int projectId;
 
+    @JsonProperty("group_id")
+    private int groupId;
+
     private String title;
 
     private String description;
 
     @JsonProperty("due_date")
     private Date dueDate;
+
+    @JsonProperty("start_date")
+    private Date startDate;
 
     private String state;
 
@@ -54,6 +60,14 @@ public class GitlabMilestone {
         this.projectId = projectId;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -76,6 +90,14 @@ public class GitlabMilestone {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public String getState() {
