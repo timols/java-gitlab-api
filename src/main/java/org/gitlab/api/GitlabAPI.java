@@ -640,7 +640,22 @@ public class GitlabAPI {
      */
     public List<GitlabProject> getOwnedProjects() throws IOException {
         Query query = new Query().append("owner", "true");
-        String tailUrl = GitlabProject.URL + query.toString() + PARAM_MAX_ITEMS_PER_PAGE;
+        query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
+        String tailUrl = GitlabProject.URL + query.toString();
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     *
+     * Get a list of projects that the authenticated user is a member of.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getMembershipProjects() throws IOException {
+        Query query = new Query().append("membership", "true");
+        query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
+        String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
@@ -653,7 +668,8 @@ public class GitlabAPI {
      */
     public List<GitlabProject> getStarredProjects() throws IOException {
         Query query = new Query().append("starred", "true");
-        String tailUrl = GitlabProject.URL + query.toString() + PARAM_MAX_ITEMS_PER_PAGE;
+        query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
+        String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 

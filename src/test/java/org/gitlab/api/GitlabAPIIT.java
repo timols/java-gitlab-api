@@ -187,6 +187,12 @@ public class GitlabAPIIT {
     }
 
     @Test
+    public void testGetMembershipProjects() throws IOException {
+        final List<GitlabProject> membershipProjects = api.getMembershipProjects();
+        assertEquals(0, membershipProjects.size());
+    }
+
+    @Test
     public void Check_get_owned_projects() throws IOException {
         final List<GitlabProject> ownedProjects = api.getOwnedProjects();
         assertEquals(0, ownedProjects.size());
