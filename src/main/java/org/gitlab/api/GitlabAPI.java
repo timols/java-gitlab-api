@@ -1078,6 +1078,16 @@ public class GitlabAPI {
     }
 
     /**
+     * Get information about the approvals present and required for a merge request
+     * EE only.
+     */
+    public GitlabMergeRequestApprovals getMergeRequestApprovals(GitlabMergeRequest mr) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getTargetProjectId()) +
+            GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
+        return retrieve().to(tailUrl, GitlabMergeRequestApprovals.class);
+    }
+
+    /**
      * Cherry picks a commit.
      * 
      * @param projectId         The id of the project
