@@ -788,7 +788,8 @@ public class GitlabAPI {
                 .appendIf("lfs_enabled", project.isLfsEnabled())
                 .appendIf("request_access_enabled", project.isRequestAccessEnabled())
                 .appendIf("repository_storage", project.getRepositoryStorage())
-                .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge());
+                .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge())
+                .appendIf("printing_merge_request_link_enabled", project.isPrintingMergeRequestLinkEnabled());
 
         GitlabNamespace namespace = project.getNamespace();
         if (namespace != null) {
