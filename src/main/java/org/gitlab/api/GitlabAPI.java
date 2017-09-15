@@ -1238,7 +1238,7 @@ public class GitlabAPI {
      */
     public GitlabNote getNote(GitlabMergeRequest mergeRequest, Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + "/" + noteId;
 
         return retrieve().to(tailUrl, GitlabNote.class);
@@ -1246,7 +1246,7 @@ public class GitlabAPI {
 
     public List<GitlabNote> getNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL;
 
         GitlabNote[] notes = retrieve().to(tailUrl, GitlabNote[].class);
@@ -1255,7 +1255,7 @@ public class GitlabAPI {
 
     public List<GitlabNote> getAllNotes(GitlabMergeRequest mergeRequest) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                GitlabMergeRequest.URL + "/" + mergeRequest.getId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
         return retrieve().getAll(tailUrl, GitlabNote[].class);
@@ -1558,14 +1558,14 @@ public class GitlabAPI {
                 .appendIf("body", body);
 
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                GitlabMergeRequest.URL + "/" + mergeRequest.getId() + GitlabNote.URL + "/" + noteId + query.toString();
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() + GitlabNote.URL + "/" + noteId + query.toString();
 
         return retrieve().method("PUT").to(tailUrl, GitlabNote.class);
     }
 
     public GitlabNote createNote(GitlabMergeRequest mergeRequest, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
-                GitlabMergeRequest.URL + "/" + mergeRequest.getId() + GitlabNote.URL;
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() + GitlabNote.URL;
 
         return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
     }
@@ -1579,7 +1579,7 @@ public class GitlabAPI {
      */
     public void deleteNote(GitlabMergeRequest mergeRequest, GitlabNote noteToDelete) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getId() + GitlabNote.URL + "/" + noteToDelete.getId();
+				+ mergeRequest.getIid() + GitlabNote.URL + "/" + noteToDelete.getId();
 		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
 	}
 
@@ -2487,7 +2487,7 @@ public class GitlabAPI {
      */
 	public List<GitlabAward> getAllAwards(GitlabMergeRequest mergeRequest) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getId() + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
+				+ mergeRequest.getIid() + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
 		return retrieve().getAll(tailUrl, GitlabAward[].class);
 	}
@@ -2501,7 +2501,7 @@ public class GitlabAPI {
      */
 	public GitlabAward getAward(GitlabMergeRequest mergeRequest, Integer awardId) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getId() + GitlabAward.URL + "/" + awardId;
+				+ mergeRequest.getIid() + GitlabAward.URL + "/" + awardId;
 
 		return retrieve().to(tailUrl, GitlabAward.class);
 	}
@@ -2516,7 +2516,7 @@ public class GitlabAPI {
 	public GitlabAward createAward(GitlabMergeRequest mergeRequest, String awardName) throws IOException {
 		Query query = new Query().append("name", awardName);
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getId() + GitlabAward.URL + query.toString();
+				+ mergeRequest.getIid() + GitlabAward.URL + query.toString();
 
 		return dispatch().to(tailUrl, GitlabAward.class);
 	}
@@ -2530,7 +2530,7 @@ public class GitlabAPI {
      */
 	public void deleteAward(GitlabMergeRequest mergeRequest, GitlabAward award) throws IOException {
 		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getId() + GitlabAward.URL + "/" + award.getId();
+				+ mergeRequest.getIid() + GitlabAward.URL + "/" + award.getId();
 
 		retrieve().method("DELETE").to(tailUrl, Void.class);
 	}
