@@ -1098,7 +1098,7 @@ public class GitlabAPI {
      * EE only.
      */
     public GitlabMergeRequestApprovals getMergeRequestApprovals(GitlabMergeRequest mr) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getTargetProjectId()) +
+	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
             GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
         return retrieve().to(tailUrl, GitlabMergeRequestApprovals.class);
     }
