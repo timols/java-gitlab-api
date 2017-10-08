@@ -615,7 +615,7 @@ public class GitlabAPI {
      * use namespace & project name to get project
      */
     public GitlabProject getProject(String namespace, String projectName) throws IOException{
-        String tailUrl = GitlabProject.URL + "/" + namespace + "%2F" + projectName;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
@@ -1131,7 +1131,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest getMergeRequestByIid(Serializable projectId, Integer mergeRequestIid) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMergeRequest.URL + "/" + mergeRequestIid;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestIid;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
@@ -1283,7 +1283,7 @@ public class GitlabAPI {
 
         query.mergeWith(pagination.asQuery());
 
-        String tailUrl = GitlabProject.URL + "/" + projectId +
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
                 "/repository" + GitlabCommit.URL + query.toString();
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
@@ -1808,7 +1808,7 @@ public class GitlabAPI {
     }
 
     public GitlabNote createNote(Serializable projectId, Integer issueId, String message) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL
                 + "/" + issueId + GitlabNote.URL;
         return dispatch().with("body", message).to(tailUrl, GitlabNote.class);
     }
@@ -1826,8 +1826,9 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
 	public void deleteNote(Serializable projectId, Integer issueId, GitlabNote noteToDelete) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/"
-				+ issueId + GitlabNote.URL + "/" + noteToDelete.getId();
+            String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId)
+                                + GitlabIssue.URL + "/" + issueId + GitlabNote.URL
+                                + "/" + noteToDelete.getId();
 		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
 	}
 
@@ -1850,7 +1851,7 @@ public class GitlabAPI {
      */
     public List<GitlabLabel> getLabels(Serializable projectId)
             throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabLabel.URL;
         GitlabLabel[] labels = retrieve().to(tailUrl, GitlabLabel[].class);
         return Arrays.asList(labels);
     }
@@ -1878,7 +1879,7 @@ public class GitlabAPI {
             Serializable projectId,
             String name,
             String color) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabLabel.URL;
         return dispatch().with("name", name)
                          .with("color", color)
                          .to(tailUrl, GitlabLabel.class);
@@ -1908,7 +1909,7 @@ public class GitlabAPI {
         Query query = new Query();
         query.append("name", name);
         String tailUrl = GitlabProject.URL + "/" +
-                projectId +
+                sanitizeProjectId(projectId) +
                 GitlabLabel.URL +
                 query.toString();
         retrieve().method("DELETE").to(tailUrl, Void.class);
@@ -1938,7 +1939,7 @@ public class GitlabAPI {
                                    String name,
                                    String newName,
                                    String newColor) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabLabel.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabLabel.URL;
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
         requestor.with("name", name);
         if (newName != null) {
@@ -1984,7 +1985,7 @@ public class GitlabAPI {
             String description,
             Date dueDate,
             Date startDate) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabMilestone.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMilestone.URL;
         GitlabHTTPRequestor requestor = dispatch().with("title", title);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (description != null) {
@@ -2038,7 +2039,7 @@ public class GitlabAPI {
             Date startDate,
             String stateEvent) throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
-                projectId +
+                sanitizeProjectId(projectId) +
                 GitlabMilestone.URL + "/" +
                 milestoneId;
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
