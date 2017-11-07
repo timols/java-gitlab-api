@@ -1728,7 +1728,11 @@ public class GitlabAPI {
     }
 
     public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return getIssues(project.getId());
+    }
+
+    public List<GitlabIssue> getIssues(Serializable projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
 
