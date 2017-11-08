@@ -528,13 +528,31 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess, GitlabUser sudoUser) throws IOException {
+        return createGroup(name, path, ldapCn, ldapAccess, sudoUser, null);
+    }
+
+    /**
+     * Creates a Group
+     *
+     * @param name       The name of the group
+     * @param path       The path for the group
+     * @param ldapCn     LDAP Group Name to sync with, null otherwise
+     * @param ldapAccess Access level for LDAP group members, null otherwise
+     * @param sudoUser   The user to create the group on behalf of
+     * @param parentId   The id of a parent group; the new group will be its subgroup
+     * @return The GitLab Group
+     *
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess, GitlabUser sudoUser, Integer parentId) throws IOException {
 
         Query query = new Query()
                 .append("name", name)
                 .append("path", path)
                 .appendIf("ldap_cn", ldapCn)
                 .appendIf("ldap_access", ldapAccess)
-                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null)
+                .appendIf("parent_id", parentId);
 
         String tailUrl = GitlabGroup.URL + query.toString();
 
