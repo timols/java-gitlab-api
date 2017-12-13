@@ -619,6 +619,22 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
+    /*
+     * use project id to get Project JSON
+     */
+    public String getProjectJson (Serializable projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
+        return retrieve().to(tailUrl, String.class);
+    }
+
+    /*
+     * use namespace & project name to get project
+     */
+    public String getProjectJson(String namespace, String projectName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
+        return retrieve().to(tailUrl, String.class);
+    }
+
     /**
      *
      * Get a list of projects accessible by the authenticated user.

@@ -385,11 +385,14 @@ public class GitlabHTTPRequestor {
                 return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
-            String data = IOUtils.toString(reader);
+            String json = IOUtils.toString(reader);
+            if (type != null && type == String.class) {
+                return type.cast(json);
+            }
             if (type != null && type != Void.class) {
-                return GitlabAPI.MAPPER.readValue(data, type);
+                return GitlabAPI.MAPPER.readValue(json, type);
             } else if (instance != null) {
-                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(data);
+                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(json);
             } else {
                 return null;
             }
