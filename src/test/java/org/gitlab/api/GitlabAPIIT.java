@@ -2,6 +2,7 @@ package org.gitlab.api;
 
 import org.gitlab.api.models.GitlabBuildVariable;
 import org.gitlab.api.models.GitlabGroup;
+import org.gitlab.api.models.GitlabNamespace;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabUser;
 import org.junit.BeforeClass;
@@ -202,6 +203,54 @@ public class GitlabAPIIT {
     public void Check_search_projects() throws IOException {
         final List<GitlabProject> searchedProjects = api.searchProjects("foo");
         assertEquals(0, searchedProjects.size());
+    }
+
+    /**
+     * There is at least one namespace for the user
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testGetNamespace() throws IOException {
+        final List<GitlabNamespace> gitlabNamespaces = api.getNamespaces();
+        assertTrue(gitlabNamespaces.size() > 0);
+    }
+
+    @Test
+    public void testCreateDeleteFork() throws IOException {
+        String projectName = randVal("Fork-me");
+
+        String password = randVal("$%password");
+
+
+        GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
+                password,
+                randVal("userName"),
+                randVal("fullName"),
+                randVal("skypeId"),
+                randVal("linkedin"),
+                randVal("twitter"),
+                "http://" + randVal("url.com"),
+                10,
+                randVal("externuid"),
+                randVal("externprovidername"),
+                randVal("bio"),
+                false,
+                false,
+                false);
+
+
+        GitlabProject project = api.createUserProject(gitUser.getId(), projectName);
+        GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
+
+        assertNotNull(fork);
+
+        assertEquals(project.getId(), fork.getForkedFrom().getId());
+
+        api.deleteProject(project.getId());
+        api.deleteProject(fork.getId());
+
+        api.deleteUser(gitUser.getId());
     }
 
     private String randVal(String postfix) {
