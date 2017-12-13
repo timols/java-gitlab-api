@@ -189,7 +189,7 @@ public class GitlabAPI {
 
         Query query = new Query()
                 .append("email", email)
-                .appendIf("confirm", skip_confirmation == null ? null : !skip_confirmation)
+                .appendIf("skip_confirmation", skip_confirmation)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
