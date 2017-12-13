@@ -1091,6 +1091,22 @@ public class GitlabAPI {
         retrieve().method("DELETE").to(tailUrl, null);
     }
 
+
+    /**
+     *  user to fork a project
+     * @param projectId The id of the project
+     * @param namespacesId The id of the project's namespaces
+     * @throws IOException on gitlab api call error
+     * POST /projects/:id/fork
+     */
+    public void forkProject(Integer projectId,Integer namespacesId) throws IOException {
+        Query query = new Query().append("projectId",String.valueOf(projectId)).appendIf("namespaces",namespacesId);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/" + "fork" + query.toString();
+        retrieve().method("POST").to(tailUrl,GitlabProject.class);
+
+    }
+
+
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
         return getMergeRequestsWithStatus(projectId, GitlabMergeRequest.STATUS_OPENED);
     }
