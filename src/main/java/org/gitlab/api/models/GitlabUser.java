@@ -111,11 +111,11 @@ public class GitlabUser {
         _name = name;
     }
 
-    public boolean isBlocked() {
+    public Boolean isBlocked() {
         return _blocked;
     }
 
-    public void setBlocked(boolean blocked) {
+    public void setBlocked(Boolean blocked) {
         _blocked = blocked;
     }
 
