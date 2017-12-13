@@ -279,16 +279,9 @@ public class GitlabHTTPRequestor {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
                     this.url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
                 } else {
-                    if (GitlabCommit[].class == type) {
-                        // there is a bug in the Gitlab CE API
-                        // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
-                        // that starts pagination with page=0 for commits
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "page=1");
-                    } else {
-                        // Since the page query was not present, its safe to assume that we just
-                        // currently used the first page, so we can default to page 2
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
-                    }
+                    // Since the page query was not present, its safe to assume that we just
+                    // currently used the first page, so we can default to page 2
+                    this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
                 }
             }
         };
