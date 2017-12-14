@@ -623,7 +623,26 @@ public class GitlabAPI {
         String tailUrl = GitlabGroup.URL + "/" + groupId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
+    
+    /** 
+     * 
+     * Get's all projects in Gitlab, requires sudo user 
+     * 
+     * @return A list of gitlab projects 
+     * @throws IOException 
+     */ 
+    public List<GitlabProject> getAllProjects() throws IOException { 
+        String tailUrl = GitlabProject.URL; 
+        return retrieve().getAll(tailUrl, GitlabProject[].class); 
+    } 
 
+    /**
+     * Get Project by project Id 
+     * 
+     * @param projectId
+     * @return
+     * @throws IOException
+     */
     public GitlabProject getProject(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
         return retrieve().to(tailUrl, GitlabProject.class);
