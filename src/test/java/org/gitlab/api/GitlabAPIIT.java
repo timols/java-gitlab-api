@@ -127,7 +127,7 @@ public class GitlabAPIIT {
                 randVal("bio"),
                 false,
                 false,
-                false);
+                true);
         assertNotNull(gitUser);
 
         GitlabUser refetched = api.getUserViaSudo(gitUser.getUsername());
