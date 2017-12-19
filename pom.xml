@@ -223,9 +223,9 @@
           <build>
             <plugins>
               <plugin>
-				<version>4.0.1-SNAPSHOT</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
                 <configuration>
                   <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>

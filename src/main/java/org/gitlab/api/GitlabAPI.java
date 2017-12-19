@@ -3067,4 +3067,35 @@ public class GitlabAPI {
     public GitlabVersion getVersion() throws IOException {
         return retrieve().to("version",GitlabVersion.class);
     }
+
+    /**
+     * Returns a List of all GitlabRunners.
+     *
+     * @return List of GitlabRunners
+     * @throws IOException
+     */
+    public List<GitlabRunner> getRunners() throws IOException {
+        return getRunners(GitlabRunner.RunnerScope.ALL);
+    }
+
+    /**
+     * Returns a List of GitlabRunners.
+     *
+     * @param scope Can be null. Defines type of Runner to retrieve.
+     * @return List of GitLabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunners(GitlabRunner.RunnerScope scope) throws IOException {
+        StringBuilder tailUrl = new StringBuilder("runners/all");
+        Query query = new Query()
+                    .appendIf("scope", scope.getScope());
+        tailUrl.append(query.toString());
+        return retrieve().getAll(tailUrl.toString(), GitlabRunner[].class);
+    }
+
+    public GitlabRunner getRunnerDetail(int id) throws IOException {
+        String tailUrl = String.format("runners/%d", id);
+        return retrieve().to(tailUrl, GitlabRunner.class);
+    }
+
 }
