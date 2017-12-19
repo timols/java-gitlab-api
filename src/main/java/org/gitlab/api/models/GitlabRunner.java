@@ -12,7 +12,8 @@ public class GitlabRunner {
         SHARED("shared"),
         ACTIVE("active"),
         PAUSED("paused"),
-        ONLINE("online");
+        ONLINE("online"),
+        ALL(null);
 
         private final String scope;
 
