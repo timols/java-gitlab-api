@@ -7,13 +7,37 @@ import java.util.Date;
 import java.util.List;
 
 public class GitlabRunner {
+    public enum RunnerScope {
+        SPECIFIC("specific"),
+        SHARED("shared"),
+        ACTIVE("active"),
+        PAUSED("paused"),
+        ONLINE("online");
+
+        private final String scope;
+
+        RunnerScope(String scope) {
+            this.scope = scope;
+        }
+
+        public String getScope() {
+            return this.scope;
+        }
+    }
+
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("description")
     private String description;
+    @JsonProperty("active")
     private Boolean active;
     @JsonProperty("is_shared")
     private Boolean isShared;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("version")
     private String version;
+    @JsonProperty("revision")
     private String revision;
     @JsonProperty("contacted_at")
     private Date contactedAt;
@@ -21,12 +45,18 @@ public class GitlabRunner {
     private List<String> tagList;
     @JsonProperty("run_untagged")
     private Boolean runUntagged;
+    @JsonProperty("locked")
     private Boolean locked;
+    @JsonProperty("platform")
     private String platform;
+    @JsonProperty("architecture")
     private String architecture;
+    @JsonProperty("projects")
+    private List<GitlabProject> projects;
+
 
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Integer id) {
@@ -34,7 +64,7 @@ public class GitlabRunner {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -42,7 +72,7 @@ public class GitlabRunner {
     }
 
     public Boolean getActive() {
-        return active;
+        return this.active;
     }
 
     public void setActive(Boolean active) {
@@ -50,15 +80,15 @@ public class GitlabRunner {
     }
 
     public Boolean getShared() {
-        return isShared;
+        return this.isShared;
     }
 
     public void setShared(Boolean shared) {
-        isShared = shared;
+        this.isShared = shared;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -66,7 +96,7 @@ public class GitlabRunner {
     }
 
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     public void setVersion(String version) {
@@ -74,7 +104,7 @@ public class GitlabRunner {
     }
 
     public String getRevision() {
-        return revision;
+        return this.revision;
     }
 
     public void setRevision(String revision) {
@@ -82,7 +112,7 @@ public class GitlabRunner {
     }
 
     public Date getContactedAt() {
-        return contactedAt;
+        return this.contactedAt;
     }
 
     public void setContactedAt(Date contactedAt) {
@@ -90,7 +120,7 @@ public class GitlabRunner {
     }
 
     public List<String> getTagList() {
-        return tagList;
+        return this.tagList;
     }
 
     public void setTagList(List<String> tagList) {
@@ -98,7 +128,7 @@ public class GitlabRunner {
     }
 
     public Boolean isRunUntagged() {
-        return runUntagged;
+        return this.runUntagged;
     }
 
     public void setRunUntagged(boolean runUntagged) {
@@ -106,7 +136,7 @@ public class GitlabRunner {
     }
 
     public Boolean isLocked() {
-        return locked;
+        return this.locked;
     }
 
     public void setLocked(boolean locked) {
@@ -115,7 +145,7 @@ public class GitlabRunner {
 
 
     public String getPlatform() {
-        return platform;
+        return this.platform;
     }
 
     public void setPlatform(String platform) {
@@ -123,7 +153,7 @@ public class GitlabRunner {
     }
 
     public String getArchitecture() {
-        return architecture;
+        return this.architecture;
     }
 
     public void setArchitecture(String architecture) {
