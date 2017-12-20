@@ -1530,7 +1530,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + "/raw";
         return retrieve().to(tailUrl, byte[].class);
     }
 
