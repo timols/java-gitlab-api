@@ -44,7 +44,7 @@ public class GitlabUser {
     private String _bio;
 
     @JsonProperty("dark_scheme")
-    private boolean _darkScheme;
+    private Boolean _darkScheme;
 
     @JsonProperty("theme_id")
     private Integer _themeId;
@@ -53,16 +53,16 @@ public class GitlabUser {
     private String _externUid;
 
     @JsonProperty("is_admin")
-    private boolean _isAdmin;
+    private Boolean _isAdmin;
 
     @JsonProperty("can_create_group")
-    private boolean _canCreateGroup;
+    private Boolean _canCreateGroup;
 
     @JsonProperty("can_create_project")
-    private boolean _canCreateProject;
+    private Boolean _canCreateProject;
 
     @JsonProperty("can_create_team")
-    private boolean _canCreateTeam;
+    private Boolean _canCreateTeam;
 
     @JsonProperty("avatar_url")
     private String _avatarUrl;
@@ -80,171 +80,171 @@ public class GitlabUser {
     private Date _lastActivityOn;
 
     public Integer getId() {
-        return _id;
+        return this._id;
     }
 
     public void setId(Integer id) {
-        _id = id;
+        this._id = id;
     }
 
     public String getUsername() {
-        return _username;
+        return this._username;
     }
 
     public void setUsername(String userName) {
-        _username = userName;
+        this._username = userName;
     }
 
     public String getEmail() {
-        return _email;
+        return this._email;
     }
 
     public void setEmail(String email) {
-        _email = email;
+        this._email = email;
     }
 
     public String getName() {
-        return _name;
+        return this._name;
     }
 
     public void setName(String name) {
-        _name = name;
+        this._name = name;
     }
 
     public Boolean isBlocked() {
-        return _blocked;
+        return this._blocked;
     }
 
     public void setBlocked(Boolean blocked) {
-        _blocked = blocked;
+       this._blocked = blocked;
     }
 
     public Date getCreatedAt() {
-        return _createdAt;
+        return this._createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
-        _createdAt = createdAt;
+        this._createdAt = createdAt;
     }
 
     public String getBio() {
-        return _bio;
+        return this._bio;
     }
 
     public void setBio(String bio) {
-        _bio = bio;
+        this._bio = bio;
     }
 
     public String getSkype() {
-        return _skype;
+        return this._skype;
     }
 
     public void setSkype(String skype) {
-        _skype = skype;
+        this._skype = skype;
     }
 
     public String getLinkedin() {
-        return _linkedin;
+        return this._linkedin;
     }
 
     public void setLinkedin(String linkedin) {
-        _linkedin = linkedin;
+        this._linkedin = linkedin;
     }
 
     public String getTwitter() {
-        return _twitter;
+        return this._twitter;
     }
 
     public void setTwitter(String twitter) {
-        _twitter = twitter;
+        this._twitter = twitter;
     }
 
-    public boolean isDarkScheme() {
-        return _darkScheme;
+    public Boolean isDarkScheme() {
+        return this._darkScheme;
     }
 
     public void setDarkScheme(boolean darkScheme) {
-        _darkScheme = darkScheme;
+        this._darkScheme = darkScheme;
     }
 
     public Integer getThemeId() {
-        return _themeId;
+        return this._themeId;
     }
 
     public void setThemeId(Integer themeId) {
-        _themeId = themeId;
+        this._themeId = themeId;
     }
 
     public String getExternUid() {
-        return _externUid;
+        return this._externUid;
     }
 
     public void setExternUid(String externUid) {
-        _externUid = externUid;
+        this._externUid = externUid;
     }
 
     public String getProvider() {
-        return _provider;
+        return this._provider;
     }
 
     public void setProvider(String provider) {
-        _provider = provider;
+        this._provider = provider;
     }
 
     public String getState() {
-        return _state;
+        return this._state;
     }
 
     public void setState(String state) {
-        _state = state;
+        this._state = state;
     }
 
     public String getExternProviderName() {
-        return _externProviderName;
+        return this._externProviderName;
     }
 
     public void setExternProviderName(String externProviderName) {
-        _externProviderName = externProviderName;
+        this._externProviderName = externProviderName;
     }
 
     public String getWebsiteUrl() {
-        return _websiteUrl;
+        return this._websiteUrl;
     }
 
     public void setWebsiteUrl(String websiteUrl) {
-        _websiteUrl = websiteUrl;
+        this._websiteUrl = websiteUrl;
     }
 
-    public boolean isAdmin() {
-        return _isAdmin;
+    public Boolean isAdmin() {
+        return this._isAdmin;
     }
 
     public void setAdmin(boolean admin) {
-        _isAdmin = admin;
+        this._isAdmin = admin;
     }
 
-    public boolean isCanCreateGroup() {
-        return _canCreateGroup;
+    public Boolean isCanCreateGroup() {
+        return this._canCreateGroup;
     }
 
     public void setCanCreateGroup(boolean canCreateGroup) {
-        _canCreateGroup = canCreateGroup;
+        this._canCreateGroup = canCreateGroup;
     }
 
-    public boolean isCanCreateProject() {
-        return _canCreateProject;
+    public Boolean isCanCreateProject() {
+        return this._canCreateProject;
     }
 
     public void setCanCreateProject(boolean canCreateProject) {
-        _canCreateProject = canCreateProject;
+        this._canCreateProject = canCreateProject;
     }
 
-    public boolean isCanCreateTeam() {
-        return _canCreateTeam;
+    public Boolean isCanCreateTeam() {
+        return this._canCreateTeam;
     }
 
     public void setCanCreateTeam(boolean canCreateTeam) {
-        _canCreateTeam = canCreateTeam;
+        this._canCreateTeam = canCreateTeam;
     }
 
     public String getAvatarUrl() {
@@ -264,7 +264,7 @@ public class GitlabUser {
     }
 
     public String getPrivateToken() {
-        return _privateToken;
+        return this._privateToken;
     }
 
     public void setPrivateToken(String privateToken) {
@@ -272,23 +272,23 @@ public class GitlabUser {
     }
 
     public Date getLastSignInAt() {
-        return _lastSignInAt;
+        return this._lastSignInAt;
     }
 
     public void setLastSignInAt(Date lastSignInAt) {
-        _lastSignInAt = lastSignInAt;
+        this._lastSignInAt = lastSignInAt;
     }
 
     public Date getCurrentSignInAt() {
-        return _currentSignInAt;
+        return this._currentSignInAt;
     }
 
     public void setCurrentSignInAt(Date currentSignInAt) {
-        _currentSignInAt = currentSignInAt;
+        this._currentSignInAt = currentSignInAt;
     }
 
     public Integer getProjectsLimit() {
-        return _projectsLimit;
+        return this._projectsLimit;
     }
 
     public void setProjectsLimit(Integer projectsLimit) {
@@ -296,7 +296,7 @@ public class GitlabUser {
     }
 
     public List<GitlabUserIdentity> getIdentities() {
-        return _identities;
+        return this._identities;
     }
 
     public void setIdentities(List<GitlabUserIdentity> identities) {
@@ -304,7 +304,7 @@ public class GitlabUser {
     }
 
     public Date getLastActivityOn() {
-        return _lastActivityOn;
+        return this._lastActivityOn;
     }
 
     public void setLastActivityOn(Date _lastActivityOn) {
