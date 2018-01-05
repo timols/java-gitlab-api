@@ -24,7 +24,6 @@ import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.GitlabAPIException;
 import org.gitlab.api.TokenType;
-import org.gitlab.api.models.GitlabCommit;
 
 /**
  * Gitlab HTTP Requestor
@@ -121,7 +120,7 @@ public class GitlabHTTPRequestor {
      * Has a fluent api for method chaining
      *
      * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param file      File data
      * @return this
      */
     public GitlabHTTPRequestor withAttachment(String key, File file) {
@@ -208,7 +207,7 @@ public class GitlabHTTPRequestor {
                 try {
                     url = root.getAPIUrl(tailApiUrl);
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -260,7 +259,7 @@ public class GitlabHTTPRequestor {
                         handleAPIError(e, connection);
                     }
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
