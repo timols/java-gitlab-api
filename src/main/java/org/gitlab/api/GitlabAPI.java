@@ -1331,12 +1331,15 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
-
-    public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId;
+    
+    public GitlabMergeRequest getMergeRequest(Serializable projectId, Integer mergeRequestId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
-
+    
+    public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
+        return getMergeRequest(project.getId(), mergeRequestId);
+    }
 
     /**
      * Create a new MergeRequest
@@ -1402,9 +1405,13 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
+        return acceptMergeRequest(project.getId(), mergeRequestId, mergeCommitMessage);
+    }
+    
+    public GitlabMergeRequest acceptMergeRequest(Serializable projectId, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
-        requestor.with("id", project.getId());
+        requestor.with("id", projectId);
         requestor.with("merge_request_id", mergeRequestId);
         if (mergeCommitMessage != null)
             requestor.with("merge_commit_message", mergeCommitMessage);
@@ -1559,12 +1566,21 @@ public class GitlabAPI {
     // List commit statuses for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/statuses
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
-        return getCommitStatuses(project, commitHash, new Pagination());
+        return getCommitStatuses(project.getId(), commitHash, new Pagination());
+    }
+    
+    public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash) throws IOException {
+        return getCommitStatuses(projectId, commitHash, new Pagination());
     }
 
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash,
                                                       Pagination pagination) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabCommit.URL + "/" +
+        return getCommitStatuses(project.getId(), commitHash, pagination);
+    }
+    
+    public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash,
+                                                      Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository" + GitlabCommit.URL + "/" +
                 commitHash + GitlabCommitStatus.URL + pagination;
         GitlabCommitStatus[] statuses = retrieve().to(tailUrl, GitlabCommitStatus[].class);
         return Arrays.asList(statuses);
@@ -1574,7 +1590,12 @@ public class GitlabAPI {
     // GET /projects/:id/statuses/:sha
     public GitlabCommitStatus createCommitStatus(GitlabProject project, String commitHash, String state, String ref,
                                                  String name, String targetUrl, String description) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabCommitStatus.URL + "/" + commitHash;
+        return createCommitStatus(project.getId(), commitHash, state, ref, name, targetUrl, description);
+    }
+    
+    public GitlabCommitStatus createCommitStatus(Serializable projectId, String commitHash, String state, String ref,
+                                                 String name, String targetUrl, String description) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabCommitStatus.URL + "/" + commitHash;
         return dispatch()
                 .with("state", state)
                 .with("ref", ref)
@@ -1604,11 +1625,11 @@ public class GitlabAPI {
      * @param filepath  The path of the file
      * @throws IOException on gitlab api call error
      */
-    public byte[] getRawFileContent(Integer projectId, String sha, String filepath) throws IOException {
+    public byte[] getRawFileContent(Serializable projectId, String sha, String filepath) throws IOException {
         Query query = new Query()
                 .append("ref", sha);
 
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/files/" + sanitizePath(filepath) + "/raw" + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/files/" + sanitizePath(filepath) + "/raw" + query.toString();
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -2559,7 +2580,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
      */
-    public CommitComment createCommitComment(Integer projectId, String sha, String note,
+    public CommitComment createCommitComment(Serializable projectId, String sha, String note,
                                              String path, String line, String line_type) throws IOException {
 
         Query query = new Query()
