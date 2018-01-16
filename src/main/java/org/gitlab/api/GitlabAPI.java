@@ -1982,14 +1982,14 @@ public class GitlabAPI {
 
     public GitlabNote getNote(GitlabIssue issue, Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() +
-                GitlabIssue.URL + "/" + issue.getId() +
+                GitlabIssue.URL + "/" + issue.getIid() +
                 GitlabNote.URL + "/" + noteId;
         return retrieve().to(tailUrl, GitlabNote.class);
     }
 
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/"
-                + issue.getId() + GitlabNote.URL;
+                + issue.getIid() + GitlabNote.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
     }
 
