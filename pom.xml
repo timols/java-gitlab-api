@@ -99,7 +99,18 @@
 		</dependency>
 	</dependencies>
 
+	
+
 	<build>
+		<resources>
+	       <resource>
+	           <directory>./</directory>
+	           <includes>
+	               <include>LICENSE</include>
+	               <include>NOTICE</include>
+	           </includes>
+	       </resource>
+	    </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

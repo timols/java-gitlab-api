@@ -31,6 +31,8 @@ dependencies {
 
 jar {
 	manifest { attributes 'Gradle-Version': gradle.gradleVersion }
+    from "LICENSE"
+    from "NOTICE"
 }
 
 install {
