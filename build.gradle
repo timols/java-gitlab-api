@@ -42,6 +42,8 @@ install {
 task sourcesJar(type: Jar, dependsOn:classes) {
 	classifier = 'sources'
 	from sourceSets.main.allSource
+    from "LICENSE"
+    from "NOTICE"
 }
 
 artifacts { archives sourcesJar }
