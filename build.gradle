@@ -31,8 +31,8 @@ dependencies {
 
 jar {
 	manifest { attributes 'Gradle-Version': gradle.gradleVersion }
-    from "LICENSE"
-    from "NOTICE"
+	from "LICENSE"
+	from "NOTICE"
 }
 
 install {
@@ -42,8 +42,8 @@ install {
 task sourcesJar(type: Jar, dependsOn:classes) {
 	classifier = 'sources'
 	from sourceSets.main.allSource
-    from "LICENSE"
-    from "NOTICE"
+	from "LICENSE"
+	from "NOTICE"
 }
 
 artifacts { archives sourcesJar }
