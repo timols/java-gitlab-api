@@ -1490,11 +1490,18 @@ public class GitlabAPI {
 
     public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
                                          String branchOrTag) throws IOException {
+        return getCommits(projectId, null, branchOrTag, null);
+    }
+
+    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
+                                         String branchOrTag, String path) throws IOException {
         final Query query = new Query();
         if (branchOrTag != null) {
             query.append("ref_name", branchOrTag);
         }
-
+        if (path != null) {
+            query.append("path", path);
+        }
         if (pagination != null) {
             query.mergeWith(pagination.asQuery());
         }
