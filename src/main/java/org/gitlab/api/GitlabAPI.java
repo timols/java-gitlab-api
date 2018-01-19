@@ -623,22 +623,21 @@ public class GitlabAPI {
         String tailUrl = GitlabGroup.URL + "/" + groupId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
-    
-    /** 
-     * 
-     * Get's all projects in Gitlab, requires sudo user 
-     * 
-     * @return A list of gitlab projects 
-     * @throws IOException 
-     */ 
-    public List<GitlabProject> getAllProjects() throws IOException { 
-        String tailUrl = GitlabProject.URL; 
-        return retrieve().getAll(tailUrl, GitlabProject[].class); 
-    } 
 
     /**
-     * Get Project by project Id 
-     * 
+     * Get's all projects in Gitlab, requires sudo user
+     *
+     * @return A list of gitlab projects
+     * @throws IOException
+     */
+    public List<GitlabProject> getAllProjects() throws IOException {
+        String tailUrl = GitlabProject.URL;
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     * Get Project by project Id
+     *
      * @param projectId
      * @return
      * @throws IOException
@@ -2350,6 +2349,38 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + projectId + "/" + GitlabProjectMember.URL + "/" + userId;
         retrieve().method("DELETE").to(tailUrl, Void.class);
     }
+
+    /**
+     * Updates a project member.
+     *
+     * @param projectId   the project id
+     * @param userId      the user id
+     * @param accessLevel the updated access level for the specified user
+     * @return GitLabProjectMember with updated access level on success
+     * @throws IOException on Gitlab API call error
+     */
+    public GitlabProjectMember updateProjectMember(Integer projectId, Integer userId, GitlabAccessLevel accessLevel) throws IOException {
+        return updateProjectMember(projectId, userId, accessLevel, null);
+    }
+
+    /**
+     * Updates a project member.
+     *
+     * @param projectId   the project id
+     * @param userId      the user id
+     * @param accessLevel the updated access level for the specified user
+     * @param expiresAt   the date at which the user's membership expires at in the form YEAR-MONTH-DAY
+     * @return GitLabProjectMember with updated access level on success
+     * @throws IOException on Gitlab API call error
+     */
+    public GitlabProjectMember updateProjectMember(Integer projectId, Integer userId, GitlabAccessLevel accessLevel, String expiresAt) throws IOException {
+        Query query = new Query()
+                .appendIf("access_level", accessLevel)
+                .appendIf("expires_at", expiresAt);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL + "/" + userId + query.toString();
+        return retrieve().method("PUT").to(tailUrl, GitlabProjectMember.class);
+    }
+
 
     public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
         return getProjectMembers(project.getId());
