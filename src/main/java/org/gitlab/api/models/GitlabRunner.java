@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 public class GitlabRunner {
+    public static final String URL = "/runners";
+
     public enum RunnerScope {
         SPECIFIC("specific"),
         SHARED("shared"),
