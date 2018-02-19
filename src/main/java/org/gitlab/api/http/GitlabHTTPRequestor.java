@@ -24,7 +24,6 @@ import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.GitlabAPIException;
 import org.gitlab.api.TokenType;
-import org.gitlab.api.models.GitlabCommit;
 
 /**
  * Gitlab HTTP Requestor
@@ -121,7 +120,7 @@ public class GitlabHTTPRequestor {
      * Has a fluent api for method chaining
      *
      * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param file      File data
      * @return this
      */
     public GitlabHTTPRequestor withAttachment(String key, File file) {
@@ -208,7 +207,7 @@ public class GitlabHTTPRequestor {
                 try {
                     url = root.getAPIUrl(tailApiUrl);
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -260,7 +259,7 @@ public class GitlabHTTPRequestor {
                         handleAPIError(e, connection);
                     }
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -279,16 +278,9 @@ public class GitlabHTTPRequestor {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
                     this.url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
                 } else {
-                    if (GitlabCommit[].class == type) {
-                        // there is a bug in the Gitlab CE API
-                        // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
-                        // that starts pagination with page=0 for commits
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "page=1");
-                    } else {
-                        // Since the page query was not present, its safe to assume that we just
-                        // currently used the first page, so we can default to page 2
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
-                    }
+                    // Since the page query was not present, its safe to assume that we just
+                    // currently used the first page, so we can default to page 2
+                    this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
                 }
             }
         };
@@ -392,11 +384,14 @@ public class GitlabHTTPRequestor {
                 return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
-            String data = IOUtils.toString(reader);
+            String json = IOUtils.toString(reader);
+            if (type != null && type == String.class) {
+                return type.cast(json);
+            }
             if (type != null && type != Void.class) {
-                return GitlabAPI.MAPPER.readValue(data, type);
+                return GitlabAPI.MAPPER.readValue(json, type);
             } else if (instance != null) {
-                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(data);
+                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(json);
             } else {
                 return null;
             }

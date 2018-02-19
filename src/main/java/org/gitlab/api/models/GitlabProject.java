@@ -122,6 +122,9 @@ public class GitlabProject {
     @JsonProperty("import_url")
     private String importUrl;
 
+    @JsonProperty("forked_from_project")
+    private GitlabProject forkedFrom;
+
     @JsonProperty("is_printing_merge_request_link_enabled")
     private Boolean printingMergeRequestLinkEnabled;
 
@@ -453,12 +456,42 @@ public class GitlabProject {
         this.importUrl = importUrl;
     }
 
+    public GitlabProject getForkedFrom() {
+        return forkedFrom;
+    }
+
+    public void setForkedFrom(GitlabProject forkedFrom) {
+        this.forkedFrom = forkedFrom;
+    }
+
     public Boolean isPrintingMergeRequestLinkEnabled() {
-	return printingMergeRequestLinkEnabled;
+        return printingMergeRequestLinkEnabled;
     }
 
     public void setPrintingMergeRequestLinkEnabled(Boolean printingMergeRequestLinkEnabled) {
         this.printingMergeRequestLinkEnabled = printingMergeRequestLinkEnabled;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GitlabProject that = (GitlabProject) o;
+
+        if (id != null || that.id != null) {
+            return id != null && id.equals(that.id);
+        } else {
+            if (name != null ? !name.equals(that.name) : that.name != null) return false;
+            return namespace != null ? namespace.equals(that.namespace) : that.namespace == null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
+        return result;
+    }
 }

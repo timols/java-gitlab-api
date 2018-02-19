@@ -39,7 +39,7 @@ public class GitlabAPIIT {
     }
     @Test
     public void testAllProjects() throws IOException {
-        api.getProjects();
+        api.getAllProjects();
     }
 
     @Test
@@ -219,19 +219,68 @@ public class GitlabAPIIT {
     @Test
     public void testGetMembershipProjects() throws IOException {
         final List<GitlabProject> membershipProjects = api.getMembershipProjects();
-        assertEquals(0, membershipProjects.size());
+        assertTrue(membershipProjects.size() >= 0);
     }
 
     @Test
     public void Check_get_owned_projects() throws IOException {
         final List<GitlabProject> ownedProjects = api.getOwnedProjects();
-        assertEquals(0, ownedProjects.size());
+        assertTrue(ownedProjects.size() >= 0);
     }
 
     @Test
     public void Check_search_projects() throws IOException {
         final List<GitlabProject> searchedProjects = api.searchProjects("foo");
         assertEquals(0, searchedProjects.size());
+    }
+
+    /**
+     * There is at least one namespace for the user
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testGetNamespace() throws IOException {
+        final List<GitlabNamespace> gitlabNamespaces = api.getNamespaces();
+        assertTrue(gitlabNamespaces.size() > 0);
+    }
+
+    @Test
+    public void testCreateDeleteFork() throws IOException {
+        String projectName = randVal("Fork-me");
+
+        String password = randVal("$%password");
+
+
+        GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
+                password,
+                randVal("userName"),
+                randVal("fullName"),
+                randVal("skypeId"),
+                randVal("linkedin"),
+                randVal("twitter"),
+                "http://" + randVal("url.com"),
+                10,
+                randVal("externuid"),
+                randVal("externprovidername"),
+                randVal("bio"),
+                false,
+                false,
+                false,
+                false);
+
+
+        GitlabProject project = api.createUserProject(gitUser.getId(), projectName);
+        GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
+
+        assertNotNull(fork);
+
+        assertEquals(project.getId(), fork.getForkedFrom().getId());
+
+        api.deleteProject(project.getId());
+        api.deleteProject(fork.getId());
+
+        api.deleteUser(gitUser.getId());
     }
 
     private String randVal(String postfix) {

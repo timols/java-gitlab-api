@@ -30,6 +30,9 @@ public class GitlabGroup {
 
     @JsonProperty("shared_runners_minutes_limit")
     private Integer sharedRunnersMinutesLimit;
+   
+    @JsonProperty("avatar_url")
+    private String avatarUrl;
 
     @JsonProperty("ldap_cn")
     private String ldapCn;
@@ -45,6 +48,60 @@ public class GitlabGroup {
 
     @JsonProperty("parent_id")
     private Integer parentId;
+
+    @JsonProperty("full_name")
+    private String fullName;
+    
+    @JsonProperty("full_path")
+    private String fullPath;
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public Boolean isLfsEnabled() {
+        return lfsEnabled;
+    }
+    
+    public void setLfsEnabled(Boolean lfsEnabled) {
+        this.lfsEnabled = lfsEnabled;
+    }
+    
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+    
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+    
+    public String getFullName() {
+        return fullName;
+    }
+    
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
+    public String getFullPath() {
+        return fullPath;
+    }
+    
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+    
+    public Boolean isRequestAccessEnabled() {
+        return requestAccessEnabled;
+    }
+    
+    public void setRequestAccessEnabled(Boolean requestAccessEnabled) {
+        this.requestAccessEnabled = requestAccessEnabled;
+    }
 
     public Integer getId() {
         return id;
@@ -86,14 +143,6 @@ public class GitlabGroup {
         this.ldapCn = ldapCn;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Boolean getMembershipLock() {
         return membershipLock;
     }
@@ -116,22 +165,6 @@ public class GitlabGroup {
 
     public void setVisibility(GitlabVisibility visibility) {
         this.visibility = visibility;
-    }
-
-    public Boolean getLfsEnabled() {
-        return lfsEnabled;
-    }
-
-    public void setLfsEnabled(Boolean lfsEnabled) {
-        this.lfsEnabled = lfsEnabled;
-    }
-
-    public Boolean getRequestAccessEnabled() {
-        return requestAccessEnabled;
-    }
-
-    public void setRequestAccessEnabled(Boolean requestAccessEnabled) {
-        this.requestAccessEnabled = requestAccessEnabled;
     }
 
     public Integer getSharedRunnersMinutesLimit() {
