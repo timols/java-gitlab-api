@@ -544,6 +544,65 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabGroup.class);
     }
+	
+	/**
+     * Creates a Group
+     *
+     * @param group The gitlab Group object
+     * @param sudoUser The user to create the group on behalf of
+     *
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroup(GitlabGroup group, GitlabUser sudoUser) throws IOException {
+
+        Query query = new Query()
+                .append("name", group.getName())
+                .append("path", group.getPath())
+                .appendIf("description", group.getDescription())
+                .appendIf("membership_lock", group.getMembershipLock())
+                .appendIf("share_with_group_lock", group.getShareWithGroupLock())
+                .appendIf("visibility", group.getVisibility().toString())
+                .appendIf("lfs_enabled", group.getLfsEnabled())
+                .appendIf("request_access_enabled", group.getRequestAccessEnabled())
+                .appendIf("shared_runners_minutes_limit", group.getSharedRunnersMinutesLimit())
+                .appendIf("ldap_cn", group.getLdapCn())
+                .appendIf("ldap_access", group.getLdapAccess())
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+
+        String tailUrl = GitlabGroup.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+
+    /**
+     * Updates a Group
+     *
+     * @param group the group object
+     * @param sudoUser The user to create the group on behalf of
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup updateGroup(GitlabGroup group, GitlabUser sudoUser) throws IOException {
+
+        Query query = new Query()
+                .appendIf("name", group.getName())
+                .appendIf("path", group.getPath())
+                .appendIf("description", group.getDescription())
+                .appendIf("membership_lock", group.getMembershipLock())
+                .appendIf("share_with_group_lock", group.getShareWithGroupLock())
+                .appendIf("visibility", group.getVisibility().toString())
+                .appendIf("lfs_enabled", group.getLfsEnabled())
+                .appendIf("request_access_enabled", group.getRequestAccessEnabled())
+                .appendIf("shared_runners_minutes_limit", group.getSharedRunnersMinutesLimit())
+                .appendIf("ldap_cn", group.getLdapCn())
+                .appendIf("ldap_access", group.getLdapAccess())
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+
+        String tailUrl = GitlabGroup.URL + "/" + group.getId() + query.toString();
+
+        return retrieve().method("PUT").to(tailUrl, GitlabGroup.class);
+    }
 
     /**
      * Add a group member.

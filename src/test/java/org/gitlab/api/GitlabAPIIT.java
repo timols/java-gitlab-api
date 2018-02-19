@@ -183,6 +183,38 @@ public class GitlabAPIIT {
         // Cleanup
         api.deleteGroup(group.getId());
     }
+	
+	@Test
+    public void testCreateAndUpdateGroup() throws IOException {
+        // Given
+        GitlabGroup originalGroup = new GitlabGroup();
+        originalGroup.setDescription("test description");
+        originalGroup.setName("groupNameTest");
+        originalGroup.setPath("groupPathTest");
+        originalGroup.setVisibility(GitlabVisibility.INTERNAL);
+
+        GitlabGroup newGroup = api.createGroup(originalGroup, null);
+        assertNotNull(newGroup);
+        assertEquals(originalGroup.getId(), newGroup.getId());
+        assertEquals(originalGroup.getName(), newGroup.getName());
+        assertEquals(originalGroup.getPath(), newGroup.getPath());
+        assertEquals(originalGroup.getDescription(), newGroup.getDescription());
+        assertEquals(originalGroup.getVisibility(), newGroup.getVisibility());
+
+        GitlabGroup groupToUpdate = new GitlabGroup();
+        groupToUpdate.setId(newGroup.getId());
+        groupToUpdate.setVisibility(GitlabVisibility.PRIVATE);
+
+        // When
+        GitlabGroup updatedGroup = api.updateGroup(newGroup, null);
+
+        // Then:
+        assertNotNull(updatedGroup);
+        assertEquals(groupToUpdate.getVisibility(), updatedGroup.getVisibility());
+
+        // Cleanup
+        api.deleteGroup(updatedGroup.getId());
+    }
 
     @Test
     public void testGetMembershipProjects() throws IOException {

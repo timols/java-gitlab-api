@@ -11,6 +11,25 @@ public class GitlabGroup {
     private Integer id;
     private String name;
     private String path;
+    private String description;
+
+    @JsonProperty("membership_lock")
+    private Boolean membershipLock;
+
+    @JsonProperty("share_with_group_lock")
+    private Boolean shareWithGroupLock;
+
+    @JsonProperty("visibility")
+    private GitlabVisibility visibility;
+
+    @JsonProperty("lfs_enabled")
+    private Boolean lfsEnabled;
+
+    @JsonProperty("request_access_enabled")
+    private Boolean requestAccessEnabled;
+
+    @JsonProperty("shared_runners_minutes_limit")
+    private Integer sharedRunnersMinutesLimit;
 
     @JsonProperty("ldap_cn")
     private String ldapCn;
@@ -65,6 +84,62 @@ public class GitlabGroup {
 
     public void setLdapCn(String ldapCn) {
         this.ldapCn = ldapCn;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getMembershipLock() {
+        return membershipLock;
+    }
+
+    public void setMembershipLock(Boolean membershipLock) {
+        this.membershipLock = membershipLock;
+    }
+
+    public Boolean getShareWithGroupLock() {
+        return shareWithGroupLock;
+    }
+
+    public void setShareWithGroupLock(Boolean shareWithGroupLock) {
+        this.shareWithGroupLock = shareWithGroupLock;
+    }
+
+    public GitlabVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(GitlabVisibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public Boolean getLfsEnabled() {
+        return lfsEnabled;
+    }
+
+    public void setLfsEnabled(Boolean lfsEnabled) {
+        this.lfsEnabled = lfsEnabled;
+    }
+
+    public Boolean getRequestAccessEnabled() {
+        return requestAccessEnabled;
+    }
+
+    public void setRequestAccessEnabled(Boolean requestAccessEnabled) {
+        this.requestAccessEnabled = requestAccessEnabled;
+    }
+
+    public Integer getSharedRunnersMinutesLimit() {
+        return sharedRunnersMinutesLimit;
+    }
+
+    public void setSharedRunnersMinutesLimit(Integer sharedRunnersMinutesLimit) {
+        this.sharedRunnersMinutesLimit = sharedRunnersMinutesLimit;
     }
 
     public GitlabAccessLevel getLdapAccess() {
