@@ -176,6 +176,7 @@ public class GitlabAPI {
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
+     * @param external             External
      * @return                     A GitlabUser
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
@@ -185,7 +186,7 @@ public class GitlabAPI {
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
                                  String bio, Boolean isAdmin, Boolean can_create_group,
-                                 Boolean skip_confirmation) throws IOException {
+                                 Boolean skip_confirmation, Boolean external) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
@@ -202,7 +203,8 @@ public class GitlabAPI {
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio", bio)
                 .appendIf("admin", isAdmin)
-                .appendIf("can_create_group", can_create_group);
+                .appendIf("can_create_group", can_create_group)
+                .appendIf("external", external);
 
         String tailUrl = GitlabUser.USERS_URL + query.toString();
 
@@ -239,6 +241,7 @@ public class GitlabAPI {
      * @param bio                  Bio
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
+     * @param external             External
      * @return The Updated User
      * @throws IOException on gitlab api call error
      */
@@ -247,7 +250,7 @@ public class GitlabAPI {
                                  String fullName, String skypeId, String linkedIn,
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
-                                 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+                                 String bio, Boolean isAdmin, Boolean can_create_group, Boolean external) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
@@ -263,7 +266,8 @@ public class GitlabAPI {
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio", bio)
                 .appendIf("admin", isAdmin)
-                .appendIf("can_create_group", can_create_group);
+                .appendIf("can_create_group", can_create_group)
+                .appendIf("external", external);
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + query.toString();
 

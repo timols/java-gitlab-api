@@ -1,9 +1,6 @@
 package org.gitlab.api;
 
-import org.gitlab.api.models.GitlabBuildVariable;
-import org.gitlab.api.models.GitlabGroup;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabUser;
+import org.gitlab.api.models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -127,7 +124,8 @@ public class GitlabAPIIT {
                 randVal("bio"),
                 false,
                 false,
-                true);
+                true,
+                false);
         assertNotNull(gitUser);
 
         GitlabUser refetched = api.getUserViaSudo(gitUser.getUsername());
@@ -138,7 +136,7 @@ public class GitlabAPIIT {
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
                 gitUser.getName(), "newSkypeId", gitUser.getLinkedin(), gitUser.getTwitter(), gitUser.getWebsiteUrl(),
                 10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
-                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
+                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup(), gitUser.isExternal());
 
 
         GitlabUser postUpdate = api.getUserViaSudo(gitUser.getUsername());

@@ -64,6 +64,9 @@ public class GitlabUser {
     @JsonProperty("can_create_team")
     private boolean _canCreateTeam;
 
+    @JsonProperty("external")
+    private boolean _external;
+
     @JsonProperty("avatar_url")
     private String _avatarUrl;
 
@@ -245,6 +248,14 @@ public class GitlabUser {
 
     public void setCanCreateTeam(boolean canCreateTeam) {
         _canCreateTeam = canCreateTeam;
+    }
+
+    public boolean isExternal() {
+        return _external;
+    }
+
+    public void setExternal(boolean external) {
+        _external = external;
     }
 
     public String getAvatarUrl() {
