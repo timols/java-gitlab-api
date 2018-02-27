@@ -334,7 +334,7 @@ public class GitlabAPI {
                 .append("title", title)
                 .append("key", key);
 
-        String tailUrl = GitlabUser.USERS_URL + GitlabSSHKey.KEYS_URL + query.toString();
+        String tailUrl = GitlabUser.USER_URL + GitlabSSHKey.KEYS_URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
