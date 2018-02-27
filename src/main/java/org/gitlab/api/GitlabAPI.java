@@ -323,7 +323,6 @@ public class GitlabAPI {
     /**
      * Create a new ssh key for the authenticated user.
      *
-     * @param targetUserId The id of the Gitlab user
      * @param title        The title of the ssh key
      * @param key          The public key
      * @return The new GitlabSSHKey
@@ -335,7 +334,7 @@ public class GitlabAPI {
                 .append("title", title)
                 .append("key", key);
 
-        String tailUrl = GitlabUser.USERS_URL + "/" + GitlabSSHKey.KEYS_URL + query.toString();
+        String tailUrl = GitlabUser.USERS_URL + GitlabSSHKey.KEYS_URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
