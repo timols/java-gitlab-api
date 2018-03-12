@@ -1,136 +1,245 @@
 package org.gitlab.api.models;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabIssue {
 
-    public enum Action {
-        LEAVE, CLOSE, REOPEN
-    }
+	public enum Action {
+		LEAVE, CLOSE, REOPEN
+	}
 
-    public static final String STATE_CLOSED = "closed";
-    public static final String STATE_OPENED = "opened";
+	public static final String STATE_CLOSED = "closed";
+	public static final String STATE_OPENED = "opened";
 
-    public static final String URL = "/issues";
+	public static final String URL = "/issues";
 
-    private int id;
-    private int iid;
+	private int id;
+	private int iid;
 
-    @JsonProperty("project_id")
-    private int projectId;
+	@JsonProperty("project_id")
+	private int projectId;
 
-    private String title;
-    private String description;
-    private String[] labels;
-    private GitlabMilestone milestone;
+	private String title;
+	private String description;
+	private String[] labels;
+	private GitlabMilestone milestone;
 
-    private GitlabUser assignee;
-    private GitlabUser author;
+	private List<GitlabUser> assignees;
+	private GitlabUser assignee;
+	private GitlabUser author;
 
-    private String state;
+	@JsonProperty("user_notes_count")
+	private Integer userNotesCount;
 
-    @JsonProperty("updated_at")
-    private Date updatedAt;
+	@JsonProperty("upvotes")
+	private Integer upVotes;
 
-    @JsonProperty("created_at")
-    private Date createdAt;
+	@JsonProperty("downvotes")
+	private Integer downVotes;
 
-    public int getId() {
-        return id;
-    }
+	@JsonProperty("due_date")
+	private LocalDate dueDate;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	private Boolean confidential;
 
-    public int getIid() {
-        return iid;
-    }
+	@JsonProperty("discussion_locked")
+	private Boolean discussionLocked;
 
-    public void setIid(int iid) {
-        this.iid = iid;
-    }
+	@JsonProperty("time_stats")
+	private GitlabIssueTimeStats timeStats;
 
-    public int getProjectId() {
-        return projectId;
-    }
+	private String state;
 
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
+	@JsonProperty("updated_at")
+	private Date updatedAt;
 
-    public String getTitle() {
-        return title;
-    }
+	@JsonProperty("created_at")
+	private Date createdAt;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	@JsonProperty("closed_at")
+	private Date closedAt;
 
-    public String getDescription() {
-        return description;
-    }
+	@JsonProperty("web_url")
+	private String webUrl;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String[] getLabels() {
-        return labels;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public void setLabels(String[] labels) {
-        this.labels = labels;
-    }
+	public int getIid() {
+		return iid;
+	}
 
-    public GitlabMilestone getMilestone() {
-        return milestone;
-    }
+	public void setIid(int iid) {
+		this.iid = iid;
+	}
 
-    public void setMilestone(GitlabMilestone milestone) {
-        this.milestone = milestone;
-    }
+	public int getProjectId() {
+		return projectId;
+	}
 
-    public GitlabUser getAssignee() {
-        return assignee;
-    }
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
 
-    public void setAssignee(GitlabUser assignee) {
-        this.assignee = assignee;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public GitlabUser getAuthor() {
-        return author;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public void setAuthor(GitlabUser author) {
-        this.author = author;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setState(String state) {
-        this.state = state;
-    }
+	public String[] getLabels() {
+		return labels;
+	}
 
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
+	public void setLabels(String[] labels) {
+		this.labels = labels;
+	}
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+	public GitlabMilestone getMilestone() {
+		return milestone;
+	}
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+	public void setMilestone(GitlabMilestone milestone) {
+		this.milestone = milestone;
+	}
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+	public List<GitlabUser> getAssignees() {
+		return assignees;
+	}
+
+	public void setAssignees(List<GitlabUser> assignees) {
+		this.assignees = assignees;
+	}
+
+	public GitlabUser getAssignee() {
+		return assignee;
+	}
+
+	public void setAssignee(GitlabUser assignee) {
+		this.assignee = assignee;
+	}
+
+	public GitlabUser getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(GitlabUser author) {
+		this.author = author;
+	}
+
+	public Integer getUserNotesCount() {
+		return userNotesCount;
+	}
+
+	public void setUserNotesCount(Integer userNotesCount) {
+		this.userNotesCount = userNotesCount;
+	}
+
+	public Integer getUpVotes() {
+		return upVotes;
+	}
+
+	public void setUpVotes(Integer upVotes) {
+		this.upVotes = upVotes;
+	}
+
+	public Integer getDownVotes() {
+		return downVotes;
+	}
+
+	public void setDownVotes(Integer downVotes) {
+		this.downVotes = downVotes;
+	}
+
+	public LocalDate getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
+	}
+
+	public Boolean getConfidential() {
+		return confidential;
+	}
+
+	public void setConfidential(Boolean confidential) {
+		this.confidential = confidential;
+	}
+
+	public Boolean getDiscussionLocked() {
+		return discussionLocked;
+	}
+
+	public void setDiscussionLocked(Boolean discussionLocked) {
+		this.discussionLocked = discussionLocked;
+	}
+
+	public GitlabIssueTimeStats getTimeStats() {
+		return timeStats;
+	}
+
+	public void setTimeStats(GitlabIssueTimeStats timeStats) {
+		this.timeStats = timeStats;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getClosedAt() {
+		return closedAt;
+	}
+
+	public void setClosedAt(Date closedAt) {
+		this.closedAt = closedAt;
+	}
+
+	public String getWebUrl() {
+		return webUrl;
+	}
+
+	public void setWebUrl(String webUrl) {
+		this.webUrl = webUrl;
+	}
 
 }
