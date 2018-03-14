@@ -323,6 +323,25 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
+    
+    /**
+     * Create a new ssh key for the authenticated user.
+     *
+     * @param title        The title of the ssh key
+     * @param key          The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey createSSHKey(String title, String key) throws IOException {
+
+        Query query = new Query()
+                .append("title", title)
+                .append("key", key);
+
+        String tailUrl = GitlabUser.USER_URL + GitlabSSHKey.KEYS_URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabSSHKey.class);
+    }
 
     /**
      * Delete user's ssh key
