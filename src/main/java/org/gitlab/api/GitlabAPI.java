@@ -765,6 +765,39 @@ public class GitlabAPI {
     }
 
     /**
+     * Get a list of projects of size perPage accessible by the authenticated user.
+     *
+     * @param page    page offset.
+     * @param perPage number elements to get after page offset.
+     * @return A list of gitlab projects
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsWithPagination(int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getProjectsWithPagination(pagination);
+    }
+
+    /**
+     * Get a list of projects by pagination accessible by the authenticated user.
+     *
+     * @param pagination
+     * @return
+     * @throws IOException
+     */
+    public List<GitlabProject> getProjectsWithPagination(Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabProject.URL);
+
+        if (pagination != null) {
+            Query query = pagination.asQuery();
+            tailUrl.append(query.toString());
+        }
+
+        return Arrays.asList(retrieve().method("GET").to(tailUrl.toString(), GitlabProject[].class));
+    }
+
+    /**
      * Get a list of projects owned by the authenticated user.
      *
      * @return A list of gitlab projects
@@ -815,6 +848,44 @@ public class GitlabAPI {
         query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
         String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     * Get a list of projects of perPage elements accessible by the authenticated user given page offset
+     *
+     * @param user    Gitlab User to invoke sudo with
+     * @param page    Page offset
+     * @param perPage Number of elements to get after page offset
+     * @return A list of gitlab projects
+     * @throws IOException Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsViaSudoWithPagination(GitlabUser user, int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getProjectsViaSudoWithPagination(user, pagination);
+    }
+
+    /**
+     * Get a list of projects of with Pagination.
+     *
+     * @param user       Gitlab User to invoke sudo with
+     * @param pagination
+     * @return A list of gitlab projects
+     * @throws IOException Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsViaSudoWithPagination(GitlabUser user, Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabProject.URL);
+
+        Query query = new Query()
+                .appendIf(PARAM_SUDO, user.getId());
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
+        tailUrl.append(query.toString());
+        return Arrays.asList(retrieve().method("GET").to(tailUrl.toString(), GitlabProject[].class));
     }
 
     /**
@@ -1412,12 +1483,12 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
-    
+
     public GitlabMergeRequest getMergeRequest(Serializable projectId, Integer mergeRequestId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
-    
+
     public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
         return getMergeRequest(project.getId(), mergeRequestId);
     }
@@ -1488,7 +1559,7 @@ public class GitlabAPI {
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
         return acceptMergeRequest(project.getId(), mergeRequestId, mergeCommitMessage);
     }
-    
+
     public GitlabMergeRequest acceptMergeRequest(Serializable projectId, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
         GitlabHTTPRequestor requestor = retrieve().method("PUT");
@@ -1656,7 +1727,7 @@ public class GitlabAPI {
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
         return getCommitStatuses(project.getId(), commitHash, new Pagination());
     }
-    
+
     public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash) throws IOException {
         return getCommitStatuses(projectId, commitHash, new Pagination());
     }
@@ -1665,7 +1736,7 @@ public class GitlabAPI {
                                                       Pagination pagination) throws IOException {
         return getCommitStatuses(project.getId(), commitHash, pagination);
     }
-    
+
     public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash,
                                                       Pagination pagination) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository" + GitlabCommit.URL + "/" +
@@ -1680,7 +1751,7 @@ public class GitlabAPI {
                                                  String name, String targetUrl, String description) throws IOException {
         return createCommitStatus(project.getId(), commitHash, state, ref, name, targetUrl, description);
     }
-    
+
     public GitlabCommitStatus createCommitStatus(Serializable projectId, String commitHash, String state, String ref,
                                                  String name, String targetUrl, String description) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabCommitStatus.URL + "/" + commitHash;
@@ -3327,7 +3398,7 @@ public class GitlabAPI {
      * @throws IOException
      */
     public List<GitlabRunner> getRunners() throws IOException {
-        return getRunners(GitlabRunner.RunnerScope.ALL);
+        return getRunnersWithPagination(GitlabRunner.RunnerScope.ALL, null);
     }
 
     /**
@@ -3338,16 +3409,55 @@ public class GitlabAPI {
      * @throws IOException on Gitlab API call error
      */
     public List<GitlabRunner> getRunners(GitlabRunner.RunnerScope scope) throws IOException {
-        StringBuilder tailUrl = new StringBuilder("runners/all");
+        return getRunnersWithPagination(scope, null);
+    }
+
+    /**
+     * Returns a list of runners with perPage elements on the page number specified.
+     *
+     * @param scope   Can be null. Defines type of Runner to retrieve.
+     * @param page    Page to get perPage number of Runners from.
+     * @param perPage Number of elements to get per page.
+     * @return List of GitlabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunnersWithPagination(GitlabRunner.RunnerScope scope, int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getRunnersWithPagination(scope, pagination);
+    }
+
+    /**
+     * Returns a list of runners with perPage elements on the page number specified.
+     *
+     * @param scope      Can be null. Defines type of Runner to retrieve.
+     * @param pagination Can be null. Pagination to query by.
+     * @return List of GitlabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunnersWithPagination(GitlabRunner.RunnerScope scope, Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabRunner.URL).append("/all");
         Query query = new Query()
                 .appendIf("scope", scope.getScope());
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
         tailUrl.append(query.toString());
-        return retrieve().getAll(tailUrl.toString(), GitlabRunner[].class);
+        return Arrays.asList(retrieve().method("GET").to(tailUrl.toString(), GitlabRunner[].class));
     }
 
+    /**
+     * Get details information of the runner with the specified id.
+     *
+     * @param id Runner id.
+     * @return Extensive GitlabRunner Details.
+     * @throws IOException
+     */
     public GitlabRunner getRunnerDetail(int id) throws IOException {
-        String tailUrl = String.format("runners/%d", id);
+        String tailUrl = String.format("%s/%d", GitlabRunner.URL, id);
         return retrieve().to(tailUrl, GitlabRunner.class);
     }
-
 }
