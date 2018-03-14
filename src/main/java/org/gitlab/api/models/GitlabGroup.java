@@ -12,9 +12,24 @@ public class GitlabGroup {
     private String name;
     private String path;
     private String description;
-    
+
+    @JsonProperty("membership_lock")
+    private Boolean membershipLock;
+
+    @JsonProperty("share_with_group_lock")
+    private Boolean shareWithGroupLock;
+
+    @JsonProperty("visibility")
+    private GitlabVisibility visibility;
+
     @JsonProperty("lfs_enabled")
     private Boolean lfsEnabled;
+
+    @JsonProperty("request_access_enabled")
+    private Boolean requestAccessEnabled;
+
+    @JsonProperty("shared_runners_minutes_limit")
+    private Integer sharedRunnersMinutesLimit;
    
     @JsonProperty("avatar_url")
     private String avatarUrl;
@@ -39,9 +54,6 @@ public class GitlabGroup {
     
     @JsonProperty("full_path")
     private String fullPath;
-    
-    @JsonProperty("request_access_enabled")
-    private Boolean requestAccessEnabled;
     
     public String getDescription() {
         return description;
@@ -129,6 +141,38 @@ public class GitlabGroup {
 
     public void setLdapCn(String ldapCn) {
         this.ldapCn = ldapCn;
+    }
+
+    public Boolean getMembershipLock() {
+        return membershipLock;
+    }
+
+    public void setMembershipLock(Boolean membershipLock) {
+        this.membershipLock = membershipLock;
+    }
+
+    public Boolean getShareWithGroupLock() {
+        return shareWithGroupLock;
+    }
+
+    public void setShareWithGroupLock(Boolean shareWithGroupLock) {
+        this.shareWithGroupLock = shareWithGroupLock;
+    }
+
+    public GitlabVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(GitlabVisibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public Integer getSharedRunnersMinutesLimit() {
+        return sharedRunnersMinutesLimit;
+    }
+
+    public void setSharedRunnersMinutesLimit(Integer sharedRunnersMinutesLimit) {
+        this.sharedRunnersMinutesLimit = sharedRunnersMinutesLimit;
     }
 
     public GitlabAccessLevel getLdapAccess() {

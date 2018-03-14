@@ -1,10 +1,6 @@
 package org.gitlab.api;
 
-import org.gitlab.api.models.GitlabBuildVariable;
-import org.gitlab.api.models.GitlabGroup;
-import org.gitlab.api.models.GitlabNamespace;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabUser;
+import org.gitlab.api.models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -128,6 +124,7 @@ public class GitlabAPIIT {
                 randVal("bio"),
                 false,
                 false,
+                true,
                 false);
         assertNotNull(gitUser);
 
@@ -139,7 +136,7 @@ public class GitlabAPIIT {
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
                 gitUser.getName(), "newSkypeId", gitUser.getLinkedin(), gitUser.getTwitter(), gitUser.getWebsiteUrl(),
                 10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
-                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
+                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup(), gitUser.isExternal());
 
 
         GitlabUser postUpdate = api.getUserViaSudo(gitUser.getUsername());
@@ -185,6 +182,38 @@ public class GitlabAPIIT {
 
         // Cleanup
         api.deleteGroup(group.getId());
+    }
+	
+	@Test
+    public void testCreateAndUpdateGroup() throws IOException {
+        // Given
+        GitlabGroup originalGroup = new GitlabGroup();
+        originalGroup.setDescription("test description");
+        originalGroup.setName("groupNameTest");
+        originalGroup.setPath("groupPathTest");
+        originalGroup.setVisibility(GitlabVisibility.INTERNAL);
+
+        GitlabGroup newGroup = api.createGroup(originalGroup, null);
+        assertNotNull(newGroup);
+        assertEquals(originalGroup.getId(), newGroup.getId());
+        assertEquals(originalGroup.getName(), newGroup.getName());
+        assertEquals(originalGroup.getPath(), newGroup.getPath());
+        assertEquals(originalGroup.getDescription(), newGroup.getDescription());
+        assertEquals(originalGroup.getVisibility(), newGroup.getVisibility());
+
+        GitlabGroup groupToUpdate = new GitlabGroup();
+        groupToUpdate.setId(newGroup.getId());
+        groupToUpdate.setVisibility(GitlabVisibility.PRIVATE);
+
+        // When
+        GitlabGroup updatedGroup = api.updateGroup(newGroup, null);
+
+        // Then:
+        assertNotNull(updatedGroup);
+        assertEquals(groupToUpdate.getVisibility(), updatedGroup.getVisibility());
+
+        // Cleanup
+        api.deleteGroup(updatedGroup.getId());
     }
 
     @Test
@@ -235,6 +264,7 @@ public class GitlabAPIIT {
                 randVal("externuid"),
                 randVal("externprovidername"),
                 randVal("bio"),
+                false,
                 false,
                 false,
                 false);
