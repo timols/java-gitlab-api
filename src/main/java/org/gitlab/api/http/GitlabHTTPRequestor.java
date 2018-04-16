@@ -360,6 +360,11 @@ public class GitlabHTTPRequestor {
             connection.setReadTimeout(requestTimeout);
         }
 
+        final int connectionTimeout = root.getConnectionTimeout();
+        if (connectionTimeout > 0) {
+            connection.setConnectTimeout(connectionTimeout);
+        }
+
         try {
             connection.setRequestMethod(method);
         } catch (ProtocolException e) {
@@ -419,6 +424,9 @@ public class GitlabHTTPRequestor {
             throw e;    // pass through 404 Not Found to allow the caller to handle it intelligently
         }
         if (e instanceof SocketTimeoutException && root.getRequestTimeout() > 0) {
+            throw e;
+        }
+        if (e instanceof ConnectException && root.getConnectionTimeout() > 0) {
             throw e;
         }
 
