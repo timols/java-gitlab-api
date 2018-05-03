@@ -38,6 +38,14 @@
 			<email>luu@fuzzproductions.com</email>
 			<organization>Fuzz Productions</organization>
 		</contributor>
+		<contributor>
+			<name>Oleg Shaburov</name>
+			<email>shaburov.o.a@gmail.com</email>
+			<roles>
+				<role>Automation QA</role>
+			</roles>
+			<timezone>+3</timezone>
+		</contributor>
 	</contributors>
 
 	<licenses>
@@ -67,6 +75,8 @@
 		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 		<!-- wait three minutes for gitlab to start -->
 		<docker-maven-plugin.timeOut>180000</docker-maven-plugin.timeOut>
+		<log4j.version>2.11.0</log4j.version>
+		<junit.jupiter.version>5.2.0</junit.jupiter.version>
 	</properties>
 
 	<dependencies>
@@ -85,6 +95,37 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.8.0-beta2</version>
+		</dependency>
+		<!-- Test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
@@ -92,9 +133,22 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.10.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Test provided -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
