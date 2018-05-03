@@ -1262,9 +1262,8 @@ public class GitlabAPI {
      */
     public GitlabProject createFork(String namespace, Integer projectId) throws IOException {
         Query query = new Query()
-                .appendIf("id", projectId)
-                .append("namespace", namespace);
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork";
+                .appendIf("namespace", namespace);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork" + query.toString();
         return dispatch().to(tailUrl, GitlabProject.class);
     }
 
