@@ -2221,7 +2221,7 @@ public class GitlabAPI {
     }
 
     public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
-        return createNote(String.valueOf(issue.getProjectId()), issue.getId(), message);
+        return createNote(String.valueOf(issue.getProjectId()), issue.getIid(), message);
     }
 
     /**
