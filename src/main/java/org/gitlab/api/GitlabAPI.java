@@ -2,12 +2,16 @@ package org.gitlab.api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -17,14 +21,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.gitlab.api.http.Method.*;
 
 /**
  * Gitlab API Wrapper class
  *
  * @author &#064;timols (Tim O)
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class GitlabAPI {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GitlabAPI.class);
 
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -39,7 +46,9 @@ public class GitlabAPI {
     private AuthMethod authMethod;
     private boolean ignoreCertificateErrors = false;
     private Proxy proxy;
-    private int requestTimeout = 0;
+    private int defaultTimeout = 0;
+    private int readTimeout = defaultTimeout;
+    private int connectionTimeout = defaultTimeout;
     private String userAgent = GitlabAPI.class.getCanonicalName() + "/" + System.getProperty("java.version");
 
     private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
@@ -78,12 +87,50 @@ public class GitlabAPI {
         return this;
     }
 
-    public int getRequestTimeout() {
-        return requestTimeout;
+    public int getResponseReadTimeout() {
+        return readTimeout;
     }
 
-    public GitlabAPI setRequestTimeout(int requestTimeout) {
-        this.requestTimeout = requestTimeout;
+    /**
+     * @deprecated use this.getResponseReadTimeout() method
+     */
+    @Deprecated
+    public int getRequestTimeout() {
+        return getResponseReadTimeout();
+    }
+
+    /**
+     * @deprecated use this.setResponseReadTimeout(int readTimeout) method
+     */
+    @Deprecated
+    public GitlabAPI setRequestTimeout(int readTimeout) {
+        setResponseReadTimeout(readTimeout);
+        return this;
+    }
+
+    public GitlabAPI setResponseReadTimeout(int readTimeout) {
+        if (readTimeout < 0) {
+            LOG.warn("The value of the \"Response Read Timeout\" parameter can not be negative. " +
+                    "The default value [{}] will be used.", defaultTimeout);
+            this.readTimeout = defaultTimeout;
+        } else {
+            this.readTimeout = readTimeout;
+        }
+        return this;
+    }
+
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public GitlabAPI setConnectionTimeout(int connectionTimeout) {
+        if (connectionTimeout < 0) {
+            LOG.warn("The value of the \"Connection Timeout\" parameter can not be negative. " +
+                    "The default value [{}] will be used.", defaultTimeout);
+            this.connectionTimeout = defaultTimeout;
+        } else {
+            this.connectionTimeout = connectionTimeout;
+        }
         return this;
     }
 
@@ -92,7 +139,7 @@ public class GitlabAPI {
     }
 
     public GitlabHTTPRequestor dispatch() {
-        return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod).method("POST");
+        return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod).method(POST);
     }
 
     public boolean isIgnoreCertificateErrors() {
@@ -118,20 +165,25 @@ public class GitlabAPI {
         return new URL(hostUrl + tailAPIUrl);
     }
 
-    public List<GitlabUser> getUsers() throws IOException {
+    public String getHost() {
+        return hostUrl;
+    }
+
+    public List<GitlabUser> getUsers() {
         String tailUrl = GitlabUser.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabUser[].class);
     }
 
     /**
      * Finds users by email address or username.
+     *
      * @param emailOrUsername Some portion of the email address or username
      * @return A non-null List of GitlabUser instances.  If the search term is
-     *         null or empty a List with zero GitlabUsers is returned.
-     * @throws IOException
+     * null or empty a List with zero GitlabUsers is returned.
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabUser> findUsers(String emailOrUsername) throws IOException {
-        List<GitlabUser> users = new ArrayList<GitlabUser>();
+        List<GitlabUser> users = new ArrayList<>();
         if (emailOrUsername != null && !emailOrUsername.equals("")) {
             String tailUrl = GitlabUser.URL + "?search=" + emailOrUsername;
             GitlabUser[] response = retrieve().to(tailUrl, GitlabUser[].class);
@@ -176,6 +228,7 @@ public class GitlabAPI {
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
+     * @param external             External
      * @return                     A GitlabUser
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
@@ -185,11 +238,11 @@ public class GitlabAPI {
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
                                  String bio, Boolean isAdmin, Boolean can_create_group,
-                                 Boolean skip_confirmation) throws IOException {
+                                 Boolean skip_confirmation, Boolean external) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
-                .appendIf("confirm", skip_confirmation == null ? null : !skip_confirmation)
+                .appendIf("skip_confirmation", skip_confirmation)
                 .appendIf("password", password)
                 .appendIf("username", username)
                 .appendIf("name", fullName)
@@ -202,22 +255,24 @@ public class GitlabAPI {
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio", bio)
                 .appendIf("admin", isAdmin)
-                .appendIf("can_create_group", can_create_group);
+                .appendIf("can_create_group", can_create_group)
+                .appendIf("external", external);
 
         String tailUrl = GitlabUser.USERS_URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabUser.class);
     }
-    
+
     /**
      * Create a new user. This may succeed only if the requester is an administrator.
+     *
      * @param request An object that represents the parameters for the request.
      * @return {@link GitlabUser}
      * @throws IOException on gitlab api call error
      */
     public GitlabUser createUser(CreateUserRequest request) throws IOException {
-      String tailUrl = GitlabUser.USERS_URL + request.toQuery().toString();
-      return dispatch().to(tailUrl, GitlabUser.class);
+        String tailUrl = GitlabUser.USERS_URL + request.toQuery().toString();
+        return dispatch().to(tailUrl, GitlabUser.class);
     }
 
 
@@ -239,6 +294,7 @@ public class GitlabAPI {
      * @param bio                  Bio
      * @param isAdmin              Is Admin
      * @param can_create_group     Can Create Group
+     * @param external             External
      * @return The Updated User
      * @throws IOException on gitlab api call error
      */
@@ -247,7 +303,7 @@ public class GitlabAPI {
                                  String fullName, String skypeId, String linkedIn,
                                  String twitter, String website_url, Integer projects_limit,
                                  String extern_uid, String extern_provider_name,
-                                 String bio, Boolean isAdmin, Boolean can_create_group) throws IOException {
+                                 String bio, Boolean isAdmin, Boolean can_create_group, Boolean external) throws IOException {
 
         Query query = new Query()
                 .append("email", email)
@@ -263,11 +319,12 @@ public class GitlabAPI {
                 .appendIf("provider", extern_provider_name)
                 .appendIf("bio", bio)
                 .appendIf("admin", isAdmin)
-                .appendIf("can_create_group", can_create_group);
+                .appendIf("can_create_group", can_create_group)
+                .appendIf("external", external);
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + query.toString();
 
-        return retrieve().method("PUT").to(tailUrl, GitlabUser.class);
+        return retrieve().method(PUT).to(tailUrl, GitlabUser.class);
     }
 
     /**
@@ -280,7 +337,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.BLOCK_URL;
 
-        retrieve().method("POST").to(tailUrl, Void.class);
+        retrieve().method(POST).to(tailUrl, Void.class);
     }
 
     /**
@@ -293,7 +350,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabUser.UNBLOCK_URL;
 
-        retrieve().method("POST").to(tailUrl, Void.class);
+        retrieve().method(POST).to(tailUrl, Void.class);
     }
 
     /**
@@ -315,6 +372,25 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
+    
+    /**
+     * Create a new ssh key for the authenticated user.
+     *
+     * @param title        The title of the ssh key
+     * @param key          The public key
+     * @return The new GitlabSSHKey
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabSSHKey createSSHKey(String title, String key) throws IOException {
+
+        Query query = new Query()
+                .append("title", title)
+                .append("key", key);
+
+        String tailUrl = GitlabUser.USER_URL + GitlabSSHKey.KEYS_URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabSSHKey.class);
+    }
 
     /**
      * Delete user's ssh key
@@ -325,7 +401,7 @@ public class GitlabAPI {
      */
     public void deleteSSHKey(Integer targetUserId, Integer targetKeyId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId + GitlabSSHKey.KEYS_URL + "/" + targetKeyId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
 
@@ -356,12 +432,12 @@ public class GitlabAPI {
     /**
      * Delete a user
      *
-     * @param targetUserId  The target User ID
+     * @param targetUserId The target User ID
      * @throws IOException on gitlab api call error
      */
     public void deleteUser(Integer targetUserId) throws IOException {
         String tailUrl = GitlabUser.USERS_URL + "/" + targetUserId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     public GitlabGroup getGroup(Integer groupId) throws IOException {
@@ -372,8 +448,9 @@ public class GitlabAPI {
      * Get a group by path
      *
      * @param path Path of the group
-     * @return
-     * @throws IOException
+     * @return {@link GitlabGroup} object
+     *
+     * @throws IOException on gitlab api call error
      */
     public GitlabGroup getGroup(String path) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + URLEncoder.encode(path, "UTF-8");
@@ -402,9 +479,8 @@ public class GitlabAPI {
      *
      * @param group the target group
      * @return a list of projects for the group
-     * @throws IOException
      */
-    public List<GitlabProject> getGroupProjects(GitlabGroup group) throws IOException {
+    public List<GitlabProject> getGroupProjects(GitlabGroup group) {
         return getGroupProjects(group.getId());
     }
 
@@ -413,9 +489,8 @@ public class GitlabAPI {
      *
      * @param groupId the target group's id.
      * @return a list of projects for the group
-     * @throws IOException
      */
-    public List<GitlabProject> getGroupProjects(Integer groupId) throws IOException {
+    public List<GitlabProject> getGroupProjects(Integer groupId) {
         String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabProject.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
@@ -425,9 +500,8 @@ public class GitlabAPI {
      *
      * @param group The GitLab Group
      * @return The Group Members
-     * @throws IOException on gitlab api call error
      */
-    public List<GitlabGroupMember> getGroupMembers(GitlabGroup group) throws IOException {
+    public List<GitlabGroupMember> getGroupMembers(GitlabGroup group) {
         return getGroupMembers(group.getId());
     }
 
@@ -436,9 +510,8 @@ public class GitlabAPI {
      *
      * @param groupId The id of the GitLab Group
      * @return The Group Members
-     * @throws IOException on gitlab api call error
      */
-    public List<GitlabGroupMember> getGroupMembers(Integer groupId) throws IOException {
+    public List<GitlabGroupMember> getGroupMembers(Integer groupId) {
         String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabGroupMember.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabGroupMember[].class);
     }
@@ -471,8 +544,8 @@ public class GitlabAPI {
     /**
      * Creates a Group
      *
-     * @param name The name of the group
-     * @param path The path for the group
+     * @param name     The name of the group
+     * @param path     The path for the group
      * @param sudoUser The user to create the group on behalf of
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
@@ -488,7 +561,6 @@ public class GitlabAPI {
      * @param path       The path for the group
      * @param ldapCn     LDAP Group Name to sync with, null otherwise
      * @param ldapAccess Access level for LDAP group members, null otherwise
-     *
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
      */
@@ -502,14 +574,13 @@ public class GitlabAPI {
      *
      * @param request  An object that represents the parameters for the request.
      * @param sudoUser The user for whom we're creating the group
-     *
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
      */
-    public GitlabGroup createGroup(CreateGroupRequest request, GitlabUser sudoUser) throws IOException {      
+    public GitlabGroup createGroup(CreateGroupRequest request, GitlabUser sudoUser) throws IOException {
         Query query = request.toQuery();
         query.appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
-        
+
         String tailUrl = GitlabGroup.URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabGroup.class);
@@ -522,8 +593,7 @@ public class GitlabAPI {
      * @param path       The path for the group
      * @param ldapCn     LDAP Group Name to sync with, null otherwise
      * @param ldapAccess Access level for LDAP group members, null otherwise
-     * @param sudoUser The user to create the group on behalf of
-     *
+     * @param sudoUser   The user to create the group on behalf of
      * @return The GitLab Group
      * @throws IOException on gitlab api call error
      */
@@ -541,7 +611,6 @@ public class GitlabAPI {
      * @param sudoUser   The user to create the group on behalf of
      * @param parentId   The id of a parent group; the new group will be its subgroup
      * @return The GitLab Group
-     *
      * @throws IOException on gitlab api call error
      */
     public GitlabGroup createGroup(String name, String path, String ldapCn, GitlabAccessLevel ldapAccess, GitlabUser sudoUser, Integer parentId) throws IOException {
@@ -557,6 +626,65 @@ public class GitlabAPI {
         String tailUrl = GitlabGroup.URL + query.toString();
 
         return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+	
+	/**
+     * Creates a Group
+     *
+     * @param group The gitlab Group object
+     * @param sudoUser The user to create the group on behalf of
+     *
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup createGroup(GitlabGroup group, GitlabUser sudoUser) throws IOException {
+
+        Query query = new Query()
+                .append("name", group.getName())
+                .append("path", group.getPath())
+                .appendIf("description", group.getDescription())
+                .appendIf("membership_lock", group.getMembershipLock())
+                .appendIf("share_with_group_lock", group.getShareWithGroupLock())
+                .appendIf("visibility", group.getVisibility().toString())
+                .appendIf("lfs_enabled", group.isLfsEnabled())
+                .appendIf("request_access_enabled", group.isRequestAccessEnabled())
+                .appendIf("shared_runners_minutes_limit", group.getSharedRunnersMinutesLimit())
+                .appendIf("ldap_cn", group.getLdapCn())
+                .appendIf("ldap_access", group.getLdapAccess())
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+
+        String tailUrl = GitlabGroup.URL + query.toString();
+
+        return dispatch().to(tailUrl, GitlabGroup.class);
+    }
+
+    /**
+     * Updates a Group
+     *
+     * @param group the group object
+     * @param sudoUser The user to create the group on behalf of
+     * @return The GitLab Group
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup updateGroup(GitlabGroup group, GitlabUser sudoUser) throws IOException {
+
+        Query query = new Query()
+                .appendIf("name", group.getName())
+                .appendIf("path", group.getPath())
+                .appendIf("description", group.getDescription())
+                .appendIf("membership_lock", group.getMembershipLock())
+                .appendIf("share_with_group_lock", group.getShareWithGroupLock())
+                .appendIf("visibility", group.getVisibility().toString())
+                .appendIf("lfs_enabled", group.isLfsEnabled())
+                .appendIf("request_access_enabled", group.isRequestAccessEnabled())
+                .appendIf("shared_runners_minutes_limit", group.getSharedRunnersMinutesLimit())
+                .appendIf("ldap_cn", group.getLdapCn())
+                .appendIf("ldap_access", group.getLdapAccess())
+                .appendIf(PARAM_SUDO, sudoUser != null ? sudoUser.getId() : null);
+
+        String tailUrl = GitlabGroup.URL + "/" + group.getId() + query.toString();
+
+        return retrieve().method(PUT).to(tailUrl, GitlabGroup.class);
     }
 
     /**
@@ -610,7 +738,7 @@ public class GitlabAPI {
      */
     public void deleteGroupMember(Integer groupId, Integer userId) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + groupId + "/" + GitlabGroupMember.URL + "/" + userId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
@@ -621,9 +749,26 @@ public class GitlabAPI {
      */
     public void deleteGroup(Integer groupId) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + groupId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
+    /**
+     * Get's all projects in Gitlab, requires sudo user
+     *
+     * @return A list of gitlab projects
+     */
+    public List<GitlabProject> getAllProjects() {
+        String tailUrl = GitlabProject.URL;
+        return retrieve().getAll(tailUrl, GitlabProject[].class);
+    }
+
+    /**
+     * Get Project by project Id
+     *
+     * @param projectId - gitlab project Id
+     * @return {@link GitlabProject}
+     * @throws IOException on gitlab api call error
+     */
     public GitlabProject getProject(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
         return retrieve().to(tailUrl, GitlabProject.class);
@@ -632,29 +777,75 @@ public class GitlabAPI {
     /**
      * use namespace & project name to get project
      */
-    public GitlabProject getProject(String namespace, String projectName) throws IOException{
+    public GitlabProject getProject(String namespace, String projectName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
+    /*
+     * use project id to get Project JSON
+     */
+    public String getProjectJson(Serializable projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
+        return retrieve().to(tailUrl, String.class);
+    }
+
+    /*
+     * use namespace & project name to get project
+     */
+    public String getProjectJson(String namespace, String projectName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
+        return retrieve().to(tailUrl, String.class);
+    }
+
     /**
-     *
      * Get a list of projects accessible by the authenticated user.
      *
      * @return A list of gitlab projects
-     * @throws IOException
      */
-    public List<GitlabProject> getProjects() throws IOException {
+    public List<GitlabProject> getProjects() {
         String tailUrl = GitlabProject.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
     /**
+     * Get a list of projects of size perPage accessible by the authenticated user.
      *
+     * @param page    page offset.
+     * @param perPage number elements to get after page offset.
+     * @return A list of gitlab projects
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsWithPagination(int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getProjectsWithPagination(pagination);
+    }
+
+    /**
+     * Get a list of projects by pagination accessible by the authenticated user.
+     *
+     * @param pagination
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabProject> getProjectsWithPagination(Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabProject.URL);
+
+        if (pagination != null) {
+            Query query = pagination.asQuery();
+            tailUrl.append(query.toString());
+        }
+
+        return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabProject[].class));
+    }
+
+    /**
      * Get a list of projects owned by the authenticated user.
      *
      * @return A list of gitlab projects
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getOwnedProjects() throws IOException {
         Query query = new Query().append("owner", "true");
@@ -664,11 +855,10 @@ public class GitlabAPI {
     }
 
     /**
-     *
      * Get a list of projects that the authenticated user is a member of.
      *
      * @return A list of gitlab projects
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getMembershipProjects() throws IOException {
         Query query = new Query().append("membership", "true");
@@ -678,11 +868,10 @@ public class GitlabAPI {
     }
 
     /**
-     *
      * Get a list of projects starred by the authenticated user.
      *
      * @return A list of gitlab projects
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getStarredProjects() throws IOException {
         Query query = new Query().append("starred", "true");
@@ -692,11 +881,10 @@ public class GitlabAPI {
     }
 
     /**
-     *
      * Get a list of projects accessible by the authenticated user.
      *
      * @return A list of gitlab projects
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getProjectsViaSudo(GitlabUser user) throws IOException {
         Query query = new Query()
@@ -707,12 +895,61 @@ public class GitlabAPI {
     }
 
     /**
+     * Get a list of projects of perPage elements accessible by the authenticated user given page offset
+     *
+     * @param user    Gitlab User to invoke sudo with
+     * @param page    Page offset
+     * @param perPage Number of elements to get after page offset
+     * @return A list of gitlab projects
+     * @throws IOException Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsViaSudoWithPagination(GitlabUser user, int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getProjectsViaSudoWithPagination(user, pagination);
+    }
+
+    /**
+     * Get a list of projects of with Pagination.
+     *
+     * @param user       Gitlab User to invoke sudo with
+     * @param pagination
+     * @return A list of gitlab projects
+     * @throws IOException Gitlab API call error
+     */
+    public List<GitlabProject> getProjectsViaSudoWithPagination(GitlabUser user, Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabProject.URL);
+
+        Query query = new Query()
+                .appendIf(PARAM_SUDO, user.getId());
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
+        tailUrl.append(query.toString());
+        return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabProject[].class));
+    }
+
+    /**
+     * Get a list of the namespaces of the authenticated user.
+     * If the user is an administrator, a list of all namespaces in the GitLab instance is shown.
+     *
+     * @return A list of gitlab namespace
+     */
+    public List<GitlabNamespace> getNamespaces() {
+        String tailUrl = GitlabNamespace.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabNamespace[].class);
+    }
+
+    /**
      * Uploads a file to a project
      *
      * @param project
      * @param file
      * @return
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabUpload uploadFile(GitlabProject project, File file) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId()) + GitlabUpload.URL;
@@ -720,38 +957,112 @@ public class GitlabAPI {
     }
 
     /**
-     *
      * Gets a list of a project's jobs in Gitlab
      *
      * @param project the project
      * @return A list of project jobs
-     * @throws IOException
      */
-    public List<GitlabJob> getProjectJobs(GitlabProject project) throws IOException {
+    public List<GitlabJob> getProjectJobs(GitlabProject project) {
         return getProjectJobs(project.getId());
     }
 
     /**
-     *
      * Gets a list of a project's jobs in Gitlab
      *
      * @param projectId the project id
      * @return A list of project jobs
-     * @throws IOException
      */
-    public List<GitlabJob> getProjectJobs(Integer projectId) throws IOException {
+    public List<GitlabJob> getProjectJobs(Integer projectId) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabJob[].class);
     }
 
+
     /**
+     * Gets a list of project's jobs of the given pipeline in Gitlab
      *
+     * @param project    the project
+     * @param pipelineId
+     * @return A list of project jobs
+     */
+    public List<GitlabJob> getPipelineJobs(GitlabProject project, Integer pipelineId) {
+        return getPipelineJobs(project.getId(), pipelineId);
+    }
+
+    /**
+     * Gets a list of project's jobs of the given pipeline in Gitlab
+     *
+     * @param projectId
+     * @param pipelineId
+     * @return A list of project jobs
+     */
+    public List<GitlabJob> getPipelineJobs(Integer projectId, Integer pipelineId) {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.URL + "/" + sanitizeId(pipelineId, "PipelineID") + GitlabJob.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabJob[].class);
+    }
+
+
+    /**
+     * Cancel a single job of a project
+     *
+     * @param projectId
+     * @param jobId
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabJob cancelJob(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + sanitizeId(jobId, "JobID") + "/cancel";
+        return dispatch().to(tailUrl, GitlabJob.class);
+    }
+
+    /**
+     * Retry a single job of a project
+     *
+     * @param projectId
+     * @param jobId
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabJob retryJob(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + sanitizeId(jobId, "JobID") + "/retry";
+        return dispatch().to(tailUrl, GitlabJob.class);
+    }
+
+    /**
+     * Erase a single job of a project (remove job artifacts and a job trace)
+     *
+     * @param projectId
+     * @param jobId
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabJob eraseJob(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + sanitizeId(jobId, "JobID") + "/erase";
+        return dispatch().to(tailUrl, GitlabJob.class);
+    }
+
+
+    /**
+     * Triggers a manual action to start a job.
+     *
+     * @param projectId
+     * @param jobId
+     * @return
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabJob playJob(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + sanitizeId(jobId, "JobID") + "/play";
+        return dispatch().to(tailUrl, GitlabJob.class);
+    }
+
+
+    /**
      * Gets a build for a project
      *
      * @param projectId the project id
-     * @param jobId the build id
+     * @param jobId     the build id
      * @return A list of project jobs
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabJob getProjectJob(Integer projectId, Integer jobId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId;
@@ -762,7 +1073,7 @@ public class GitlabAPI {
      * Get build artifacts of a project build
      *
      * @param project The Project
-     * @param job The build
+     * @param job     The build
      * @throws IOException on gitlab api call error
      */
     public byte[] getJobArtifact(GitlabProject project, GitlabJob job) throws IOException {
@@ -773,11 +1084,34 @@ public class GitlabAPI {
      * Get build artifacts of a project build
      *
      * @param projectId The Project's Id
-     * @param jobId The build's Id
+     * @param jobId     The build's Id
      * @throws IOException on gitlab api call error
      */
     public byte[] getJobArtifact(Integer projectId, Integer jobId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId + "/artifacts";
+        return retrieve().to(tailUrl, byte[].class);
+    }
+
+    /**
+     * Get build trace of a project build
+     *
+     * @param project The Project
+     * @param job     The build
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getJobTrace(GitlabProject project, GitlabJob job) throws IOException {
+        return getJobArtifact(project.getId(), job.getId());
+    }
+
+    /**
+     * Get build trace of a project build
+     *
+     * @param projectId The Project's Id
+     * @param jobId     The build's Id
+     * @throws IOException on gitlab api call error
+     */
+    public byte[] getJobTrace(Integer projectId, Integer jobId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabJob.URL + "/" + jobId + "/trace";
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -817,7 +1151,7 @@ public class GitlabAPI {
 
         GitlabNamespace namespace = project.getNamespace();
         if (namespace != null) {
-                query.appendIf("namespace_id", namespace.getId());
+            query.appendIf("namespace_id", namespace.getId());
         }
 
 
@@ -865,10 +1199,10 @@ public class GitlabAPI {
     /**
      * Creates a group Project
      *
-     * @param name            The name of the project
-     * @param group           The group for which the project should be crated
-     * @param description     The project description
-     * @param visibility      The project visibility level (private: 0, internal: 10, public: 20)
+     * @param name        The name of the project
+     * @param group       The group for which the project should be crated
+     * @param description The project description
+     * @param visibility  The project visibility level (private: 0, internal: 10, public: 20)
      * @return The GitLab Project
      * @throws IOException on gitlab api call error
      */
@@ -960,6 +1294,30 @@ public class GitlabAPI {
     }
 
     /**
+     * @param namespace The namespace of the fork
+     * @param projectId ProjectId of the project forked
+     * @return The new Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createFork(String namespace, Integer projectId) throws IOException {
+        Query query = new Query()
+                .appendIf("id", projectId)
+                .append("namespace", namespace);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork";
+        return dispatch().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
+     * @param namespace     The namespace of the fork
+     * @param gitlabProject The project forked
+     * @return The new Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createFork(String namespace, GitlabProject gitlabProject) throws IOException {
+        return createFork(namespace, gitlabProject.getId());
+    }
+
+    /**
      * Updates a Project
      *
      * @param projectId            The id of the project to update
@@ -971,24 +1329,23 @@ public class GitlabAPI {
      * @param mergeRequestsEnabled Whether Merge Requests should be enabled, otherwise null indicates to use GitLab default
      * @param wikiEnabled          Whether a Wiki should be enabled, otherwise null indicates to use GitLab default
      * @param snippetsEnabled      Whether Snippets should be enabled, otherwise null indicates to use GitLab default
-     * @param visibility      The visibility level of the project, otherwise null indicates to use GitLab default
+     * @param visibility           The visibility level of the project, otherwise null indicates to use GitLab default
      * @return the Gitlab Project
      * @throws IOException on gitlab api call error
      */
     @Deprecated
     public GitlabProject updateProject(
             Integer projectId,
-            String  name,
-            String  description,
-            String  defaultBranch,
+            String name,
+            String description,
+            String defaultBranch,
             Boolean issuesEnabled,
             Boolean wallEnabled,
             Boolean mergeRequestsEnabled,
             Boolean wikiEnabled,
             Boolean snippetsEnabled,
             String visibility)
-        throws IOException
-    {
+            throws IOException {
         Query query = new Query()
                 .appendIf("name", name)
                 .appendIf("description", description)
@@ -1002,7 +1359,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabProject.URL + "/" + projectId + query.toString();
 
-        return retrieve().method("PUT").to(tailUrl, GitlabProject.class);
+        return retrieve().method(PUT).to(tailUrl, GitlabProject.class);
     }
 
     /**
@@ -1013,7 +1370,7 @@ public class GitlabAPI {
      */
     public void deleteProject(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId);
-        retrieve().method("DELETE").to(tailUrl, null);
+        retrieve().method(DELETE).to(tailUrl, null);
     }
 
     public List<GitlabMergeRequest> getOpenMergeRequests(Serializable projectId) throws IOException {
@@ -1086,27 +1443,27 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
-    public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) throws IOException {
+    public List<GitlabMergeRequest> getMergeRequests(Serializable projectId) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
-    public List<GitlabMergeRequest> getMergeRequests(Serializable projectId, Pagination pagination) throws IOException {
+    public List<GitlabMergeRequest> getMergeRequests(Serializable projectId, Pagination pagination) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + pagination.toString();
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
-    public List<GitlabMergeRequest> getMergeRequests(GitlabProject project) throws IOException {
+    public List<GitlabMergeRequest> getMergeRequests(GitlabProject project) {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
-    public List<GitlabMergeRequest> getMergeRequests(GitlabProject project, Pagination pagination) throws IOException {
+    public List<GitlabMergeRequest> getMergeRequests(GitlabProject project, Pagination pagination) {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + pagination.toString();
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
 
-    public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) throws IOException {
+    public List<GitlabMergeRequest> getAllMergeRequests(GitlabProject project) {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL;
         return retrieve().getAll(tailUrl, GitlabMergeRequest[].class);
     }
@@ -1116,17 +1473,17 @@ public class GitlabAPI {
      * EE only.
      */
     public GitlabMergeRequestApprovals getMergeRequestApprovals(GitlabMergeRequest mr) throws IOException {
-	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
-            GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
+                GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
         return retrieve().to(tailUrl, GitlabMergeRequestApprovals.class);
     }
 
     /**
      * Cherry picks a commit.
      *
-     * @param projectId         The id of the project
-     * @param sha               The sha of the commit
-     * @param targetBranchName  The branch on which the commit must be cherry-picked
+     * @param projectId        The id of the project
+     * @param sha              The sha of the commit
+     * @param targetBranchName The branch on which the commit must be cherry-picked
      * @return the commit of the cherry-pick.
      * @throws IOException on gitlab api call error
      */
@@ -1156,8 +1513,8 @@ public class GitlabAPI {
     /**
      * Return a Merge Request including its changes.
      *
-     * @param projectId       The id of the project
-     * @param mergeRequestId  The id of the merge request
+     * @param projectId      The id of the project
+     * @param mergeRequestId The id of the merge request
      * @return the Gitlab Merge Request
      * @throws IOException on gitlab api call error
      */
@@ -1166,11 +1523,14 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
-    public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId;
+    public GitlabMergeRequest getMergeRequest(Serializable projectId, Integer mergeRequestId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
+    public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
+        return getMergeRequest(project.getId(), mergeRequestId);
+    }
 
     /**
      * Create a new MergeRequest
@@ -1198,18 +1558,17 @@ public class GitlabAPI {
     }
 
 
-
     /**
      * Updates a Merge Request
      *
-     * @param projectId            The id of the project
-     * @param mergeRequestId       The id of the merge request to update
-     * @param targetBranch         The target branch of the merge request, otherwise null to leave it untouched
-     * @param assigneeId           The id of the assignee, otherwise null to leave it untouched
-     * @param title                The title of the merge request, otherwise null to leave it untouched
-     * @param description          The description of the merge request, otherwise null to leave it untouched
-     * @param stateEvent           The state (close|reopen|merge) of the merge request, otherwise null to leave it untouched
-     * @param labels               A comma separated list of labels, otherwise null to leave it untouched
+     * @param projectId      The id of the project
+     * @param mergeRequestId The id of the merge request to update
+     * @param targetBranch   The target branch of the merge request, otherwise null to leave it untouched
+     * @param assigneeId     The id of the assignee, otherwise null to leave it untouched
+     * @param title          The title of the merge request, otherwise null to leave it untouched
+     * @param description    The description of the merge request, otherwise null to leave it untouched
+     * @param stateEvent     The state (close|reopen|merge) of the merge request, otherwise null to leave it untouched
+     * @param labels         A comma separated list of labels, otherwise null to leave it untouched
      * @return the Merge Request
      * @throws IOException on gitlab api call error
      */
@@ -1226,20 +1585,24 @@ public class GitlabAPI {
 
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + query.toString();
 
-        return retrieve().method("PUT").to(tailUrl, GitlabMergeRequest.class);
+        return retrieve().method(PUT).to(tailUrl, GitlabMergeRequest.class);
     }
 
     /**
-     * @param project           The Project
-     * @param mergeRequestId    Merge Request ID
+     * @param project            The Project
+     * @param mergeRequestId     Merge Request ID
      * @param mergeCommitMessage optional merge commit message. Null if not set
      * @return new merge request status
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
-        requestor.with("id", project.getId());
+        return acceptMergeRequest(project.getId(), mergeRequestId, mergeCommitMessage);
+    }
+
+    public GitlabMergeRequest acceptMergeRequest(Serializable projectId, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
+        requestor.with("id", projectId);
         requestor.with("merge_request_id", mergeRequestId);
         if (mergeCommitMessage != null)
             requestor.with("merge_commit_message", mergeCommitMessage);
@@ -1249,8 +1612,8 @@ public class GitlabAPI {
     /**
      * Get a Note from a Merge Request.
      *
-     * @param mergeRequest         The merge request
-     * @param noteId               The id of the note
+     * @param mergeRequest The merge request
+     * @param noteId       The id of the note
      * @return the Gitlab Note
      * @throws IOException on gitlab api call error
      */
@@ -1271,7 +1634,7 @@ public class GitlabAPI {
         return Arrays.asList(notes);
     }
 
-    public List<GitlabNote> getAllNotes(GitlabMergeRequest mergeRequest) throws IOException {
+    public List<GitlabNote> getAllNotes(GitlabMergeRequest mergeRequest) {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + PARAM_MAX_ITEMS_PER_PAGE;
@@ -1318,11 +1681,18 @@ public class GitlabAPI {
 
     public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
                                          String branchOrTag) throws IOException {
+        return getCommits(projectId, null, branchOrTag, null);
+    }
+
+    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
+                                         String branchOrTag, String path) throws IOException {
         final Query query = new Query();
         if (branchOrTag != null) {
             query.append("ref_name", branchOrTag);
         }
-
+        if (path != null) {
+            query.append("path", path);
+        }
         if (pagination != null) {
             query.mergeWith(pagination.asQuery());
         }
@@ -1394,12 +1764,21 @@ public class GitlabAPI {
     // List commit statuses for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/statuses
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash) throws IOException {
-        return getCommitStatuses(project, commitHash, new Pagination());
+        return getCommitStatuses(project.getId(), commitHash, new Pagination());
+    }
+
+    public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash) throws IOException {
+        return getCommitStatuses(projectId, commitHash, new Pagination());
     }
 
     public List<GitlabCommitStatus> getCommitStatuses(GitlabProject project, String commitHash,
                                                       Pagination pagination) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabCommit.URL + "/" +
+        return getCommitStatuses(project.getId(), commitHash, pagination);
+    }
+
+    public List<GitlabCommitStatus> getCommitStatuses(Serializable projectId, String commitHash,
+                                                      Pagination pagination) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository" + GitlabCommit.URL + "/" +
                 commitHash + GitlabCommitStatus.URL + pagination;
         GitlabCommitStatus[] statuses = retrieve().to(tailUrl, GitlabCommitStatus[].class);
         return Arrays.asList(statuses);
@@ -1409,7 +1788,12 @@ public class GitlabAPI {
     // GET /projects/:id/statuses/:sha
     public GitlabCommitStatus createCommitStatus(GitlabProject project, String commitHash, String state, String ref,
                                                  String name, String targetUrl, String description) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabCommitStatus.URL + "/" + commitHash;
+        return createCommitStatus(project.getId(), commitHash, state, ref, name, targetUrl, description);
+    }
+
+    public GitlabCommitStatus createCommitStatus(Serializable projectId, String commitHash, String state, String ref,
+                                                 String name, String targetUrl, String description) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabCommitStatus.URL + "/" + commitHash;
         return dispatch()
                 .with("state", state)
                 .with("ref", ref)
@@ -1422,9 +1806,9 @@ public class GitlabAPI {
     /**
      * Get raw file content
      *
-     * @param project The Project
-     * @param sha   The commit or branch name
-     * @param filepath   The path of the file
+     * @param project  The Project
+     * @param sha      The commit or branch name
+     * @param filepath The path of the file
      * @throws IOException on gitlab api call error
      */
     public byte[] getRawFileContent(GitlabProject project, String sha, String filepath) throws IOException {
@@ -1435,15 +1819,15 @@ public class GitlabAPI {
      * Get raw file content
      *
      * @param projectId The Project
-     * @param sha   The commit or branch name
-     * @param filepath   The path of the file
+     * @param sha       The commit or branch name
+     * @param filepath  The path of the file
      * @throws IOException on gitlab api call error
      */
-    public byte[] getRawFileContent(Integer projectId, String sha, String filepath) throws IOException {
+    public byte[] getRawFileContent(Serializable projectId, String sha, String filepath) throws IOException {
         Query query = new Query()
                 .append("ref", sha);
 
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/repository/files/" + sanitizePath(filepath) + "/raw" + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/files/" + sanitizePath(filepath) + "/raw" + query.toString();
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -1451,11 +1835,11 @@ public class GitlabAPI {
      * Get the raw file contents for a blob by blob SHA.
      *
      * @param project The Project
-     * @param sha   The commit or branch name
+     * @param sha     The commit or branch name
      * @throws IOException on gitlab api call error
      */
     public byte[] getRawBlobContent(GitlabProject project, String sha) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/raw_blobs/" + sha;
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/blobs/" + sha + "/raw";
         return retrieve().to(tailUrl, byte[].class);
     }
 
@@ -1474,8 +1858,8 @@ public class GitlabAPI {
      * Get an archive of the repository
      *
      * @param project The Project
-     * @param path The path inside the repository. Used to get content of subdirectories (optional)
-     * @param ref The name of a repository branch or tag or if not given the default branch (optional)
+     * @param path    The path inside the repository. Used to get content of subdirectories (optional)
+     * @param ref     The name of a repository branch or tag or if not given the default branch (optional)
      * @throws IOException on gitlab api call error
      */
     public List<GitlabRepositoryTree> getRepositoryTree(GitlabProject project, String path, String ref, boolean recursive) throws IOException {
@@ -1486,7 +1870,7 @@ public class GitlabAPI {
 
         String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository" + GitlabRepositoryTree.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabRepositoryTree[].class);
-	}
+    }
 
     public GitlabRepositoryFile getRepositoryFile(GitlabProject project, String path, String ref) throws IOException {
         Query query = new Query()
@@ -1499,75 +1883,70 @@ public class GitlabAPI {
     /**
      * Creates a new file in the repository
      *
-     * @param project The Project
-     * @param path The file path inside the repository
+     * @param project    The Project
+     * @param path       The file path inside the repository
      * @param branchName The name of a repository branch
-     * @param commitMsg The commit message
-     * @param content The base64 encoded content of the file
+     * @param commitMsg  The commit message
+     * @param content    The base64 encoded content of the file
      * @throws IOException on gitlab api call error
      */
     public GitlabSimpleRepositoryFile createRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
         GitlabHTTPRequestor requestor = dispatch();
 
         return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
-            .with("encoding", "base64")
-            .with("commit_message", commitMsg)
-            .with("content", content)
-            .to(tailUrl, GitlabSimpleRepositoryFile.class);
+                .with("branch", branchName)
+                .with("encoding", "base64")
+                .with("commit_message", commitMsg)
+                .with("content", content)
+                .to(tailUrl, GitlabSimpleRepositoryFile.class);
     }
 
     /**
      * Updates the content of an existing file in the repository
      *
-     * @param project The Project
-     * @param path The file path inside the repository
+     * @param project    The Project
+     * @param path       The file path inside the repository
      * @param branchName The name of a repository branch
-     * @param commitMsg The commit message
-     * @param content The base64 encoded content of the file
+     * @param commitMsg  The commit message
+     * @param content    The base64 encoded content of the file
      * @throws IOException on gitlab api call error
      */
     public GitlabSimpleRepositoryFile updateRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg, String content) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path);
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
 
         return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
-            .with("encoding", "base64")
-            .with("commit_message", commitMsg)
-            .with("content", content)
-            .to(tailUrl, GitlabSimpleRepositoryFile.class);
+                .with("branch", branchName)
+                .with("encoding", "base64")
+                .with("commit_message", commitMsg)
+                .with("content", content)
+                .to(tailUrl, GitlabSimpleRepositoryFile.class);
     }
 
     /**
      * Deletes an existing file in the repository
      *
-     * @param project The Project
-     * @param path The file path inside the repository
+     * @param project    The Project
+     * @param path       The file path inside the repository
      * @param branchName The name of a repository branch
-     * @param commitMsg The commit message
+     * @param commitMsg  The commit message
      * @throws IOException on gitlab api call error
      */
-    public GitlabSimpleRepositoryFile deleteRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files";
-        GitlabHTTPRequestor requestor = retrieve().method("DELETE");
-
-        return requestor
-            .with("file_path", sanitizePath(path))
-            .with("branch_name", branchName)
-            .with("commit_message", commitMsg)
-            .to(tailUrl, GitlabSimpleRepositoryFile.class);
+    public void deleteRepositoryFile(GitlabProject project, String path, String branchName, String commitMsg) throws IOException {
+        Query query = new Query()
+                .append("branch", branchName)
+                .append("commit_message", commitMsg);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + "/repository/files/" + sanitizePath(path) + query.toString();
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
      * Update a Merge Request Note
      *
-     * @param mergeRequest         The merge request
-     * @param noteId               The id of the note
-     * @param body                 The content of the note
+     * @param mergeRequest The merge request
+     * @param noteId       The id of the note
+     * @param body         The content of the note
      * @return the Gitlab Note
      * @throws IOException on gitlab api call error
      */
@@ -1578,7 +1957,7 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() + GitlabNote.URL + "/" + noteId + query.toString();
 
-        return retrieve().method("PUT").to(tailUrl, GitlabNote.class);
+        return retrieve().method(PUT).to(tailUrl, GitlabNote.class);
     }
 
     public GitlabNote createNote(GitlabMergeRequest mergeRequest, String body) throws IOException {
@@ -1591,22 +1970,22 @@ public class GitlabAPI {
     /**
      * Delete a Merge Request Note
      *
-     * @param mergeRequest         The merge request
-     * @param noteToDelete         The note to delete
+     * @param mergeRequest The merge request
+     * @param noteToDelete The note to delete
      * @throws IOException on gitlab api call error
      */
     public void deleteNote(GitlabMergeRequest mergeRequest, GitlabNote noteToDelete) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getIid() + GitlabNote.URL + "/" + noteToDelete.getId();
-		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
-	}
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+                + mergeRequest.getIid() + GitlabNote.URL + "/" + noteToDelete.getId();
+        retrieve().method(DELETE).to(tailUrl, GitlabNote.class);
+    }
 
-    public List<GitlabBranch> getBranches(Serializable projectId) throws IOException {
+    public List<GitlabBranch> getBranches(Serializable projectId) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabBranch[].class);
     }
 
-    public List<GitlabBranch> getBranches(GitlabProject project) throws IOException {
+    public List<GitlabBranch> getBranches(GitlabProject project) {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabBranch[].class);
     }
@@ -1614,12 +1993,12 @@ public class GitlabAPI {
     /**
      * Create Branch.
      * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
-     *     Create Repository Branch Documentation
+     * Create Repository Branch Documentation
      * </a>
      *
-     * @param project  The gitlab project
+     * @param project    The gitlab project
      * @param branchName The name of the branch to create
-     * @param ref The branch name or commit SHA to create branch from
+     * @param ref        The branch name or commit SHA to create branch from
      * @throws IOException on gitlab api call error
      */
     public void createBranch(GitlabProject project, String branchName, String ref) throws IOException {
@@ -1629,13 +2008,12 @@ public class GitlabAPI {
     /**
      * Create Branch.
      * <a href="http://doc.gitlab.com/ce/api/branches.html#create-repository-branch">
-     *     Create Repository Branch Documentation
+     * Create Repository Branch Documentation
      * </a>
-     *
      *
      * @param projectId  The id of the project
      * @param branchName The name of the branch to create
-     * @param ref The branch name or commit SHA to create branch from
+     * @param ref        The branch name or commit SHA to create branch from
      * @throws IOException on gitlab api call error
      */
     public void createBranch(Serializable projectId, String branchName, String ref) throws IOException {
@@ -1652,7 +2030,7 @@ public class GitlabAPI {
      */
     public void deleteBranch(Serializable projectId, String branchName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBranch.URL + '/' + sanitizePath(branchName);
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     public GitlabBranch getBranch(Serializable projectId, String branchName) throws IOException {
@@ -1661,7 +2039,7 @@ public class GitlabAPI {
     }
 
     public GitlabBranch getBranch(GitlabProject project, String branchName) throws IOException {
-        return getBranch(project.getId(),branchName);
+        return getBranch(project.getId(), branchName);
     }
 
     public void protectBranch(GitlabProject project, String branchName) throws IOException {
@@ -1673,12 +2051,12 @@ public class GitlabAPI {
         final Query query = new Query()
                 .append("developers_can_push", Boolean.toString(developers_can_push))
                 .append("developers_can_merge", Boolean.toString(developers_can_merge));
-        retrieve().method("PUT").to(tailUrl + query.toString(), Void.class);
+        retrieve().method(PUT).to(tailUrl + query.toString(), Void.class);
     }
 
     public void unprotectBranch(GitlabProject project, String branchName) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabBranch.URL + '/' + sanitizePath(branchName) + "/unprotect";
-        retrieve().method("PUT").to(tailUrl, Void.class);
+        retrieve().method(PUT).to(tailUrl, Void.class);
     }
 
     public List<GitlabProjectHook> getProjectHooks(Serializable projectId) throws IOException {
@@ -1714,7 +2092,7 @@ public class GitlabAPI {
                 .to(tailUrl, GitlabProjectHook.class);
     }
 
-    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean tagPushEvents, boolean sslVerification) throws IOException {
+    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents, boolean tagPushEvents, boolean sslVerification, String token) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
         return dispatch()
@@ -1722,8 +2100,10 @@ public class GitlabAPI {
                 .with("push_events", pushEvents ? "true" : "false")
                 .with("issues_events", issuesEvents ? "true" : "false")
                 .with("merge_requests_events", mergeRequestEvents ? "true" : "false")
+                .with("note_events", noteEvents ? "true" : "false")
                 .with("tag_push_events", tagPushEvents ? "true" : "false")
                 .with("enable_ssl_verification", sslVerification ? "true" : "false")
+                .with("token", token)
                 .to(tailUrl, GitlabProjectHook.class);
     }
 
@@ -1732,36 +2112,36 @@ public class GitlabAPI {
                 .append("url", url);
 
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + query.toString();
-        return retrieve().method("PUT").to(tailUrl, GitlabProjectHook.class);
+        return retrieve().method(PUT).to(tailUrl, GitlabProjectHook.class);
     }
 
     public void deleteProjectHook(GitlabProjectHook hook) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + hook.getProjectId() + GitlabProjectHook.URL + "/" + hook.getId();
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     public void deleteProjectHook(GitlabProject project, String hookId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
-    public List<GitlabIssue> getIssues(GitlabProject project) throws IOException {
+    public List<GitlabIssue> getIssues(GitlabProject project) {
         return getIssues(project.getId());
     }
 
-    public List<GitlabIssue> getIssues(Serializable projectId) throws IOException {
+    public List<GitlabIssue> getIssues(Serializable projectId) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
 
-    public List<GitlabIssue> getIssues(GitlabProject project, GitlabMilestone milestone) throws IOException {
+    public List<GitlabIssue> getIssues(GitlabProject project, GitlabMilestone milestone) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(project.getId())
                 + GitlabMilestone.URL + "/" + sanitizeMilestoneId(milestone.getId())
                 + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
         return retrieve().getAll(tailUrl, GitlabIssue[].class);
     }
 
-    public List<GitlabIssue> getIssues(GitlabGroup group, GitlabMilestone milestone) throws IOException {
+    public List<GitlabIssue> getIssues(GitlabGroup group, GitlabMilestone milestone) {
         String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(group.getId())
                 + GitlabMilestone.URL + "/" + sanitizeMilestoneId(milestone.getId())
                 + GitlabIssue.URL + PARAM_MAX_ITEMS_PER_PAGE;
@@ -1797,7 +2177,7 @@ public class GitlabAPI {
     public GitlabIssue editIssue(int projectId, int issueId, int assigneeId, int milestoneId, String labels,
                                  String description, String title, GitlabIssue.Action action) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabIssue.URL + "/" + issueId;
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
         applyIssue(requestor, projectId, assigneeId, milestoneId, labels, description, title);
 
         if (action != GitlabIssue.Action.LEAVE) {
@@ -1823,14 +2203,14 @@ public class GitlabAPI {
 
     public GitlabNote getNote(GitlabIssue issue, Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() +
-                GitlabIssue.URL + "/" + issue.getId() +
+                GitlabIssue.URL + "/" + issue.getIid() +
                 GitlabNote.URL + "/" + noteId;
         return retrieve().to(tailUrl, GitlabNote.class);
     }
 
     public List<GitlabNote> getNotes(GitlabIssue issue) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/"
-                + issue.getId() + GitlabNote.URL;
+                + issue.getIid() + GitlabNote.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabNote[].class));
     }
 
@@ -1847,34 +2227,35 @@ public class GitlabAPI {
     /**
      * Delete an Issue Note
      *
-     * @param projectId	           The project id
-     * @param issueId              The issue id
-     * @param noteToDelete         The note to delete
+     * @param projectId    The project id
+     * @param issueId      The issue id
+     * @param noteToDelete The note to delete
      * @throws IOException on gitlab api call error
      */
-	public void deleteNote(Serializable projectId, Integer issueId, GitlabNote noteToDelete) throws IOException {
-            String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId)
-                                + GitlabIssue.URL + "/" + issueId + GitlabNote.URL
-                                + "/" + noteToDelete.getId();
-		retrieve().method("DELETE").to(tailUrl, GitlabNote.class);
-	}
+    public void deleteNote(Serializable projectId, Integer issueId, GitlabNote noteToDelete) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId)
+                + GitlabIssue.URL + "/" + issueId + GitlabNote.URL
+                + "/" + noteToDelete.getId();
+        retrieve().method(DELETE).to(tailUrl, GitlabNote.class);
+    }
 
-	/**
+    /**
      * Delete an Issue Note
      *
-     * @param issue                The issue
-     * @param noteToDelete         The note to delete
+     * @param issue        The issue
+     * @param noteToDelete The note to delete
      * @throws IOException on gitlab api call error
      */
-	public void deleteNote(GitlabIssue issue, GitlabNote noteToDelete) throws IOException {
-		deleteNote(String.valueOf(issue.getProjectId()), issue.getId(), noteToDelete);
-	}
+    public void deleteNote(GitlabIssue issue, GitlabNote noteToDelete) throws IOException {
+        deleteNote(String.valueOf(issue.getProjectId()), issue.getId(), noteToDelete);
+    }
 
     /**
      * Gets labels associated with a project.
+     *
      * @param projectId The ID of the project.
      * @return A non-null list of labels.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabLabel> getLabels(Serializable projectId)
             throws IOException {
@@ -1885,9 +2266,10 @@ public class GitlabAPI {
 
     /**
      * Gets labels associated with a project.
+     *
      * @param project The project associated with labels.
      * @return A non-null list of labels.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabLabel> getLabels(GitlabProject project)
             throws IOException {
@@ -1896,11 +2278,12 @@ public class GitlabAPI {
 
     /**
      * Creates a new label.
+     *
      * @param projectId The ID of the project containing the new label.
-     * @param name The name of the label.
-     * @param color The color of the label (eg #ff0000).
+     * @param name      The name of the label.
+     * @param color     The color of the label (eg #ff0000).
      * @return The newly created label.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabLabel createLabel(
             Serializable projectId,
@@ -1908,14 +2291,15 @@ public class GitlabAPI {
             String color) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabLabel.URL;
         return dispatch().with("name", name)
-                         .with("color", color)
-                         .to(tailUrl, GitlabLabel.class);
+                .with("color", color)
+                .to(tailUrl, GitlabLabel.class);
     }
 
     /**
      * Creates a new label.
+     *
      * @param projectId The ID of the project containing the label.
-     * @param label The label to create.
+     * @param label     The label to create.
      * @return The newly created label.
      */
     public GitlabLabel createLabel(Serializable projectId, GitlabLabel label)
@@ -1927,9 +2311,10 @@ public class GitlabAPI {
 
     /**
      * Deletes an existing label.
+     *
      * @param projectId The ID of the project containing the label.
-     * @param name The name of the label to delete.
-     * @throws IOException
+     * @param name      The name of the label to delete.
+     * @throws IOException on gitlab api call error
      */
     public void deleteLabel(Serializable projectId, String name)
             throws IOException {
@@ -1939,14 +2324,15 @@ public class GitlabAPI {
                 sanitizeProjectId(projectId) +
                 GitlabLabel.URL +
                 query.toString();
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
      * Deletes an existing label.
+     *
      * @param projectId The ID of the project containing the label.
-     * @param label The label to delete.
-     * @throws IOException
+     * @param label     The label to delete.
+     * @throws IOException on gitlab api call error
      */
     public void deleteLabel(Serializable projectId, GitlabLabel label)
             throws IOException {
@@ -1955,19 +2341,20 @@ public class GitlabAPI {
 
     /**
      * Updates an existing label.
+     *
      * @param projectId The ID of the project containing the label.
-     * @param name The name of the label to update.
-     * @param newName The updated name.
-     * @param newColor The updated color.
+     * @param name      The name of the label to update.
+     * @param newName   The updated name.
+     * @param newColor  The updated color.
      * @return The updated, deserialized label.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabLabel updateLabel(Serializable projectId,
                                    String name,
                                    String newName,
                                    String newColor) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabLabel.URL;
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
         requestor.with("name", name);
         if (newName != null) {
             requestor.with("new_name", newName);
@@ -1998,13 +2385,14 @@ public class GitlabAPI {
 
     /**
      * Cretaes a new project milestone.
-     * @param projectId The ID of the project.
-     * @param title The title of the milestone.
+     *
+     * @param projectId   The ID of the project.
+     * @param title       The title of the milestone.
      * @param description The description of the milestone. (Optional)
-     * @param dueDate The date the milestone is due. (Optional)
-     * @param startDate The start date of the milestone. (Optional)
+     * @param dueDate     The date the milestone is due. (Optional)
+     * @param startDate   The start date of the milestone. (Optional)
      * @return The newly created, de-serialized milestone.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabMilestone createMilestone(
             Serializable projectId,
@@ -2029,10 +2417,11 @@ public class GitlabAPI {
 
     /**
      * Creates a new project milestone.
+     *
      * @param projectId The ID of the project.
      * @param milestone The milestone to create.
      * @return The newly created, de-serialized milestone.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabMilestone createMilestone(
             Serializable projectId,
@@ -2046,16 +2435,17 @@ public class GitlabAPI {
 
     /**
      * Updates an existing project milestone.
-     * @param projectId The ID of the project.
+     *
+     * @param projectId   The ID of the project.
      * @param milestoneId The ID of the milestone.
-     * @param title The title of the milestone. (Optional)
+     * @param title       The title of the milestone. (Optional)
      * @param description The description of the milestone. (Optional)
-     * @param dueDate The date the milestone is due. (Optional)
-     * @param startDate The start date of the milestone. (Optional)
-     * @param stateEvent A value used to update the state of the milestone.
-     *                   (Optional) (activate | close)
+     * @param dueDate     The date the milestone is due. (Optional)
+     * @param startDate   The start date of the milestone. (Optional)
+     * @param stateEvent  A value used to update the state of the milestone.
+     *                    (Optional) (activate | close)
      * @return The updated, de-serialized milestone.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabMilestone updateMilestone(
             Serializable projectId,
@@ -2069,7 +2459,7 @@ public class GitlabAPI {
                 sanitizeProjectId(projectId) +
                 GitlabMilestone.URL + "/" +
                 milestoneId;
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (title != null) {
             requestor.with("title", title);
@@ -2091,12 +2481,13 @@ public class GitlabAPI {
 
     /**
      * Updates an existing project milestone.
-     * @param projectId The ID of the project.
-     * @param edited The already edited milestone.
+     *
+     * @param projectId  The ID of the project.
+     * @param edited     The already edited milestone.
      * @param stateEvent A value used to update the state of the milestone.
      *                   (Optional) (activate | close)
      * @return The updated, de-serialized milestone.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabMilestone updateMilestone(
             Serializable projectId,
@@ -2113,11 +2504,12 @@ public class GitlabAPI {
 
     /**
      * Updates an existing project milestone.
-     * @param edited The already edited milestone.
-     * @return The updated, de-serialized milestone.
+     *
+     * @param edited     The already edited milestone.
      * @param stateEvent A value used to update the state of the milestone.
      *                   (Optional) (activate | close)
-     * @throws IOException
+     * @return The updated, de-serialized milestone.
+     * @throws IOException on gitlab api call error
      */
     public GitlabMilestone updateMilestone(
             GitlabMilestone edited,
@@ -2177,8 +2569,40 @@ public class GitlabAPI {
      */
     public void deleteProjectMember(Integer projectId, Integer userId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + "/" + GitlabProjectMember.URL + "/" + userId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
+
+    /**
+     * Updates a project member.
+     *
+     * @param projectId   the project id
+     * @param userId      the user id
+     * @param accessLevel the updated access level for the specified user
+     * @return GitLabProjectMember with updated access level on success
+     * @throws IOException on Gitlab API call error
+     */
+    public GitlabProjectMember updateProjectMember(Integer projectId, Integer userId, GitlabAccessLevel accessLevel) throws IOException {
+        return updateProjectMember(projectId, userId, accessLevel, null);
+    }
+
+    /**
+     * Updates a project member.
+     *
+     * @param projectId   the project id
+     * @param userId      the user id
+     * @param accessLevel the updated access level for the specified user
+     * @param expiresAt   the date at which the user's membership expires at in the form YEAR-MONTH-DAY
+     * @return GitLabProjectMember with updated access level on success
+     * @throws IOException on Gitlab API call error
+     */
+    public GitlabProjectMember updateProjectMember(Integer projectId, Integer userId, GitlabAccessLevel accessLevel, String expiresAt) throws IOException {
+        Query query = new Query()
+                .appendIf("access_level", accessLevel)
+                .appendIf("expires_at", expiresAt);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectMember.URL + "/" + userId + query.toString();
+        return retrieve().method(PUT).to(tailUrl, GitlabProjectMember.class);
+    }
+
 
     public List<GitlabProjectMember> getProjectMembers(GitlabProject project) throws IOException {
         return getProjectMembers(project.getId());
@@ -2189,11 +2613,11 @@ public class GitlabAPI {
     }
 
     public List<GitlabProjectMember> getProjectMembers(Serializable projectId) throws IOException {
-    	return getProjectMembers(projectId, new Pagination());
+        return getProjectMembers(projectId, new Pagination());
     }
 
     public List<GitlabProjectMember> getProjectMembers(Serializable projectId, Pagination pagination) throws IOException {
-    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL + pagination.asQuery();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectMember.URL + pagination.asQuery();
         return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 
@@ -2201,7 +2625,7 @@ public class GitlabAPI {
      * This will fail, if the given namespace is a user and not a group
      *
      * @param namespace The namespace
-     * @return  A list of Gitlab Project members
+     * @return A list of Gitlab Project members
      * @throws IOException on gitlab api call error
      */
     public List<GitlabProjectMember> getNamespaceMembers(GitlabNamespace namespace) throws IOException {
@@ -2212,11 +2636,11 @@ public class GitlabAPI {
      * This will fail, if the given namespace is a user and not a group
      *
      * @param namespaceId Namespace ID
-     * @return  A list of Gitlab Project members
+     * @return A list of Gitlab Project members
      * @throws IOException on gitlab api call error
      */
     public List<GitlabProjectMember> getNamespaceMembers(Integer namespaceId) throws IOException {
-        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProjectMember.URL;
+        String tailUrl = GitlabGroup.URL + "/" + namespaceId + GitlabProjectMember.URL;
         return Arrays.asList(retrieve().to(tailUrl, GitlabProjectMember[].class));
     }
 
@@ -2228,7 +2652,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void transfer(Integer namespaceId, Integer projectId) throws IOException {
-        String tailUrl = GitlabNamespace.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
+        String tailUrl = GitlabGroup.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
         dispatch().to(tailUrl, Void.class);
     }
 
@@ -2236,8 +2660,8 @@ public class GitlabAPI {
      * Create a new deploy key for the project
      *
      * @param targetProjectId The id of the Gitlab project
-     * @param title        The title of the ssh key
-     * @param key          The public key
+     * @param title           The title of the ssh key
+     * @param key             The public key
      * @return The new GitlabSSHKey
      * @throws IOException on gitlab api call error
      */
@@ -2249,8 +2673,8 @@ public class GitlabAPI {
      * Create a new deploy key for the project which can push.
      *
      * @param targetProjectId The id of the Gitlab project
-     * @param title        The title of the ssh key
-     * @param key          The public key
+     * @param title           The title of the ssh key
+     * @param key             The public key
      * @return The new GitlabSSHKey
      * @throws IOException on gitlab api call error
      */
@@ -2274,12 +2698,12 @@ public class GitlabAPI {
      * Delete a deploy key for a project
      *
      * @param targetProjectId The id of the Gitlab project
-     * @param targetKeyId  The id of the Gitlab ssh key
+     * @param targetKeyId     The id of the Gitlab ssh key
      * @throws IOException on gitlab api call error
      */
     public void deleteDeployKey(Integer targetProjectId, Integer targetKeyId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + targetProjectId + GitlabSSHKey.DEPLOY_KEYS_URL + "/" + targetKeyId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
@@ -2338,7 +2762,7 @@ public class GitlabAPI {
      */
     public GitlabSystemHook deleteSystemHook(Integer hookId) throws IOException {
         String tailUrl = GitlabSystemHook.URL + "/" + hookId;
-        return retrieve().method("DELETE").to(tailUrl, GitlabSystemHook.class);
+        return retrieve().method(DELETE).to(tailUrl, GitlabSystemHook.class);
     }
 
     private String sanitizeProjectId(Serializable projectId) {
@@ -2365,7 +2789,7 @@ public class GitlabAPI {
         }
     }
 
-    private String sanitizePath(String branch){
+    private String sanitizePath(String branch) {
         try {
             return URLEncoder.encode(branch, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -2376,45 +2800,45 @@ public class GitlabAPI {
     /**
      * Post comment to commit
      *
-     * @param projectId            	(required) - The ID of a project
-     * @param sha 					(required) - The name of a repository branch or tag or if not given the default branch
-     * @param note 					(required) - Text of comment
-     * @param path 					(optional) - The file path
-     * @param line 					(optional) - The line number
-     * @param line_type			    (optional) - The line type (new or old)
-     * @return                     	A CommitComment
+     * @param projectId (required) - The ID of a project
+     * @param sha       (required) - The name of a repository branch or tag or if not given the default branch
+     * @param note      (required) - Text of comment
+     * @param path      (optional) - The file path
+     * @param line      (optional) - The line number
+     * @param line_type (optional) - The line type (new or old)
+     * @return A CommitComment
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
      */
-    public CommitComment createCommitComment(Integer projectId, String sha, String note,
-    		String path, String line, String line_type) throws IOException {
+    public CommitComment createCommitComment(Serializable projectId, String sha, String note,
+                                             String path, String line, String line_type) throws IOException {
 
-    	Query query = new Query()
-    			.append("id", projectId.toString())
-    			.appendIf("sha", sha)
-    			.appendIf("note", note)
-    			.appendIf("path", path)
-    			.appendIf("line", line)
-    			.appendIf("line_type", line_type);
-    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL + query.toString();
+        Query query = new Query()
+                .append("id", projectId.toString())
+                .appendIf("sha", sha)
+                .appendIf("note", note)
+                .appendIf("path", path)
+                .appendIf("line", line)
+                .appendIf("line_type", line_type);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL + query.toString();
 
-    	return dispatch().to(tailUrl, CommitComment.class);
+        return dispatch().to(tailUrl, CommitComment.class);
     }
 
     /**
      * Get the comments of a commit
      *
-     * @param projectId            	(required) - The ID of a project
-     * @param sha 					(required) - The name of a repository branch or tag or if not given the default branch
-     * @return                     	A CommitComment
+     * @param projectId (required) - The ID of a project
+     * @param sha       (required) - The name of a repository branch or tag or if not given the default branch
+     * @return A CommitComment
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit">http://doc.gitlab.com/ce/api/commits.html#post-comment-to-commit</a>
      */
     public List<CommitComment> getCommitComments(Integer projectId, String sha) throws IOException {
 
-    	String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL;
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + sha + CommitComment.URL;
 
-    	return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
+        return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
     }
 
     /**
@@ -2422,11 +2846,10 @@ public class GitlabAPI {
      *
      * @param projectId
      * @return
-     * @throws IOException on gitlab api call error
      */
-    public List<GitlabTag> getTags(Serializable projectId) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
-      return retrieve().getAll(tailUrl, GitlabTag[].class);
+    public List<GitlabTag> getTags(Serializable projectId) {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabTag[].class);
     }
 
     /**
@@ -2434,11 +2857,10 @@ public class GitlabAPI {
      *
      * @param project
      * @return
-     * @throws IOException on gitlab api call error
      */
-    public List<GitlabTag> getTags(GitlabProject project) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
-      return retrieve().getAll(tailUrl, GitlabTag[].class);
+    public List<GitlabTag> getTags(GitlabProject project) {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL + PARAM_MAX_ITEMS_PER_PAGE;
+        return retrieve().getAll(tailUrl, GitlabTag[].class);
     }
 
     /**
@@ -2453,13 +2875,13 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabTag addTag(Serializable projectId, String tagName, String ref, String message, String releaseDescription) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL;
-      return dispatch()
-          .with("tag_name", tagName )
-          .with("ref", ref)
-          .with("message", message)
-          .with("release_description", releaseDescription)
-          .to(tailUrl, GitlabTag.class);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL;
+        return dispatch()
+                .with("tag_name", tagName)
+                .with("ref", ref)
+                .with("message", message)
+                .with("release_description", releaseDescription)
+                .to(tailUrl, GitlabTag.class);
     }
 
     /**
@@ -2474,13 +2896,13 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabTag addTag(GitlabProject project, String tagName, String ref, String message, String releaseDescription) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
-      return dispatch()
-          .with("tag_name", tagName )
-          .with("ref", ref)
-          .with("message", message)
-          .with("release_description", releaseDescription)
-          .to(tailUrl, GitlabTag.class);
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL;
+        return dispatch()
+                .with("tag_name", tagName)
+                .with("ref", ref)
+                .with("message", message)
+                .with("release_description", releaseDescription)
+                .to(tailUrl, GitlabTag.class);
     }
 
     /**
@@ -2491,8 +2913,8 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteTag(Serializable projectId, String tagName) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + "/" + tagName;
-      retrieve().method("DELETE").to(tailUrl, Void.class);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabTag.URL + "/" + tagName;
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
@@ -2503,22 +2925,21 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void deleteTag(GitlabProject project, String tagName) throws IOException {
-      String tailUrl = GitlabProject.URL + "/" + project + GitlabTag.URL + "/" + tagName;
-      retrieve().method("DELETE").to(tailUrl, Void.class);
+        String tailUrl = GitlabProject.URL + "/" + project + GitlabTag.URL + "/" + tagName;
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
      * Get all awards for a merge request
      *
      * @param mergeRequest
-     * @throws IOException on gitlab api call error
      */
-	public List<GitlabAward> getAllAwards(GitlabMergeRequest mergeRequest) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getIid() + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
+    public List<GitlabAward> getAllAwards(GitlabMergeRequest mergeRequest) {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+                + mergeRequest.getIid() + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
-		return retrieve().getAll(tailUrl, GitlabAward[].class);
-	}
+        return retrieve().getAll(tailUrl, GitlabAward[].class);
+    }
 
     /**
      * Get a specific award for a merge request
@@ -2527,12 +2948,12 @@ public class GitlabAPI {
      * @param awardId
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward getAward(GitlabMergeRequest mergeRequest, Integer awardId) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getIid() + GitlabAward.URL + "/" + awardId;
+    public GitlabAward getAward(GitlabMergeRequest mergeRequest, Integer awardId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+                + mergeRequest.getIid() + GitlabAward.URL + "/" + awardId;
 
-		return retrieve().to(tailUrl, GitlabAward.class);
-	}
+        return retrieve().to(tailUrl, GitlabAward.class);
+    }
 
     /**
      * Create an award for a merge request
@@ -2541,13 +2962,13 @@ public class GitlabAPI {
      * @param awardName
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward createAward(GitlabMergeRequest mergeRequest, String awardName) throws IOException {
-		Query query = new Query().append("name", awardName);
-		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getIid() + GitlabAward.URL + query.toString();
+    public GitlabAward createAward(GitlabMergeRequest mergeRequest, String awardName) throws IOException {
+        Query query = new Query().append("name", awardName);
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+                + mergeRequest.getIid() + GitlabAward.URL + query.toString();
 
-		return dispatch().to(tailUrl, GitlabAward.class);
-	}
+        return dispatch().to(tailUrl, GitlabAward.class);
+    }
 
     /**
      * Delete an award for a merge request
@@ -2556,25 +2977,24 @@ public class GitlabAPI {
      * @param award
      * @throws IOException on gitlab api call error
      */
-	public void deleteAward(GitlabMergeRequest mergeRequest, GitlabAward award) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
-				+ mergeRequest.getIid() + GitlabAward.URL + "/" + award.getId();
+    public void deleteAward(GitlabMergeRequest mergeRequest, GitlabAward award) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() + GitlabMergeRequest.URL + "/"
+                + mergeRequest.getIid() + GitlabAward.URL + "/" + award.getId();
 
-		retrieve().method("DELETE").to(tailUrl, Void.class);
-	}
+        retrieve().method(DELETE).to(tailUrl, Void.class);
+    }
 
     /**
      * Get all awards for an issue
      *
      * @param issue
-     * @throws IOException on gitlab api call error
      */
-	public List<GitlabAward> getAllAwards(GitlabIssue issue) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
+    public List<GitlabAward> getAllAwards(GitlabIssue issue) {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
-		return retrieve().getAll(tailUrl, GitlabAward[].class);
-	}
+        return retrieve().getAll(tailUrl, GitlabAward[].class);
+    }
 
     /**
      * Get a specific award for an issue
@@ -2583,12 +3003,12 @@ public class GitlabAPI {
      * @param awardId
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward getAward(GitlabIssue issue, Integer awardId) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabAward.URL + "/" + awardId;
+    public GitlabAward getAward(GitlabIssue issue, Integer awardId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabAward.URL + "/" + awardId;
 
-		return retrieve().to(tailUrl, GitlabAward.class);
-	}
+        return retrieve().to(tailUrl, GitlabAward.class);
+    }
 
     /**
      * Create an award for an issue
@@ -2597,13 +3017,13 @@ public class GitlabAPI {
      * @param awardName
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward createAward(GitlabIssue issue, String awardName) throws IOException {
-		Query query = new Query().append("name", awardName);
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabAward.URL + query.toString();
+    public GitlabAward createAward(GitlabIssue issue, String awardName) throws IOException {
+        Query query = new Query().append("name", awardName);
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabAward.URL + query.toString();
 
-		return dispatch().to(tailUrl, GitlabAward.class);
-	}
+        return dispatch().to(tailUrl, GitlabAward.class);
+    }
 
     /**
      * Delete an award for an issue
@@ -2612,25 +3032,24 @@ public class GitlabAPI {
      * @param award
      * @throws IOException on gitlab api call error
      */
-	public void deleteAward(GitlabIssue issue, GitlabAward award) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabAward.URL + "/" + award.getId();
-		retrieve().method("DELETE").to(tailUrl, Void.class);
-	}
+    public void deleteAward(GitlabIssue issue, GitlabAward award) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabAward.URL + "/" + award.getId();
+        retrieve().method(DELETE).to(tailUrl, Void.class);
+    }
 
-	/**
+    /**
      * Get all awards for an issue note
      *
      * @param issue
      * @param noteId
-     * @throws IOException on gitlab api call error
      */
-	public List<GitlabAward> getAllAwards(GitlabIssue issue, Integer noteId) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabNote.URL + noteId + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
+    public List<GitlabAward> getAllAwards(GitlabIssue issue, Integer noteId) {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabNote.URL + noteId + GitlabAward.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
-		return retrieve().getAll(tailUrl, GitlabAward[].class);
-	}
+        return retrieve().getAll(tailUrl, GitlabAward[].class);
+    }
 
     /**
      * Get a specific award for an issue note
@@ -2640,12 +3059,12 @@ public class GitlabAPI {
      * @param awardId
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward getAward(GitlabIssue issue, Integer noteId, Integer awardId) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabNote.URL + noteId + GitlabAward.URL + "/" + awardId;
+    public GitlabAward getAward(GitlabIssue issue, Integer noteId, Integer awardId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabNote.URL + noteId + GitlabAward.URL + "/" + awardId;
 
-		return retrieve().to(tailUrl, GitlabAward.class);
-	}
+        return retrieve().to(tailUrl, GitlabAward.class);
+    }
 
     /**
      * Create an award for an issue note
@@ -2655,15 +3074,15 @@ public class GitlabAPI {
      * @param awardName
      * @throws IOException on gitlab api call error
      */
-	public GitlabAward createAward(GitlabIssue issue, Integer noteId, String awardName) throws IOException {
-		Query query = new Query().append("name", awardName);
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabNote.URL + noteId + GitlabAward.URL + query.toString();
+    public GitlabAward createAward(GitlabIssue issue, Integer noteId, String awardName) throws IOException {
+        Query query = new Query().append("name", awardName);
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabNote.URL + noteId + GitlabAward.URL + query.toString();
 
-		return dispatch().to(tailUrl, GitlabAward.class);
-	}
+        return dispatch().to(tailUrl, GitlabAward.class);
+    }
 
-	/**
+    /**
      * Delete an award for an issue note
      *
      * @param issue
@@ -2671,17 +3090,18 @@ public class GitlabAPI {
      * @param award
      * @throws IOException on gitlab api call error
      */
-	public void deleteAward(GitlabIssue issue, Integer noteId, GitlabAward award) throws IOException {
-		String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
-				+ GitlabNote.URL + noteId + GitlabAward.URL + "/" + award.getId();
-		retrieve().method("DELETE").to(tailUrl, Void.class);
-	}
+    public void deleteAward(GitlabIssue issue, Integer noteId, GitlabAward award) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + issue.getProjectId() + GitlabIssue.URL + "/" + issue.getId()
+                + GitlabNote.URL + noteId + GitlabAward.URL + "/" + award.getId();
+        retrieve().method(DELETE).to(tailUrl, Void.class);
+    }
 
     /**
      * Gets build variables associated with a project.
+     *
      * @param projectId The ID of the project.
      * @return A non-null list of variables.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabBuildVariable> getBuildVariables(Integer projectId)
             throws IOException {
@@ -2692,9 +3112,10 @@ public class GitlabAPI {
 
     /**
      * Gets build variables associated with a project.
+     *
      * @param project The project associated with variables.
      * @return A non-null list of variables.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public List<GitlabBuildVariable> getBuildVariables(GitlabProject project)
             throws IOException {
@@ -2703,10 +3124,11 @@ public class GitlabAPI {
 
     /**
      * Gets build variable associated with a project and key.
+     *
      * @param projectId The ID of the project.
-     * @param key The key of the variable.
+     * @param key       The key of the variable.
      * @return A variable.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabBuildVariable getBuildVariable(Integer projectId, String key)
             throws IOException {
@@ -2719,9 +3141,10 @@ public class GitlabAPI {
 
     /**
      * Gets build variable associated with a project and key.
+     *
      * @param project The project associated with the variable.
      * @return A variable.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabBuildVariable getBuildVariable(GitlabProject project, String key)
             throws IOException {
@@ -2730,11 +3153,12 @@ public class GitlabAPI {
 
     /**
      * Creates a new build variable.
+     *
      * @param projectId The ID of the project containing the new variable.
-     * @param key The key of the variable.
-     * @param value The value of the variable
+     * @param key       The key of the variable.
+     * @param value     The value of the variable
      * @return The newly created variable.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabBuildVariable createBuildVariable(
             Integer projectId,
@@ -2748,8 +3172,9 @@ public class GitlabAPI {
 
     /**
      * Creates a new variable.
+     *
      * @param projectId The ID of the project containing the variable.
-     * @param variable The variable to create.
+     * @param variable  The variable to create.
      * @return The newly created variable.
      */
     public GitlabBuildVariable createBuildVariable(Integer projectId, GitlabBuildVariable variable)
@@ -2761,9 +3186,10 @@ public class GitlabAPI {
 
     /**
      * Deletes an existing variable.
+     *
      * @param projectId The ID of the project containing the variable.
-     * @param key The key of the variable to delete.
-     * @throws IOException
+     * @param key       The key of the variable to delete.
+     * @throws IOException on gitlab api call error
      */
     public void deleteBuildVariable(Integer projectId, String key)
             throws IOException {
@@ -2771,14 +3197,15 @@ public class GitlabAPI {
                 projectId +
                 GitlabBuildVariable.URL + "/" +
                 key;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
      * Deletes an existing variable.
+     *
      * @param projectId The ID of the project containing the variable.
-     * @param variable The variable to delete.
-     * @throws IOException
+     * @param variable  The variable to delete.
+     * @throws IOException on gitlab api call error
      */
     public void deleteBuildVariable(Integer projectId, GitlabBuildVariable variable)
             throws IOException {
@@ -2787,20 +3214,21 @@ public class GitlabAPI {
 
     /**
      * Updates an existing variable.
+     *
      * @param projectId The ID of the project containing the variable.
-     * @param key The key of the variable to update.
-     * @param newValue The updated value.
+     * @param key       The key of the variable to update.
+     * @param newValue  The updated value.
      * @return The updated, deserialized variable.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabBuildVariable updateBuildVariable(Integer projectId,
-                                   String key,
-                                   String newValue) throws IOException {
+                                                   String key,
+                                                   String newValue) throws IOException {
         String tailUrl = GitlabProject.URL + "/" +
                 projectId +
                 GitlabBuildVariable.URL + "/" +
                 key;
-        GitlabHTTPRequestor requestor = retrieve().method("PUT");
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
         if (newValue != null) {
             requestor = requestor.with("value", newValue);
         }
@@ -2813,13 +3241,12 @@ public class GitlabAPI {
      * @param project the project
      * @return list of build triggers
      * @throws IllegalStateException if jobs are not enabled for the project
-     * @throws IOException
      */
-    public List<GitlabTrigger> getPipelineTriggers(GitlabProject project) throws IOException {
+    public List<GitlabTrigger> getPipelineTriggers(GitlabProject project) {
         if (!project.isJobsEnabled()) {
             // if the project has not allowed jobs, you will only get a 403 forbidden message which is
             // not helpful.
-            throw new IllegalStateException("Jobs are not enabled for " + project.getNameWithNamespace() );
+            throw new IllegalStateException("Jobs are not enabled for " + project.getNameWithNamespace());
         } else {
             return retrieve().getAll(GitlabProject.URL + "/" + project.getId() + GitlabTrigger.URL + PARAM_MAX_ITEMS_PER_PAGE, GitlabTrigger[].class);
         }
@@ -2827,8 +3254,9 @@ public class GitlabAPI {
 
     /**
      * Gets email-on-push service setup for a projectId.
+     *
      * @param projectId The ID of the project containing the variable.
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public GitlabServiceEmailOnPush getEmailsOnPush(Integer projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL;
@@ -2837,32 +3265,29 @@ public class GitlabAPI {
 
     /**
      * Update recipients for email-on-push service for a projectId.
-     * @param projectId The ID of the project containing the variable.
+     *
+     * @param projectId    The ID of the project containing the variable.
      * @param emailAddress The emailaddress of the recipent who is going to receive push notification.
      * @return
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
     public boolean updateEmailsOnPush(Integer projectId, String emailAddress) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL;
-
         GitlabServiceEmailOnPush emailOnPush = this.getEmailsOnPush(projectId);
         GitlabEmailonPushProperties properties = emailOnPush.getProperties();
         String appendedRecipients = properties.getRecipients();
-        if(appendedRecipients != "")
-        {
-        	if(appendedRecipients.contains(emailAddress))
-          		return true;
-        	appendedRecipients = appendedRecipients + " " + emailAddress;
-        }
-        else
-        	appendedRecipients = emailAddress;
+        if (appendedRecipients != "") {
+            if (appendedRecipients.contains(emailAddress))
+                return true;
+            appendedRecipients = appendedRecipients + " " + emailAddress;
+        } else
+            appendedRecipients = emailAddress;
 
         Query query = new Query()
-        .appendIf("active", true)
-        .appendIf("recipients", appendedRecipients);
+                .appendIf("active", true)
+                .appendIf("recipients", appendedRecipients);
 
-        tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL + query.toString();
-        return retrieve().method("PUT").to(tailUrl, Boolean.class);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceEmailOnPush.URL + query.toString();
+        return retrieve().method(PUT).to(tailUrl, Boolean.class);
     }
 
     /**
@@ -2871,11 +3296,11 @@ public class GitlabAPI {
      *
      * @param projectId The ID of the project containing the variable.
      * @return
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
-    public GitlabServiceJira getJiraService(Integer projectId) throws IOException{
-    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL;
-    	return retrieve().to(tailUrl, GitlabServiceJira.class);
+    public GitlabServiceJira getJiraService(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceJira.URL;
+        return retrieve().to(tailUrl, GitlabServiceJira.class);
     }
 
     /**
@@ -2884,60 +3309,59 @@ public class GitlabAPI {
      *
      * @param projectId The ID of the project containing the variable.
      * @return
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
-    public boolean deleteJiraService(Integer projectId) throws IOException{
-    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL;
-    	return retrieve().method("DELETE").to(tailUrl, Boolean.class);
+    public boolean deleteJiraService(Integer projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceJira.URL;
+        return retrieve().method(DELETE).to(tailUrl, Boolean.class);
     }
 
     /**
      * Set JIRA service for a project.
      * https://docs.gitlab.com/ce/api/services.html#create-edit-jira-service
      *
-     * @param projectId The ID of the project containing the variable.
+     * @param projectId    The ID of the project containing the variable.
      * @param jiraPropties
      * @return
-     * @throws IOException
+     * @throws IOException on gitlab api call error
      */
-    public boolean createOrEditJiraService(Integer projectId, GitlabJiraProperties jiraPropties) throws IOException{
+    public boolean createOrEditJiraService(Integer projectId, GitlabJiraProperties jiraPropties) throws IOException {
 
-    	Query query = new Query()
-    			.appendIf("url", jiraPropties.getUrl())
-    			.appendIf("project_key", jiraPropties.getProjectKey());
+        Query query = new Query()
+                .appendIf("url", jiraPropties.getUrl())
+                .appendIf("project_key", jiraPropties.getProjectKey());
 
-    	if(!jiraPropties.getUsername().isEmpty()){
-    		query.appendIf("username", jiraPropties.getUsername());
-    	}
+        if (!jiraPropties.getUsername().isEmpty()) {
+            query.appendIf("username", jiraPropties.getUsername());
+        }
 
-    	if(!jiraPropties.getPassword().isEmpty()){
-    		query.appendIf("password", jiraPropties.getPassword());
-    	}
+        if (!jiraPropties.getPassword().isEmpty()) {
+            query.appendIf("password", jiraPropties.getPassword());
+        }
 
-    	if(jiraPropties.getIssueTransitionId() != null){
-    		query.appendIf("jira_issue_transition_id", jiraPropties.getIssueTransitionId());
-    	}
+        if (jiraPropties.getIssueTransitionId() != null) {
+            query.appendIf("jira_issue_transition_id", jiraPropties.getIssueTransitionId());
+        }
 
 
-    	String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabServiceJira.URL+ query.toString();
-    	return retrieve().method("PUT").to(tailUrl, Boolean.class);
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabServiceJira.URL + query.toString();
+        return retrieve().method(PUT).to(tailUrl, Boolean.class);
 
     }
 
     /**
-    *
-    * Get a list of projects accessible by the authenticated user by search.
-    *
-    * @return A list of gitlab projects
-    * @throws IOException
-    */
-   public List<GitlabProject> searchProjects(String search) throws IOException {
-	   Query query = new Query()
-               .append("search", search);
-       String tailUrl = GitlabProject.URL + query.toString();
-       GitlabProject[] response = retrieve().to(tailUrl, GitlabProject[].class);
-       return Arrays.asList(response);
-   }
+     * Get a list of projects accessible by the authenticated user by search.
+     *
+     * @return A list of gitlab projects
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabProject> searchProjects(String search) throws IOException {
+        Query query = new Query()
+                .append("search", search);
+        String tailUrl = GitlabProject.URL + query.toString();
+        GitlabProject[] response = retrieve().to(tailUrl, GitlabProject[].class);
+        return Arrays.asList(response);
+    }
 
     /**
      * Share a project with a group.
@@ -2978,7 +3402,7 @@ public class GitlabAPI {
      */
     public void deleteSharedProjectGroupLink(int groupId, int projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + projectId + "/share/" + groupId;
-        retrieve().method("DELETE").to(tailUrl, Void.class);
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     /**
@@ -2995,6 +3419,76 @@ public class GitlabAPI {
     }
 
     public GitlabVersion getVersion() throws IOException {
-        return retrieve().to("version",GitlabVersion.class);
+        return retrieve().to("version", GitlabVersion.class);
+    }
+
+    /**
+     * Returns a List of all GitlabRunners.
+     *
+     * @return List of GitlabRunners
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabRunner> getRunners() throws IOException {
+        return getRunnersWithPagination(GitlabRunner.RunnerScope.ALL, null);
+    }
+
+    /**
+     * Returns a List of GitlabRunners.
+     *
+     * @param scope Can be null. Defines type of Runner to retrieve.
+     * @return List of GitLabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunners(GitlabRunner.RunnerScope scope) throws IOException {
+        return getRunnersWithPagination(scope, null);
+    }
+
+    /**
+     * Returns a list of runners with perPage elements on the page number specified.
+     *
+     * @param scope   Can be null. Defines type of Runner to retrieve.
+     * @param page    Page to get perPage number of Runners from.
+     * @param perPage Number of elements to get per page.
+     * @return List of GitlabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunnersWithPagination(GitlabRunner.RunnerScope scope, int page, int perPage) throws IOException {
+        Pagination pagination = new Pagination()
+                .withPage(page)
+                .withPerPage(perPage);
+        return getRunnersWithPagination(scope, pagination);
+    }
+
+    /**
+     * Returns a list of runners with perPage elements on the page number specified.
+     *
+     * @param scope      Can be null. Defines type of Runner to retrieve.
+     * @param pagination Can be null. Pagination to query by.
+     * @return List of GitlabRunners
+     * @throws IOException on Gitlab API call error
+     */
+    public List<GitlabRunner> getRunnersWithPagination(GitlabRunner.RunnerScope scope, Pagination pagination) throws IOException {
+        StringBuilder tailUrl = new StringBuilder(GitlabRunner.URL).append("/all");
+        Query query = new Query()
+                .appendIf("scope", scope.getScope());
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
+        tailUrl.append(query.toString());
+        return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabRunner[].class));
+    }
+
+    /**
+     * Get details information of the runner with the specified id.
+     *
+     * @param id Runner id.
+     * @return Extensive GitlabRunner Details.
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabRunner getRunnerDetail(int id) throws IOException {
+        String tailUrl = String.format("%s/%d", GitlabRunner.URL, id);
+        return retrieve().to(tailUrl, GitlabRunner.class);
     }
 }

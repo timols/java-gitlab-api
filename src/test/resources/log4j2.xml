@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <properties>
+        <property name="default.pattern">%d{HH:mm:ss.SSS} [%-5p] [%25.25C] - %m%n</property>
+    </properties>
+    <Appenders>
+        <File name="default" fileName="out/logs/default.log">
+            <PatternLayout pattern="${default.pattern}"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.gitlab.api" level="ALL" additivity="false">
+            <AppenderRef ref="default" level="TRACE"/>
+        </Logger>
+    </Loggers>
+</Configuration>

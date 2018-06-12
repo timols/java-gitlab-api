@@ -8,18 +8,18 @@ public class GitlabSimpleRepositoryFile {
    "branch_name": "master"
      */
 
-    @JsonProperty("file_name")
-    private String fileName;
+    @JsonProperty("file_path")
+    private String filePath;
 
-    @JsonProperty("branch_name")
+    @JsonProperty("branch")
     private String branchName;
 
-    public String getFileName() {
-        return fileName;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getBranchName() {

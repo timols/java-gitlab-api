@@ -24,7 +24,10 @@ import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.GitlabAPIException;
 import org.gitlab.api.TokenType;
-import org.gitlab.api.models.GitlabCommit;
+
+import static org.gitlab.api.http.Method.GET;
+import static org.gitlab.api.http.Method.POST;
+import static org.gitlab.api.http.Method.PUT;
 
 /**
  * Gitlab HTTP Requestor
@@ -38,31 +41,13 @@ public class GitlabHTTPRequestor {
 
     private final GitlabAPI root;
 
-    private String method = "GET"; // Default to GET requests
-    private Map<String, Object> data = new HashMap<String, Object>();
-    private Map<String, File> attachments = new HashMap<String, File>();
+    private Method method = GET; // Default to GET requests
+    private Map<String, Object> data = new HashMap<>();
+    private Map<String, File> attachments = new HashMap<>();
 
     private String apiToken;
     private TokenType tokenType;
     private AuthMethod authMethod;
-
-    private enum METHOD {
-        GET, PUT, POST, PATCH, DELETE, HEAD, OPTIONS, TRACE;
-
-        public static String prettyValues() {
-            METHOD[] methods = METHOD.values();
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < methods.length; i++) {
-                METHOD method = methods[i];
-                builder.append(method.toString());
-
-                if (i != methods.length - 1) {
-                    builder.append(", ");
-                }
-            }
-            return builder.toString();
-        }
-    }
 
     public GitlabHTTPRequestor(GitlabAPI root) {
         this.root = root;
@@ -83,7 +68,7 @@ public class GitlabHTTPRequestor {
         this.authMethod = method;
         return this;
     }
-    
+
     /**
      * Sets the HTTP Request method for the request.
      * Has a fluent api for method chaining.
@@ -91,13 +76,8 @@ public class GitlabHTTPRequestor {
      * @param method The HTTP method
      * @return this
      */
-    public GitlabHTTPRequestor method(String method) {
-        try {
-            this.method = METHOD.valueOf(method).toString();
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid HTTP Method: " + method + ". Must be one of " + METHOD.prettyValues());
-        }
-
+    public GitlabHTTPRequestor method(Method method) {
+        this.method = method;
         return this;
     }
 
@@ -121,7 +101,7 @@ public class GitlabHTTPRequestor {
      * Has a fluent api for method chaining
      *
      * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param file      File data
      * @return this
      */
     public GitlabHTTPRequestor withAttachment(String key, File file) {
@@ -158,7 +138,7 @@ public class GitlabHTTPRequestor {
                 submitAttachments(connection);
             } else if (hasOutput()) {
                  submitData(connection);
-            } else if ("PUT".equals(method)) {
+            } else if (PUT.equals(method)) {
                 // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
                 connection.setDoOutput(true);
                 connection.setFixedLengthStreamingMode(0);
@@ -179,7 +159,7 @@ public class GitlabHTTPRequestor {
     }
 
     public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
-        List<T> results = new ArrayList<T>();
+        List<T> results = new ArrayList<>();
         Iterator<T[]> iterator = asIterator(tailUrl, type);
 
         while (iterator.hasNext()) {
@@ -193,7 +173,7 @@ public class GitlabHTTPRequestor {
     }
 
     public <T> Iterator<T> asIterator(final String tailApiUrl, final Class<T> type) {
-        method("GET"); // Ensure we only use iterators for GET requests
+        method(GET); // Ensure we only use iterators for GET requests
 
         // Ensure that we don't submit any data and alert the user
         if (!data.isEmpty()) {
@@ -208,7 +188,7 @@ public class GitlabHTTPRequestor {
                 try {
                     url = root.getAPIUrl(tailApiUrl);
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -260,7 +240,7 @@ public class GitlabHTTPRequestor {
                         handleAPIError(e, connection);
                     }
                 } catch (IOException e) {
-                    throw new Error(e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -279,16 +259,9 @@ public class GitlabHTTPRequestor {
                     Integer page = Integer.parseInt(matcher.group(2)) + 1;
                     this.url = new URL(matcher.replaceAll(matcher.group(1) + "page=" + page));
                 } else {
-                    if (GitlabCommit[].class == type) {
-                        // there is a bug in the Gitlab CE API
-                        // (https://gitlab.com/gitlab-org/gitlab-ce/issues/759)
-                        // that starts pagination with page=0 for commits
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "page=1");
-                    } else {
-                        // Since the page query was not present, its safe to assume that we just
-                        // currently used the first page, so we can default to page 2
-                        this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
-                    }
+                    // Since the page query was not present, its safe to assume that we just
+                    // currently used the first page, so we can default to page 2
+                    this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
                 }
             }
         };
@@ -301,35 +274,30 @@ public class GitlabHTTPRequestor {
         String charset = "UTF-8";
         String CRLF = "\r\n"; // Line separator required by multipart/form-data.
         OutputStream output = connection.getOutputStream();
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-        try {
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true)) {
             for (Map.Entry<String, Object> paramEntry : data.entrySet()) {
                 String paramName = paramEntry.getKey();
                 String param = GitlabAPI.MAPPER.writeValueAsString(paramEntry.getValue());
-                writer.append("--" + boundary).append(CRLF);
-                writer.append("Content-Disposition: form-data; name=\"" + paramName + "\"").append(CRLF);
-                writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
+                writer.append("--").append(boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\"").append(paramName).append("\"").append(CRLF);
+                writer.append("Content-Type: text/plain; charset=").append(charset).append(CRLF);
                 writer.append(CRLF).append(param).append(CRLF).flush();
             }
             for (Map.Entry<String, File> attachMentEntry : attachments.entrySet()) {
                 File binaryFile = attachMentEntry.getValue();
-                writer.append("--" + boundary).append(CRLF);
-                writer.append("Content-Disposition: form-data; name=\""+ attachMentEntry.getKey() +"\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
-                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
+                writer.append("--").append(boundary).append(CRLF);
+                writer.append("Content-Disposition: form-data; name=\"").append(attachMentEntry.getKey())
+                        .append("\"; filename=\"").append(binaryFile.getName()).append("\"").append(CRLF);
+                writer.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
                 writer.append("Content-Transfer-Encoding: binary").append(CRLF);
                 writer.append(CRLF).flush();
-                Reader fileReader = new FileReader(binaryFile);
-                try {
+                try (Reader fileReader = new FileReader(binaryFile)) {
                     IOUtils.copy(fileReader, output);
-                } finally {
-                    fileReader.close();
                 }
                 output.flush(); // Important before continuing with writer!
                 writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
             }
-            writer.append("--" + boundary + "--").append(CRLF).flush();
-        } finally {
-            writer.close();
+            writer.append("--").append(boundary).append("--").append(CRLF).flush();
         }
     }
     
@@ -344,7 +312,7 @@ public class GitlabHTTPRequestor {
     }
     
     private boolean hasOutput() {
-        return method.equals("POST") || method.equals("PUT") && !data.isEmpty();
+        return method.equals(POST) || method.equals(PUT) && !data.isEmpty();
     }
 
     private HttpURLConnection setupConnection(URL url) throws IOException {
@@ -354,30 +322,31 @@ public class GitlabHTTPRequestor {
 
         if (apiToken != null && authMethod == AuthMethod.URL_PARAMETER) {
             String urlWithAuth = url.toString();
-            urlWithAuth = urlWithAuth + (urlWithAuth.indexOf('?') > 0 ? '&' : '?') + tokenType.getTokenParamName() + "=" + apiToken;
+            urlWithAuth = urlWithAuth + (urlWithAuth.indexOf('?') > 0 ? '&' : '?') +
+                    tokenType.getTokenParamName() + "=" + apiToken;
             url = new URL(urlWithAuth);
         }
 
-        HttpURLConnection connection = root.getProxy() != null ? (HttpURLConnection) url.openConnection(root.getProxy()) : (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = root.getProxy() != null ?
+                (HttpURLConnection) url.openConnection(root.getProxy()) : (HttpURLConnection) url.openConnection();
         if (apiToken != null && authMethod == AuthMethod.HEADER) {
-            connection.setRequestProperty(tokenType.getTokenHeaderName(), String.format(tokenType.getTokenHeaderFormat(), apiToken));
+            connection.setRequestProperty(tokenType.getTokenHeaderName(),
+                    String.format(tokenType.getTokenHeaderFormat(), apiToken));
         }
 
-        final int requestTimeout = root.getRequestTimeout();
-        if (requestTimeout > 0) {
-            connection.setReadTimeout(requestTimeout);
-        }
+        connection.setReadTimeout(root.getResponseReadTimeout());
+        connection.setConnectTimeout(root.getConnectionTimeout());
 
         try {
-            connection.setRequestMethod(method);
+            connection.setRequestMethod(method.name());
         } catch (ProtocolException e) {
             // Hack in case the API uses a non-standard HTTP verb
             try {
                 Field methodField = connection.getClass().getDeclaredField("method");
                 methodField.setAccessible(true);
-                methodField.set(connection, method);
+                methodField.set(connection, method.name());
             } catch (Exception x) {
-                throw (IOException) new IOException("Failed to set the custom verb").initCause(x);
+                throw new IOException("Failed to set the custom verb", x);
             }
         }
         connection.setRequestProperty("User-Agent", root.getUserAgent());
@@ -392,16 +361,20 @@ public class GitlabHTTPRequestor {
                 return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
-            String data = IOUtils.toString(reader);
+            String json = IOUtils.toString(reader);
+            if (type != null && type == String.class) {
+                return type.cast(json);
+            }
             if (type != null && type != Void.class) {
-                return GitlabAPI.MAPPER.readValue(data, type);
+                return GitlabAPI.MAPPER.readValue(json, type);
             } else if (instance != null) {
-                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(data);
+                return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(json);
             } else {
                 return null;
             }
         } catch (SSLHandshakeException e) {
-            throw new SSLHandshakeException("You can disable certificate checking by setting ignoreCertificateErrors on GitlabHTTPRequestor. SSL Error: " + e.getMessage());
+            throw new SSLException("You can disable certificate checking by setting ignoreCertificateErrors " +
+                    "on GitlabHTTPRequestor.", e);
         } finally {
             IOUtils.closeQuietly(reader);
         }
@@ -420,10 +393,9 @@ public class GitlabHTTPRequestor {
     }
 
     private void handleAPIError(IOException e, HttpURLConnection connection) throws IOException {
-        if (e instanceof FileNotFoundException) {
-            throw e;    // pass through 404 Not Found to allow the caller to handle it intelligently
-        }
-        if (e instanceof SocketTimeoutException && root.getRequestTimeout() > 0) {
+        if (e instanceof FileNotFoundException || // pass through 404 Not Found to allow the caller to handle it intelligently
+                e instanceof SocketTimeoutException ||
+                e instanceof ConnectException) {
             throw e;
         }
 
@@ -459,12 +431,7 @@ public class GitlabHTTPRequestor {
                 }
         };
         // Added per https://github.com/timols/java-gitlab-api/issues/44
-        HostnameVerifier nullVerifier = new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        };
+        HostnameVerifier nullVerifier = (hostname, session) -> true;
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
@@ -472,8 +439,6 @@ public class GitlabHTTPRequestor {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             // Added per https://github.com/timols/java-gitlab-api/issues/44
             HttpsURLConnection.setDefaultHostnameVerifier(nullVerifier);
-        } catch (Exception e) {
-            // Ignore it
-        }
+        } catch (Exception ignore) {}
     }
 }

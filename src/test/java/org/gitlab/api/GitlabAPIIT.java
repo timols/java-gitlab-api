@@ -1,26 +1,27 @@
 package org.gitlab.api;
 
-import org.gitlab.api.models.GitlabBuildVariable;
-import org.gitlab.api.models.GitlabGroup;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabUser;
+import org.gitlab.api.models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class GitlabAPIIT {
 
-    static GitlabAPI api;
+    private static GitlabAPI api;
 
-    private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") + ":" + System.getProperty("gitlab.port", "18080");
-    String rand = createRandomString();
+    private static final String TEST_URL = "http://" + System.getProperty("docker.host.address", "localhost") +
+            ":" + System.getProperty("gitlab.port", "18080");
 
     @BeforeClass
     public static void getApi() {
@@ -28,9 +29,10 @@ public class GitlabAPIIT {
     }
 
     @Test
-    public void Check_invalid_credentials() throws IOException {
+    public void checkInvalidCredentials() throws Exception {
         try {
-            api.dispatch().with("login", "INVALID").with("password", createRandomString()).to("session", GitlabUser.class);
+            api.dispatch().with("login", "INVALID").with("password", createRandomString())
+                    .to("session", GitlabUser.class);
         } catch (GitlabAPIException e) {
             final String message = e.getMessage();
             if (!message.equals("{\"message\":\"401 Unauthorized\"}")) {
@@ -40,30 +42,26 @@ public class GitlabAPIIT {
             }
         }
     }
+
     @Test
-    public void testAllProjects() throws IOException {
-        api.getProjects();
+    public void testAllProjects() {
+        assertThat(api.getAllProjects(), is(notNullValue()));
     }
 
     @Test
-    public void testConnect() throws IOException {
-        assertEquals(GitlabAPI.class, api.getClass());
-    }
-
-    @Test
-    public void testGetAPIUrl() throws IOException {
+    public void testGetAPIUrl() throws Exception {
         URL expected = new URL(TEST_URL + "/api/v4/");
         assertEquals(expected, api.getAPIUrl(""));
     }
 
     @Test
-    public void testGetUrl() throws IOException {
+    public void testGetUrl() throws Exception {
         URL expected = new URL(TEST_URL);
         assertEquals(expected + "/", api.getUrl("").toString());
     }
 
     @Test
-    public void testCreateUpdateDeleteVariable() throws IOException {
+    public void testCreateUpdateDeleteVariable() throws Exception {
         String key = randVal("key");
         String value = randVal("value");
         String newValue = randVal("new_value");
@@ -84,15 +82,12 @@ public class GitlabAPIIT {
 
         api.updateBuildVariable(project.getId(), key, newValue);
 
-
         GitlabBuildVariable postUpdate = api.getBuildVariable(project.getId(), key);
-
 
         assertNotNull(postUpdate);
         assertEquals(postUpdate.getKey(), variable.getKey());
         assertNotEquals(postUpdate.getValue(), variable.getValue());
         assertEquals(postUpdate.getValue(), newValue);
-
 
         api.deleteBuildVariable(project.getId(), key);
 
@@ -103,16 +98,12 @@ public class GitlabAPIIT {
         } catch (FileNotFoundException thisIsSoOddForAnRESTApiClient) {
             assertTrue(true); // expected
         }
-
         api.deleteProject(project.getId());
     }
 
     @Test
-    public void testCreateUpdateDeleteUser() throws IOException, InterruptedException {
-
+    public void testCreateUpdateDeleteUser() throws Exception {
         String password = randVal("$%password");
-
-
         GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
                 password,
                 randVal("userName"),
@@ -127,6 +118,7 @@ public class GitlabAPIIT {
                 randVal("bio"),
                 false,
                 false,
+                true,
                 false);
         assertNotNull(gitUser);
 
@@ -136,13 +128,13 @@ public class GitlabAPIIT {
         assertEquals(refetched.getUsername(), gitUser.getUsername());
 
         api.updateUser(gitUser.getId(), gitUser.getEmail(), password, gitUser.getUsername(),
-                gitUser.getName(), "newSkypeId", gitUser.getLinkedin(), gitUser.getTwitter(), gitUser.getWebsiteUrl(),
-                10 /* project limit does not come back on GET */, gitUser.getExternUid(), gitUser.getExternProviderName(),
-                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup());
-
+                gitUser.getName(), "newSkypeId", gitUser.getLinkedin(),
+                gitUser.getTwitter(), gitUser.getWebsiteUrl(),
+                10 /* project limit does not come back on GET */,
+                gitUser.getExternUid(), gitUser.getExternProviderName(),
+                gitUser.getBio(), gitUser.isAdmin(), gitUser.isCanCreateGroup(), gitUser.isExternal());
 
         GitlabUser postUpdate = api.getUserViaSudo(gitUser.getUsername());
-
 
         assertNotNull(postUpdate);
         assertEquals(postUpdate.getSkype(), "newSkypeId");
@@ -161,12 +153,10 @@ public class GitlabAPIIT {
         } catch (FileNotFoundException thisIsSoOddForAnRESTApiClient) {
             assertTrue(true); // expected
         }
-
-
     }
 
     @Test
-    public void testGetGroupByPath() throws IOException {
+    public void testGetGroupByPath() throws Exception {
         // Given
         String name = "groupName";
         String path = "groupPath";
@@ -185,27 +175,100 @@ public class GitlabAPIIT {
         // Cleanup
         api.deleteGroup(group.getId());
     }
+	
+	@Test
+    public void testCreateAndUpdateGroup() throws Exception {
+        // Given
+        GitlabGroup originalGroup = new GitlabGroup();
+        originalGroup.setDescription("test description");
+        originalGroup.setName("groupNameTest");
+        originalGroup.setPath("groupPathTest");
+        originalGroup.setVisibility(GitlabVisibility.INTERNAL);
 
-    @Test
-    public void testGetMembershipProjects() throws IOException {
-        final List<GitlabProject> membershipProjects = api.getMembershipProjects();
-        assertEquals(0, membershipProjects.size());
+        GitlabGroup newGroup = api.createGroup(originalGroup, null);
+        assertNotNull(newGroup);
+        assertEquals(originalGroup.getId(), newGroup.getId());
+        assertEquals(originalGroup.getName(), newGroup.getName());
+        assertEquals(originalGroup.getPath(), newGroup.getPath());
+        assertEquals(originalGroup.getDescription(), newGroup.getDescription());
+        assertEquals(originalGroup.getVisibility(), newGroup.getVisibility());
+
+        GitlabGroup groupToUpdate = new GitlabGroup();
+        groupToUpdate.setId(newGroup.getId());
+        groupToUpdate.setVisibility(GitlabVisibility.PRIVATE);
+
+        // When
+        GitlabGroup updatedGroup = api.updateGroup(newGroup, null);
+
+        // Then:
+        assertNotNull(updatedGroup);
+        assertEquals(groupToUpdate.getVisibility(), updatedGroup.getVisibility());
+
+        // Cleanup
+        api.deleteGroup(updatedGroup.getId());
     }
 
     @Test
-    public void Check_get_owned_projects() throws IOException {
-        final List<GitlabProject> ownedProjects = api.getOwnedProjects();
-        assertEquals(0, ownedProjects.size());
+    public void testGetMembershipProjects() throws Exception {
+        assertThat(api.getMembershipProjects(), not(nullValue()));
     }
 
     @Test
-    public void Check_search_projects() throws IOException {
+    public void checkGetOwnedProjects() throws Exception {
+        assertThat(api.getOwnedProjects(), not(nullValue()));
+    }
+
+    @Test
+    public void checkSearchProjects() throws Exception {
         final List<GitlabProject> searchedProjects = api.searchProjects("foo");
-        assertEquals(0, searchedProjects.size());
+        assertThat(searchedProjects, not(nullValue()));
+        assertThat(searchedProjects.isEmpty(), is(true));
+    }
+
+    /**
+     * There is at least one namespace for the user
+     */
+    @Test
+    public void testGetNamespace() {
+        final List<GitlabNamespace> gitlabNamespaces = api.getNamespaces();
+        assertThat(gitlabNamespaces, not(nullValue()));
+        assertThat(gitlabNamespaces.isEmpty(), is(false));
+    }
+
+    @Test
+    public void testCreateDeleteFork() throws Exception {
+        String projectName = randVal("Fork-me");
+        String password = randVal("$%password");
+        GitlabUser gitUser = api.createUser(randVal("testEmail@gitlabapitest.com"),
+                password,
+                randVal("userName"),
+                randVal("fullName"),
+                randVal("skypeId"),
+                randVal("linkedin"),
+                randVal("twitter"),
+                "http://" + randVal("url.com"),
+                10,
+                randVal("externuid"),
+                randVal("externprovidername"),
+                randVal("bio"),
+                false,
+                false,
+                false,
+                false);
+
+        GitlabProject project = api.createUserProject(gitUser.getId(), projectName);
+        GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
+
+        assertNotNull(fork);
+        assertEquals(project.getId(), fork.getForkedFrom().getId());
+
+        api.deleteProject(project.getId());
+        api.deleteProject(fork.getId());
+        api.deleteUser(gitUser.getId());
     }
 
     private String randVal(String postfix) {
-        return rand + "_" + postfix;
+        return createRandomString() + "_" + postfix;
     }
 
     private static String createRandomString() {

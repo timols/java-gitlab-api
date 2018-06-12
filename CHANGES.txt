@@ -1,0 +1,2 @@
+Current
+Fixed: GITHUB-297: The "connectTimeout" parameter is not configurable.
