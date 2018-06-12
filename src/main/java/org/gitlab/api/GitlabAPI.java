@@ -848,7 +848,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getOwnedProjects() throws IOException {
-        Query query = new Query().append("owner", "true");
+        Query query = new Query().append("owned", "true");
         query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
         String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
