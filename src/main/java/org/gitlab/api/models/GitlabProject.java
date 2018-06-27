@@ -125,7 +125,7 @@ public class GitlabProject {
     @JsonProperty("forked_from_project")
     private GitlabProject forkedFrom;
 
-    @JsonProperty("is_printing_merge_request_link_enabled")
+    @JsonProperty("printing_merge_request_link_enabled")
     private Boolean printingMergeRequestLinkEnabled;
 
     public Integer getId() {
