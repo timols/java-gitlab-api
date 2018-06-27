@@ -778,8 +778,7 @@ public class GitlabAPI {
      * use namespace & project name to get project
      */
     public GitlabProject getProject(String namespace, String projectName) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(namespace);
-        tailUrl += GitlabProject.URL + "?search=" + sanitizeProjectId(projectName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
         return retrieve().to(tailUrl, GitlabProject.class);
     }
 
@@ -795,8 +794,7 @@ public class GitlabAPI {
      * use namespace & project name to get project
      */
     public String getProjectJson(String namespace, String projectName) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + sanitizeGroupId(namespace);
-        tailUrl += GitlabProject.URL + "?search=" + sanitizeProjectId(projectName);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeGroupId(namespace) + "%2F" + sanitizeProjectId(projectName);
         return retrieve().to(tailUrl, String.class);
     }
 
