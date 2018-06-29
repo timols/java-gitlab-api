@@ -261,7 +261,7 @@ public class GitlabHTTPRequestor {
                 } else {
                     // Since the page query was not present, its safe to assume that we just
                     // currently used the first page, so we can default to page 2
-                    this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "&page=2");
+                    this.url = new URL(url + (url.indexOf('?') > 0 ? '&' : '?') + "page=2");
                 }
             }
         };
