@@ -128,6 +128,9 @@ public class GitlabProject {
     @JsonProperty("printing_merge_request_link_enabled")
     private Boolean printingMergeRequestLinkEnabled;
 
+    @JsonProperty("import_status")
+    private String importStatus;
+
     public Integer getId() {
         return id;
     }
