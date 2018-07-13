@@ -803,8 +803,10 @@ public class GitlabAPI {
      *
      * @return A list of gitlab projects
      */
-    public List<GitlabProject> getProjects() {
-        String tailUrl = GitlabProject.URL + PARAM_MAX_ITEMS_PER_PAGE;
+    public List<GitlabProject> getProjects() throws IOException {
+        Query query = new Query().append("membership", "true");
+        query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
+        String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
     }
 
