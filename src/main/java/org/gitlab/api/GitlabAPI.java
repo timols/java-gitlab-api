@@ -1819,7 +1819,7 @@ public class GitlabAPI {
             query.appendIf("new_issue_url", customIssueTracker.getNewIssueUrl());
         }
         
-        String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabCustomIssueTracker.URL + query.toString();
+        String tailUrl = GitlabProject.URL+ "/" + sanitizeProjectId(projectId) + GitlabCustomIssueTracker.URL + query.toString();
         return retrieve().method("PUT").to(tailUrl, Boolean.class);
     }
 }
