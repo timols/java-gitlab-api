@@ -6,7 +6,10 @@ public class GitlabCustomIssueTracker {
     
     public static final String URL = "/services/custom-issue-tracker/";
     
+    @JsonProperty("title")
     private String title;
+    
+    @JsonProperty("description")
     private String description;
     
     @JsonProperty("project_url")
