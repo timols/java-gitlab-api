@@ -1786,4 +1786,40 @@ public class GitlabAPI {
     
     	return Arrays.asList(retrieve().to(tailUrl, CommitComment[].class));
     }
+    
+    /**
+     * Set Custom Issue Tracker service for a project.
+     * https://docs.gitlab.com/ee/api/services.html#create-edit-custom-issue-tracker-service
+     * 
+     * @param projectId The ID of the project containing the variable.
+     * @param customIssueTrackerPropties
+     * @return boolean
+     * @throws IOException
+     */
+    public boolean createOrEditCustomIssueTracker(Integer projectId, GitlabCustomIssueTracker customIssueTracker) throws IOException {
+        Query query = new Query();
+        
+        if (!customIssueTracker.getTitle().isEmpty()) {
+            query.appendIf("title", customIssueTracker.getTitle());
+        }
+        
+        if (!customIssueTracker.getDescription().isEmpty()) {
+            query.appendIf("description", customIssueTracker.getDescription());
+        }
+        
+        if (!customIssueTracker.getProjectUrl().isEmpty()) {
+            query.appendIf("project_url", customIssueTracker.getProjectUrl());
+        }
+        
+        if (!customIssueTracker.getIssuesUrl().isEmpty()) {
+            query.appendIf("issues_url", customIssueTracker.getIssuesUrl());
+        }
+        
+        if (!customIssueTracker.getNewIssueUrl().isEmpty()) {
+            query.appendIf("new_issue_url", customIssueTracker.getNewIssueUrl());
+        }
+        
+        String tailUrl = GitlabProject.URL+ "/" + projectId + GitlabCustomIssueTracker.URL + query.toString();
+        return retrieve().method("PUT").to(tailUrl, Boolean.class);
+    }
 }
