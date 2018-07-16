@@ -1797,7 +1797,10 @@ public class GitlabAPI {
      * @throws IOException
      */
     public boolean createOrEditCustomIssueTracker(Integer projectId, GitlabCustomIssueTracker customIssueTracker) throws IOException {
-        Query query = new Query();
+        Query query = new Query()
+                .append("project_url", customIssueTracker.getProjectUrl())
+                .append("issues_url", customIssueTracker.getIssuesUrl())
+                .append("new_issue_url", customIssueTracker.getNewIssueUrl());
         
         if (!customIssueTracker.getTitle().isEmpty()) {
             query.appendIf("title", customIssueTracker.getTitle());
@@ -1805,18 +1808,6 @@ public class GitlabAPI {
         
         if (!customIssueTracker.getDescription().isEmpty()) {
             query.appendIf("description", customIssueTracker.getDescription());
-        }
-        
-        if (!customIssueTracker.getProjectUrl().isEmpty()) {
-            query.appendIf("project_url", customIssueTracker.getProjectUrl());
-        }
-        
-        if (!customIssueTracker.getIssuesUrl().isEmpty()) {
-            query.appendIf("issues_url", customIssueTracker.getIssuesUrl());
-        }
-        
-        if (!customIssueTracker.getNewIssueUrl().isEmpty()) {
-            query.appendIf("new_issue_url", customIssueTracker.getNewIssueUrl());
         }
         
         String tailUrl = GitlabProject.URL+ "/" + sanitizeProjectId(projectId) + GitlabCustomIssueTracker.URL + query.toString();
