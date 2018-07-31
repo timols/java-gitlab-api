@@ -848,7 +848,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public List<GitlabProject> getOwnedProjects() throws IOException {
-        Query query = new Query().append("owner", "true");
+        Query query = new Query().append("owned", "true");
         query.mergeWith(new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).asQuery());
         String tailUrl = GitlabProject.URL + query.toString();
         return retrieve().getAll(tailUrl, GitlabProject[].class);
@@ -1301,9 +1301,8 @@ public class GitlabAPI {
      */
     public GitlabProject createFork(String namespace, Integer projectId) throws IOException {
         Query query = new Query()
-                .appendIf("id", projectId)
-                .append("namespace", namespace);
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork";
+                .appendIf("namespace", namespace);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork" + query.toString();
         return dispatch().to(tailUrl, GitlabProject.class);
     }
 
@@ -2221,7 +2220,7 @@ public class GitlabAPI {
     }
 
     public GitlabNote createNote(GitlabIssue issue, String message) throws IOException {
-        return createNote(String.valueOf(issue.getProjectId()), issue.getId(), message);
+        return createNote(String.valueOf(issue.getProjectId()), issue.getIid(), message);
     }
 
     /**
