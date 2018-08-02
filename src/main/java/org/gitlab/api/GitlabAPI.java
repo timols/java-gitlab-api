@@ -2278,16 +2278,16 @@ public class GitlabAPI {
     }
 
     /**
-     * Create project badge
+     * Add project badge
      *
-     * @param projectId The id of the project for which the badge should be retrieved
+     * @param projectId The id of the project for which the badge should be added
      * @param linkUrl   The URL that the badge should link to
      * @param imageUrl  The URL to the badge image
      * @return The created badge
      *
      * @throws IOException on GitLab API call error
      */
-    public GitlabBadge createProjectBadge(Serializable projectId, String linkUrl, String imageUrl) throws IOException {
+    public GitlabBadge addProjectBadge(Serializable projectId, String linkUrl, String imageUrl) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL;
         return dispatch().with("link_url", linkUrl)
                 .with("image_url", imageUrl)
@@ -2356,16 +2356,16 @@ public class GitlabAPI {
     }
 
     /**
-     * Create group badge
+     * Add group badge
      *
-     * @param groupId  The id of the group for which the badge should be retrieved
+     * @param groupId  The id of the group for which the badge should be added
      * @param linkUrl  The URL that the badge should link to
      * @param imageUrl The URL to the badge image
      * @return The created badge
      *
      * @throws IOException on GitLab API call error
      */
-    public GitlabBadge createGroupBadge(Integer groupId, String linkUrl, String imageUrl) throws IOException {
+    public GitlabBadge addGroupBadge(Integer groupId, String linkUrl, String imageUrl) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL;
         return dispatch().with("link_url", linkUrl)
                 .with("image_url", imageUrl)
