@@ -2250,6 +2250,162 @@ public class GitlabAPI {
     }
 
     /**
+     * Get project badges
+     *
+     * @param projectId The id of the project for which the badges should be retrieved
+     * @return The list of badges
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public List<GitlabBadge> getProjectBadges(Serializable projectId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabBadge[].class));
+    }
+
+    /**
+     * Get project badge
+     *
+     * @param projectId The id of the project for which the badge should be retrieved
+     * @param badgeId   The id of the badge that should be retrieved
+     * @return The badge with a given id
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge getProjectBadge(Serializable projectId, Integer badgeId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL
+                + "/" + badgeId;
+        return retrieve().to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Add project badge
+     *
+     * @param projectId The id of the project for which the badge should be added
+     * @param linkUrl   The URL that the badge should link to
+     * @param imageUrl  The URL to the badge image
+     * @return The created badge
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge addProjectBadge(Serializable projectId, String linkUrl, String imageUrl) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL;
+        return dispatch().with("link_url", linkUrl)
+                .with("image_url", imageUrl)
+                .to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Edit project badge
+     *
+     * @param projectId The id of the project for which the badge should be edited
+     * @param badgeId   The id of the badge that should be edited
+     * @param linkUrl   The URL that the badge should link to
+     * @param imageUrl  The URL to the badge image
+     * @return The updated badge
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge editProjectBadge(Serializable projectId, Integer badgeId, String linkUrl, String imageUrl) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL
+                + "/" + badgeId;
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
+        requestor.with("link_url", linkUrl)
+                .with("image_url", imageUrl);
+        return requestor.to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Delete project badge
+     *
+     * @param projectId The id of the project for which the badge should be deleted
+     * @param badgeId   The id of the badge that should be deleted
+     * @throws IOException on GitLab API call error
+     */
+    public void deleteProjectBadge(Serializable projectId, Integer badgeId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabBadge.URL
+                + "/" + badgeId;
+        retrieve().method(DELETE).to(tailUrl, Void.class);
+    }
+
+    /**
+     * Get project badges
+     *
+     * @param groupId The id of the group for which the badges should be retrieved
+     * @return The list of badges
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public List<GitlabBadge> getGroupBadges(Integer groupId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL;
+        return Arrays.asList(retrieve().to(tailUrl, GitlabBadge[].class));
+    }
+
+    /**
+     * Get group badge
+     *
+     * @param groupId The id of the group for which the badge should be retrieved
+     * @param badgeId The id of the badge that should be retrieved
+     * @return The badge with a given id
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge getGroupBadge(Integer groupId, Integer badgeId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL
+                + "/" + badgeId;
+        return retrieve().to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Add group badge
+     *
+     * @param groupId  The id of the group for which the badge should be added
+     * @param linkUrl  The URL that the badge should link to
+     * @param imageUrl The URL to the badge image
+     * @return The created badge
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge addGroupBadge(Integer groupId, String linkUrl, String imageUrl) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL;
+        return dispatch().with("link_url", linkUrl)
+                .with("image_url", imageUrl)
+                .to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Edit group badge
+     *
+     * @param groupId  The id of the group for which the badge should be edited
+     * @param badgeId  The id of the badge that should be edited
+     * @param linkUrl  The URL that the badge should link to
+     * @param imageUrl The URL to the badge image
+     * @return The updated badge
+     *
+     * @throws IOException on GitLab API call error
+     */
+    public GitlabBadge editGroupBadge(Integer groupId, Integer badgeId, String linkUrl, String imageUrl) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL
+                + "/" + badgeId;
+        GitlabHTTPRequestor requestor = retrieve().method(PUT);
+        requestor.with("link_url", linkUrl)
+                .with("image_url", imageUrl);
+        return requestor.to(tailUrl, GitlabBadge.class);
+    }
+
+    /**
+     * Delete group badge
+     *
+     * @param groupId The id of the group for which the badge should be deleted
+     * @param badgeId The id of the badge that should be deleted
+     * @throws IOException on GitLab API call error
+     */
+    public void deleteGroupBadge(Integer groupId, Integer badgeId) throws IOException {
+        String tailUrl = GitlabGroup.URL + "/" + groupId + GitlabBadge.URL
+                + "/" + badgeId;
+        retrieve().method(DELETE).to(tailUrl, Void.class);
+    }
+
+    /**
      * Gets labels associated with a project.
      *
      * @param projectId The ID of the project.
