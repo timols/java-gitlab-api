@@ -1616,7 +1616,8 @@ public class GitlabAPI {
      * @return the Gitlab Note
      * @throws IOException on gitlab api call error
      */
-    public GitlabNote getNote(GitlabMergeRequest mergeRequest, Integer noteId) throws IOException {
+    public GitlabNote getNote(GitlabMergeRequest mergeRequest,
+            Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + "/" + noteId;
@@ -1651,7 +1652,8 @@ public class GitlabAPI {
      * @return The GitLab discussion identified by the given id.
      * @throws IOException on a GitLab api call error
      */
-    public GitlabDiscussion getDiscussion(GitlabMergeRequest mergeRequest, int discussionId) throws IOException {
+    public GitlabDiscussion getDiscussion(GitlabMergeRequest mergeRequest,
+            int discussionId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -1758,10 +1760,13 @@ public class GitlabAPI {
      * @return The created discussion object.
      * @throws IOException on a GitLab api call error
      */
-    public GitlabDiscussion createImageDiscussion(GitlabMergeRequest mergeRequest,
-            String body, String position, String positionBaseSha, String positionStartSha,
+    public GitlabDiscussion createImageDiscussion(
+            GitlabMergeRequest mergeRequest, String body, String position,
+            String positionBaseSha, String positionStartSha,
             String positionHeadSha, String positionNewPath, String positionOldPath,
-            Integer positionWidth, Integer positionHeight, Integer positionX, Integer positionY) throws IOException {
+            Integer positionWidth, Integer positionHeight, Integer positionX,
+            Integer positionY
+        ) throws IOException {
         checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
 
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
@@ -1785,15 +1790,16 @@ public class GitlabAPI {
     }
 
     /**
-     * Check if the required arguments to create a discussion are present and contain values.
+     * Check if the required arguments to create a discussion are present and
+     * contain values.
      *
      * @param body              The content of a discussion.
      * @param positionBaseSha   The base commit SHA in the source branch.
      * @param positionStartSha  The SHA referencing commit in target branch
      * @param positionHeadSha   The SHA referencing HEAD of this merge request
      */
-    private void checkRequiredCreateDiscussionArguments(String body, String positionBaseSha,
-            String positionStartSha, String positionHeadSha) {
+    private void checkRequiredCreateDiscussionArguments(String body,
+            String positionBaseSha, String positionStartSha, String positionHeadSha) {
         if (body == null || body.isEmpty()) {
             throw new IllegalArgumentException("Missing required argument 'body'!");
         } else if (positionBaseSha == null || positionBaseSha.isEmpty()) {
@@ -1815,8 +1821,8 @@ public class GitlabAPI {
      * @return The discussion object.
      * @throws IOException on a GitLab api call error
      */
-    public GitlabDiscussion resolveDiscussion(GitlabMergeRequest mergeRequest, int discussionId,
-            boolean resolved) throws IOException {
+    public GitlabDiscussion resolveDiscussion(GitlabMergeRequest mergeRequest,
+            int discussionId, boolean resolved) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -1835,8 +1841,8 @@ public class GitlabAPI {
      * @return The added note object.
      * @throws IOException on a GitLab api call error
      */
-    public GitlabNote addDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId,
-            String body) throws IOException {
+    public GitlabNote addDiscussionNote(GitlabMergeRequest mergeRequest,
+            int discussionId, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId +
