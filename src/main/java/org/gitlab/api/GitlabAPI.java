@@ -1500,7 +1500,7 @@ public class GitlabAPI {
      * Return Merge Request.
      *
      * @param projectId       The id of the project
-     * @param mergeRequestIid The iid of the merge request
+     * @param mergeRequestIid The internal id of the merge request
      * @return the Gitlab Merge Request
      * @throws IOException on gitlab api call error
      */
@@ -1512,23 +1512,28 @@ public class GitlabAPI {
     /**
      * Return a Merge Request including its changes.
      *
-     * @param projectId      The id of the project
-     * @param mergeRequestId The id of the merge request
+     * @param projectId       The id of the project
+     * @param mergeRequestIid The internal id of the merge request
      * @return the Gitlab Merge Request
      * @throws IOException on gitlab api call error
      */
-    public GitlabMergeRequest getMergeRequestChanges(Serializable projectId, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/changes";
+    public GitlabMergeRequest getMergeRequestChanges(Serializable projectId,
+            Integer mergeRequestIid) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                GitlabMergeRequest.URL + "/" + mergeRequestIid + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
-    public GitlabMergeRequest getMergeRequest(Serializable projectId, Integer mergeRequestId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId;
+    public GitlabMergeRequest getMergeRequest(Serializable projectId,
+            Integer mergeRequestIid) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                GitlabMergeRequest.URL + "/" + mergeRequestIid;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
-    public GitlabMergeRequest getMergeRequest(GitlabProject project, Integer mergeRequestId) throws IOException {
-        return getMergeRequest(project.getId(), mergeRequestId);
+    public GitlabMergeRequest getMergeRequest(GitlabProject project,
+            Integer mergeRequestIid) throws IOException {
+        return getMergeRequest(project.getId(), mergeRequestIid);
     }
 
     /**
@@ -1560,18 +1565,18 @@ public class GitlabAPI {
     /**
      * Updates a Merge Request
      *
-     * @param projectId      The id of the project
-     * @param mergeRequestId The id of the merge request to update
-     * @param targetBranch   The target branch of the merge request, otherwise null to leave it untouched
-     * @param assigneeId     The id of the assignee, otherwise null to leave it untouched
-     * @param title          The title of the merge request, otherwise null to leave it untouched
-     * @param description    The description of the merge request, otherwise null to leave it untouched
-     * @param stateEvent     The state (close|reopen|merge) of the merge request, otherwise null to leave it untouched
-     * @param labels         A comma separated list of labels, otherwise null to leave it untouched
+     * @param projectId       The id of the project
+     * @param mergeRequestIid The internal id of the merge request to update
+     * @param targetBranch    The target branch of the merge request, otherwise null to leave it untouched
+     * @param assigneeId      The id of the assignee, otherwise null to leave it untouched
+     * @param title           The title of the merge request, otherwise null to leave it untouched
+     * @param description     The description of the merge request, otherwise null to leave it untouched
+     * @param stateEvent      The state (close|reopen|merge) of the merge request, otherwise null to leave it untouched
+     * @param labels          A comma separated list of labels, otherwise null to leave it untouched
      * @return the Merge Request
      * @throws IOException on gitlab api call error
      */
-    public GitlabMergeRequest updateMergeRequest(Serializable projectId, Integer mergeRequestId, String targetBranch,
+    public GitlabMergeRequest updateMergeRequest(Serializable projectId, Integer mergeRequestIid, String targetBranch,
                                                  Integer assigneeId, String title, String description, String stateEvent,
                                                  String labels) throws IOException {
         Query query = new Query()
@@ -1582,27 +1587,29 @@ public class GitlabAPI {
                 .appendIf("state_event", stateEvent)
                 .appendIf("labels", labels);
 
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + query.toString();
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                GitlabMergeRequest.URL + "/" + mergeRequestIid + query.toString();
 
         return retrieve().method(PUT).to(tailUrl, GitlabMergeRequest.class);
     }
 
     /**
      * @param project            The Project
-     * @param mergeRequestId     Merge Request ID
+     * @param mergeRequestIid    Merge Request internal ID
      * @param mergeCommitMessage optional merge commit message. Null if not set
      * @return new merge request status
      * @throws IOException on gitlab api call error
      */
-    public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        return acceptMergeRequest(project.getId(), mergeRequestId, mergeCommitMessage);
+    public GitlabMergeRequest acceptMergeRequest(GitlabProject project, Integer mergeRequestIid, String mergeCommitMessage) throws IOException {
+        return acceptMergeRequest(project.getId(), mergeRequestIid, mergeCommitMessage);
     }
 
-    public GitlabMergeRequest acceptMergeRequest(Serializable projectId, Integer mergeRequestId, String mergeCommitMessage) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + "/merge";
+    public GitlabMergeRequest acceptMergeRequest(Serializable projectId, Integer mergeRequestIid, String mergeCommitMessage) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                GitlabMergeRequest.URL + "/" + mergeRequestIid + "/merge";
         GitlabHTTPRequestor requestor = retrieve().method(PUT);
         requestor.with("id", projectId);
-        requestor.with("merge_request_id", mergeRequestId);
+        requestor.with("merge_request_iid", mergeRequestIid);
         if (mergeCommitMessage != null)
             requestor.with("merge_commit_message", mergeCommitMessage);
         return requestor.to(tailUrl, GitlabMergeRequest.class);
