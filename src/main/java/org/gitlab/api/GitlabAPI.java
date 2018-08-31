@@ -2807,8 +2807,9 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public void transfer(Integer namespaceId, Integer projectId) throws IOException {
-        String tailUrl = GitlabGroup.URL + "/" + namespaceId + GitlabProject.URL + "/" + projectId;
-        dispatch().to(tailUrl, Void.class);
+        Query query = new Query().append("namespace", String.valueOf(namespaceId));
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/transfer" + query.toString();
+        retrieve().method(PUT).to(tailUrl, Void.class);
     }
 
     /**
