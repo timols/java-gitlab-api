@@ -1616,7 +1616,8 @@ public class GitlabAPI {
      * @return the Gitlab Note
      * @throws IOException on gitlab api call error
      */
-    public GitlabNote getNote(GitlabMergeRequest mergeRequest, Integer noteId) throws IOException {
+    public GitlabNote getNote(GitlabMergeRequest mergeRequest,
+            Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + "/" + noteId;
@@ -1639,6 +1640,263 @@ public class GitlabAPI {
                 GitlabNote.URL + PARAM_MAX_ITEMS_PER_PAGE;
 
         return retrieve().getAll(tailUrl, GitlabNote[].class);
+    }
+
+    /**
+     * Get a discussion by id from a merge request.
+     * <a href="https://docs.gitlab.com/ce/api/discussions.html#get-single-merge-request-discussion">https://docs.gitlab.com/ce/api/discussions.html#get-single-merge-request-discussion</a>
+     *
+     * @param mergeRequest to fetch the discussion from.
+     * @param discussionId The id of the discussion.
+     *
+     * @return The GitLab discussion identified by the given id.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabDiscussion getDiscussion(GitlabMergeRequest mergeRequest,
+            int discussionId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL + "/" + discussionId;
+        return retrieve().to(tailUrl, GitlabDiscussion.class);
+    }
+
+    /**
+     * Get the discussions from a merge request.
+     * <a href="https://docs.gitlab.com/ce/api/discussions.html#list-project-merge-request-discussions">https://docs.gitlab.com/ce/api/discussions.html#list-project-merge-request-discussions</a>
+     *
+     * @param mergeRequest to fetch the discussions from.
+     *
+     * @return The discussions contained in the given merge request.
+     * @throws IOException on a GitLab api call error
+     */
+    public List<GitlabDiscussion> getDiscussions(GitlabMergeRequest mergeRequest) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL;
+
+        GitlabDiscussion[] discussions = retrieve().to(tailUrl, GitlabDiscussion[].class);
+        return Arrays.asList(discussions);
+    }
+
+    /**
+     * Create a discussion just with the required arguments.
+     *
+     * @param mergeRequest      The merge request where the discussion is created.
+     * @param body              The content of a discussion.
+     * @param positionBaseSha   The base commit SHA in the source branch.
+     * @param positionStartSha  The SHA referencing the commit in the target branch.
+     * @param positionHeadSha   The SHA referencing the HEAD of this merge request.
+     *
+     * @return The created discussion object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabDiscussion createDiscussion(GitlabMergeRequest mergeRequest,
+            String body, String positionBaseSha, String positionStartSha,
+            String positionHeadSha) throws IOException {
+        return createTextDiscussion(mergeRequest, body, null,
+                positionBaseSha, positionStartSha, positionHeadSha,
+                null, null, null, null);
+    }
+
+    /**
+     * Create a new discussion with position type text on the given merge request.
+     * <a href="https://docs.gitlab.com/ce/api/discussions.html#create-new-merge-request-discussion">https://docs.gitlab.com/ce/api/discussions.html#create-new-merge-request-discussion</a>
+     *
+     * @param mergeRequest      The merge request where the discussion is created.
+     * @param body              The content of a discussion.
+     * @param position          The position when creating a diff note. (hash)
+     * @param positionBaseSha   The base commit SHA in the source branch.
+     * @param positionStartSha  The SHA referencing the commit in the target branch.
+     * @param positionHeadSha   The SHA referencing the HEAD of this merge request.
+     * @param positionNewPath   The file path after the change.
+     * @param positionNewLine   The Line number after change
+     * @param positionOldPath   The file path before the change.
+     * @param positionOldLine   The Line number before change.
+     *
+     * @return The created discussion object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabDiscussion createTextDiscussion(GitlabMergeRequest mergeRequest,
+            String body, String position, String positionBaseSha, String positionStartSha,
+            String positionHeadSha, String positionNewPath, Integer positionNewLine,
+            String positionOldPath, Integer positionOldLine) throws IOException {
+        checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
+
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL;
+
+        return dispatch()
+                .with("body", body)
+                .with("position", position)
+                .with("position[base_sha]", positionBaseSha)
+                .with("position[start_sha]", positionStartSha)
+                .with("position[head_sha]", positionHeadSha)
+                .with("position[position_type]", "text")
+                .with("position[new_path]", positionNewPath)
+                .with("position[new_line]", positionNewLine)
+                .with("position[old_path]", positionOldPath)
+                .with("position[old_line]", positionOldLine)
+                .to(tailUrl, GitlabDiscussion.class);
+    }
+
+    /**
+     * Create a new discussion with position type image on the given merge request.
+     * <a href="https://docs.gitlab.com/ce/api/discussions.html#create-new-merge-request-discussion">https://docs.gitlab.com/ce/api/discussions.html#create-new-merge-request-discussion</a>
+     *
+     * @param mergeRequest      The merge request where the discussion is created.
+     * @param body              The content of a discussion.
+     * @param position          The position when creating a diff note. (hash)
+     * @param positionBaseSha   The base commit SHA in the source branch.
+     * @param positionStartSha  The SHA referencing the commit in the target branch.
+     * @param positionHeadSha   The SHA referencing the HEAD of this merge request.
+     * @param positionNewPath   The file path after the change.
+     * @param positionOldPath   The file path before the change.
+     * @param positionWidth     The width of the image.
+     * @param positionHeight    The height of the image.
+     * @param positionX         The X coordinate.
+     * @param positionY         The Y coordinate.
+     *
+     * @return The created discussion object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabDiscussion createImageDiscussion(
+            GitlabMergeRequest mergeRequest, String body, String position,
+            String positionBaseSha, String positionStartSha,
+            String positionHeadSha, String positionNewPath, String positionOldPath,
+            Integer positionWidth, Integer positionHeight, Integer positionX,
+            Integer positionY
+        ) throws IOException {
+        checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
+
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL;
+
+        return dispatch()
+                .with("body", body)
+                .with("position", position)
+                .with("position[base_sha]", positionBaseSha)
+                .with("position[start_sha]", positionStartSha)
+                .with("position[head_sha]", positionHeadSha)
+                .with("position[position_type]", "image")
+                .with("position[new_path]", positionNewPath)
+                .with("position[old_path]", positionOldPath)
+                .with("position[width]", positionWidth)
+                .with("position[height]", positionHeight)
+                .with("position[x]", positionX)
+                .with("position[y]", positionY)
+                .to(tailUrl, GitlabDiscussion.class);
+    }
+
+    /**
+     * Check if the required arguments to create a discussion are present and
+     * contain values.
+     *
+     * @param body              The content of a discussion.
+     * @param positionBaseSha   The base commit SHA in the source branch.
+     * @param positionStartSha  The SHA referencing commit in target branch
+     * @param positionHeadSha   The SHA referencing HEAD of this merge request
+     */
+    private void checkRequiredCreateDiscussionArguments(String body,
+            String positionBaseSha, String positionStartSha, String positionHeadSha) {
+        if (body == null || body.isEmpty()) {
+            throw new IllegalArgumentException("Missing required argument 'body'!");
+        } else if (positionBaseSha == null || positionBaseSha.isEmpty()) {
+            throw new IllegalArgumentException("Missing required argument 'positionBaseSha'!");
+        } else if (positionStartSha == null || positionStartSha.isEmpty()) {
+            throw new IllegalArgumentException("Missing required argument 'positionStartSha'!");
+        } else if (positionHeadSha == null || positionHeadSha.isEmpty()) {
+            throw new IllegalArgumentException("Missing required argument 'positionHeadSha'!");
+        }
+    }
+
+    /**
+     * Resolve or unresolve a whole discussion of a merge request.
+     *
+     * @param mergeRequest  The merge request of the discussion.
+     * @param discussionId  The id of the discussion to resolve.
+     * @param resolved      Resolve or unresolve the note.
+     *
+     * @return The discussion object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabDiscussion resolveDiscussion(GitlabMergeRequest mergeRequest,
+            int discussionId, boolean resolved) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL + "/" + discussionId;
+        return retrieve().method(PUT)
+                .with("resolved", resolved)
+                .to(tailUrl, GitlabDiscussion.class);
+    }
+
+    /**
+     * Add a note to existing merge request discussion.
+     *
+     * @param mergeRequest  The merge request of the discussion.
+     * @param discussionId  The id of the discussion to add a note to.
+     * @param body          The content of the discussion.
+     *
+     * @return The added note object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabNote addDiscussionNote(GitlabMergeRequest mergeRequest,
+            int discussionId, String body) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL + "/" + discussionId +
+                GitlabNote.URL;
+        return dispatch().with("body", body).to(tailUrl, GitlabNote.class);
+    }
+
+    /**
+     * Modify or resolve an existing discussion note of the given merge request.
+     *
+     * @param mergeRequest  The merge request of the discussion.
+     * @param discussionId  The id of the discussion to modify.
+     * @param noteId        The id of the discussion note.
+     * @param body          The content of the discussion.
+     * @param resolved      Resolve or unresolve the note.
+     *
+     * @return The modified note object.
+     * @throws IOException on a GitLab api call error
+     */
+    public GitlabNote modifyDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId,
+            int noteId, String body, Boolean resolved) throws IOException {
+        boolean bodyHasValue = false;
+        if (body != null && !body.isEmpty()) {
+            bodyHasValue = true;
+        }
+        if ((!bodyHasValue && resolved == null) || (bodyHasValue && resolved != null)) {
+            throw new IllegalArgumentException("Exactly one of body or resolved must be set!");
+        }
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL + "/" + discussionId +
+                GitlabNote.URL + "/" + noteId;
+        return retrieve().method(PUT)
+                .with("body", body)
+                .with("resolved", resolved)
+                .to(tailUrl, GitlabNote.class);
+    }
+
+    /**
+     * Delete a discussion note of a merge request.
+     *
+     * @param mergeRequest  The merge request of the discussion.
+     * @param discussionId  The id of the discussion to resolve.
+     * @param noteId        The id of a discussion note.
+     *
+     * @return The deleted note object.
+     * @throws IOException on a GitLab api call error
+     */
+    public void deleteDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId, int noteId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabDiscussion.URL + "/" + discussionId +
+                GitlabNote.URL + "/" + noteId;
+        retrieve().method(DELETE).to(tailUrl, Void.class);
     }
 
     // Get a specific commit identified by the commit hash or name of a branch or tag
