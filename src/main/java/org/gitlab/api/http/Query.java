@@ -51,39 +51,7 @@ public class Query {
      * @return this
      * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
      */
-    public Query appendIf(final String name, final String value) throws UnsupportedEncodingException {
-        if (value != null) {
-            append(name, value);
-        }
-        return this;
-    }
-
-    /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
-     *
-     * @param name  Parameter name
-     * @param value Parameter value
-     * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
-     */
-    public Query appendIf(final String name, final Integer value) throws UnsupportedEncodingException {
-        if (value != null) {
-            append(name, value.toString());
-        }
-        return this;
-    }
-
-    /**
-     * Conditionally append a parameter to the query
-     * if the value of the parameter is not null
-     *
-     * @param name  Parameter name
-     * @param value Parameter value
-     * @return this
-     * @throws java.io.UnsupportedEncodingException If the provided value cannot be URL Encoded
-     */
-    public Query appendIf(final String name, final Boolean value) throws UnsupportedEncodingException {
+    public <T> Query appendIf(final String name, final T value) throws UnsupportedEncodingException {
         if (value != null) {
             append(name, value.toString());
         }
