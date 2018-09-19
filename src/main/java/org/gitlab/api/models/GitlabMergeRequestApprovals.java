@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabMergeRequestApprovals {
     public static final String URL = "/approvals";
+    public static final String APPROVERS_URL = "/approvers";
 
     private Integer id;
     private Integer iid;
@@ -39,6 +40,10 @@ public class GitlabMergeRequestApprovals {
     @JsonProperty("suggested_approvers")
     private List<GitlabUser> suggestedApprovers;
 
+    private List<GitlabUser> approvers;
+
+    @JsonProperty("approver_groups")
+    private List<GitlabGroup> approverGroups;
 
     public Integer getId() {
         return id;
@@ -135,7 +140,7 @@ public class GitlabMergeRequestApprovals {
     public void setApprovedBy(List<GitlabApprovedBy> approvedBy) {
         this.approvedBy = approvedBy;
     }
-    
+
     public List<GitlabUser> getSuggestedApprovers() {
         return suggestedApprovers;
     }
@@ -143,4 +148,21 @@ public class GitlabMergeRequestApprovals {
     public void setSuggestedApprovers(List<GitlabUser> suggestedApprovers) {
         this.suggestedApprovers = suggestedApprovers;
     }
+
+    public List<GitlabUser> getApprovers() {
+        return approvers;
+    }
+
+    public void setApprovers(List<GitlabUser> approvers) {
+        this.approvers = approvers;
+    }
+
+    public List<GitlabGroup> getApproverGroups() {
+        return approverGroups;
+    }
+
+    public void setApproverGroups(List<GitlabGroup> approverGroups) {
+        this.approverGroups = approverGroups;
+    }
+
 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Collection;
 
 import static org.gitlab.api.http.Method.*;
 
@@ -140,6 +141,10 @@ public class GitlabAPI {
 
     public GitlabHTTPRequestor dispatch() {
         return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod).method(POST);
+    }
+
+    public GitlabHTTPRequestor put() {
+        return new GitlabHTTPRequestor(this).authenticate(apiToken, tokenType, authMethod).method(PUT);
     }
 
     public boolean isIgnoreCertificateErrors() {
@@ -1475,6 +1480,36 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
                 GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
         return retrieve().to(tailUrl, GitlabMergeRequestApprovals.class);
+    }
+
+    /**
+     * Set the number of required approvers.
+     *
+     * EE only.
+     */
+    public GitlabMergeRequestApprovals setMergeRequestApprovals(GitlabMergeRequest mr, int count) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
+                GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
+        return dispatch()
+            .with("approvals_required", count)
+            .to(tailUrl, GitlabMergeRequestApprovals.class);
+    }
+
+    /**
+     * Set the list of approvers.  Important: Approvers and groups not
+     * in the request will be removed
+     *
+     * EE only.
+     */
+    public GitlabMergeRequestApprovals setMergeRequestApprovers(GitlabMergeRequest mr,
+                                                                Collection<Integer> userApproverIds,
+                                                                Collection<Integer> groupApproverIds) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
+                GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.APPROVERS_URL;
+        return put()
+            .with("approver_ids", userApproverIds)
+            .with("approver_group_ids", groupApproverIds)
+            .to(tailUrl, GitlabMergeRequestApprovals.class);
     }
 
     /**
