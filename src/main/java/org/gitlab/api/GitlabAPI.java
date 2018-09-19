@@ -3912,4 +3912,107 @@ public class GitlabAPI {
         String tailUrl = String.format("%s/%d", GitlabRunner.URL, id);
         return retrieve().to(tailUrl, GitlabRunner.class);
     }
+
+    /**
+     * Get events for a project.
+     *
+     * @param action If not null, include only events of a particular action type
+     * @param targetType If not null, include only events of a particular target type
+     * @param before If not null, include only events created before a particular date.
+     * @param after If not null, include only events created before a
+     * particular date.
+     * @param sort If null, uses the server's default, which is "desc"
+     */
+    public List<GitlabEvent> getEvents(GitlabProject project,
+                                       GitlabEvent.ActionType action,
+                                       GitlabEvent.TargetType targetType,
+                                       GitlabDate before,
+                                       GitlabDate after,
+                                       SortOrder sortOrder)
+        throws IOException {
+        return getEvents(project, action, targetType, before,
+                         after, sortOrder, new Pagination());
+    }
+
+    /**
+     * Get events for a project.
+     *
+     * @param action If not null, include only events of a particular action type
+     * @param targetType If not null, include only events of a particular target type
+     * @param before If not null, include only events created before a particular date.
+     * @param after If not null, include only events created before a
+     * particular date.
+     * @param sort If null, uses the server's default, which is "desc"
+     */
+    public List<GitlabEvent> getEvents(GitlabProject project,
+                                       GitlabEvent.ActionType action,
+                                       GitlabEvent.TargetType targetType,
+                                       GitlabDate before,
+                                       GitlabDate after,
+                                       SortOrder sortOrder,
+                                       Pagination pagination)
+        throws IOException {
+        return getProjectEvents(project.getId(), action, targetType, before,
+                                after, sortOrder, pagination);
+    }
+
+    /**
+     * Get events for a project.
+     *
+     * @param action If not null, include only events of a particular action type
+     * @param targetType If not null, include only events of a particular target type
+     * @param before If not null, include only events created before a particular date.
+     * @param after If not null, include only events created before a
+     * particular date.
+     * @param sort If null, uses the server's default, which is "desc"
+     */
+    public List<GitlabEvent> getProjectEvents(Serializable projectId,
+                                              GitlabEvent.ActionType action,
+                                              GitlabEvent.TargetType targetType,
+                                              GitlabDate before,
+                                              GitlabDate after,
+                                              SortOrder sort)
+        throws IOException {
+        return getProjectEvents(projectId, action, targetType, before,
+                                after, sort, new Pagination());
+    }
+
+    /**
+     * Get events for a project.
+     *
+     * @param action If not null, include only events of a particular action type
+     * @param targetType If not null, include only events of a particular target type
+     * @param before If not null, include only events created before a particular date.
+     * @param after If not null, include only events created before a
+     * particular date.
+     * @param sort If null, uses the server's default, which is "desc"
+     */
+    public List<GitlabEvent> getProjectEvents(Serializable projectId,
+                                              GitlabEvent.ActionType action,
+                                              GitlabEvent.TargetType targetType,
+                                              GitlabDate before,
+                                              GitlabDate after,
+                                              SortOrder sort,
+                                              Pagination pagination)
+        throws IOException {
+
+        final Query query = new Query();
+        query.appendIf("action", action);
+        query.appendIf("target_type", targetType);
+        query.appendIf("before", before);
+        query.appendIf("after", after);
+        query.appendIf("sort", sort);
+
+        if (pagination != null) {
+            query.mergeWith(pagination.asQuery());
+        }
+
+        StringBuilder tailUrl = new StringBuilder(GitlabProject.URL)
+            .append("/")
+            .append(sanitizeProjectId(projectId))
+            .append(GitlabEvent.URL)
+            .append(query.toString());
+
+        return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabEvent[].class));
+    }
 }
