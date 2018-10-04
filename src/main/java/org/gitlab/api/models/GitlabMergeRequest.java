@@ -10,7 +10,7 @@ public class GitlabMergeRequest {
     public static final String STATUS_OPENED = "opened";
     public static final String STATUS_MERGED = "merged";
     public static final String STATUS_CLOSED = "closed";
-    
+
     private Integer id;
     private Integer iid;
     private String title;
@@ -23,10 +23,18 @@ public class GitlabMergeRequest {
     private GitlabMilestone milestone;
 
     private String[] labels;
+
     private List<GitlabCommitDiff> changes;
 
-    private int upvotes;
-    private int downvotes;
+    private Integer upvotes;
+
+    private Integer downvotes;
+
+    @JsonProperty("updated_at")
+    private Date updatedAt;
+
+    @JsonProperty("created_at")
+    private Date createdAt;
 
     @JsonProperty("target_branch")
     private String targetBranch;
@@ -46,23 +54,64 @@ public class GitlabMergeRequest {
     @JsonProperty("milestone_id")
     private Integer milestoneId;
 
-    @JsonProperty("updated_at")
-    private Date updatedAt;
+    @JsonProperty("work_in_progress")
+    private Boolean workInProgress;
 
-    @JsonProperty("created_at")
-    private Date createdAt;
+    @JsonProperty("merge_when_pipeline_succeeds")
+    private Boolean mergeWhenPipelineSucceeds;
+
+    @JsonProperty("merge_status")
+    private String mergeStatus;
+
+    @JsonProperty("sha")
+    private String sha;
 
     @JsonProperty("merge_commit_sha")
     private String mergeCommitSHA;
-    
-    @JsonProperty("merge_status")
-    private String mergeStatus;
+
+    @JsonProperty("user_notes_count")
+    private Integer userNotesCount;
+
+    @JsonProperty("discussion_locked")
+    private Boolean discussionLocked;
+
+    @JsonProperty("should_remove_source_branch")
+    private Boolean shouldRemoveSourceBranch;
+
+    @JsonProperty("force_remove_source_branch")
+    private Boolean forceRemoveSourceBranch;
 
     @JsonProperty("web_url")
     private String webUrl;
 
-    @JsonProperty("sha")
-    private String sha;
+    private Boolean squash;
+
+    @JsonProperty("changes_count")
+    private Integer changesCount;
+
+    @JsonProperty("merged_by")
+    private GitlabUser mergedBy;
+
+    @JsonProperty("merged_at")
+    private Date mergedAt;
+
+    @JsonProperty("closed_by")
+    private GitlabUser closedBy;
+
+    @JsonProperty("closed_at")
+    private Date closedAt;
+
+    @JsonProperty("latest_build_started_at")
+    private Date latestBuildStartedAt;
+
+    @JsonProperty("latest_build_finished_at")
+    private Date latestBuildFinishedAt;
+
+    @JsonProperty("first_deployed_to_production_at")
+    private Date firstDeployedToProductionAt;
+
+    @JsonProperty("diff_refs")
+    private DiffRefs diffRefs;
 
     public Integer getId() {
         return id;
@@ -280,5 +329,97 @@ public class GitlabMergeRequest {
 
     public void setSha(String sha) {
         this.sha = sha;
+    }
+
+    public Boolean isWorkInProgress() {
+        return workInProgress;
+    }
+
+
+    public Boolean isMergeWhenPipelineSucceeds() {
+        return mergeWhenPipelineSucceeds;
+    }
+
+    public Integer getUserNotesCount() {
+        return userNotesCount;
+    }
+
+    public Boolean isDiscussionLocked() {
+        return discussionLocked;
+    }
+
+    public Boolean isShouldRemoveSourceBranch() {
+        return shouldRemoveSourceBranch;
+    }
+
+    public boolean isForceRemoveSourceBranch() {
+        return forceRemoveSourceBranch;
+    }
+
+    public Boolean isSquash() {
+        return squash;
+    }
+
+    public Integer getChangesCount() {
+        return changesCount;
+    }
+
+    public GitlabUser getMergedBy() {
+        return mergedBy;
+    }
+
+    public Date getMergedAt() {
+        return mergedAt;
+    }
+
+    public GitlabUser getClosedBy() {
+        return closedBy;
+    }
+
+    public Date getClosedAt() {
+        return closedAt;
+    }
+
+    public Date getLatestBuildStartedAt() {
+        return latestBuildStartedAt;
+    }
+
+    public Date getLatestBuildFinishedAt() {
+        return latestBuildFinishedAt;
+    }
+
+    public Date getFirstDeployedToProductionAt() {
+        return firstDeployedToProductionAt;
+    }
+
+    public String getBaseSha() {
+        return diffRefs == null ? null : diffRefs.baseSha;
+    }
+
+    public String getHeadSha() {
+        return diffRefs == null ? null : diffRefs.headSha;
+    }
+
+    public String getStartSha() {
+        return diffRefs == null ? null : diffRefs.startSha;
+    }
+
+    /**
+     * Class representing the diff_refs json object, which is just a collection
+     * of sha references of the merge request. It is currently not provided by
+     * GitLab when fetching multiple merge requests.
+     *
+     * @author Patrizio Bonzani
+     */
+    private static class DiffRefs {
+
+        @JsonProperty("base_sha")
+        private String baseSha;
+
+        @JsonProperty("head_sha")
+        private String headSha;
+
+        @JsonProperty("start_sha")
+        private String startSha;
     }
 }
