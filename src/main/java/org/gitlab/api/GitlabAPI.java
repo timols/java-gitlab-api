@@ -1763,23 +1763,23 @@ public class GitlabAPI {
             String positionHeadSha, String positionNewPath, Integer positionNewLine,
             String positionOldPath, Integer positionOldLine) throws IOException {
         checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
+        Query query = new Query()
+                .append("body", body)
+                .appendIf("position", position)
+                .append("position[base_sha]", positionBaseSha)
+                .append("position[start_sha]", positionStartSha)
+                .append("position[head_sha]", positionHeadSha)
+                .append("position[position_type]", "text")
+                .appendIf("position[new_path]", positionNewPath)
+                .appendIf("position[new_line]", positionNewLine)
+                .appendIf("position[old_path]", positionOldPath)
+                .appendIf("position[old_line]", positionOldLine);
 
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
-                GitlabDiscussion.URL;
+                GitlabDiscussion.URL + query.toString();
 
-        return dispatch()
-                .with("body", body)
-                .with("position", position)
-                .with("position[base_sha]", positionBaseSha)
-                .with("position[start_sha]", positionStartSha)
-                .with("position[head_sha]", positionHeadSha)
-                .with("position[position_type]", "text")
-                .with("position[new_path]", positionNewPath)
-                .with("position[new_line]", positionNewLine)
-                .with("position[old_path]", positionOldPath)
-                .with("position[old_line]", positionOldLine)
-                .to(tailUrl, GitlabDiscussion.class);
+        return dispatch().to(tailUrl, GitlabDiscussion.class);
     }
 
     /**
@@ -1810,25 +1810,25 @@ public class GitlabAPI {
             Integer positionY
         ) throws IOException {
         checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
+        Query query = new Query()
+                .append("body", body)
+                .appendIf("position", position)
+                .append("position[base_sha]", positionBaseSha)
+                .append("position[start_sha]", positionStartSha)
+                .append("position[head_sha]", positionHeadSha)
+                .append("position[position_type]", "image")
+                .appendIf("position[new_path]", positionNewPath)
+                .appendIf("position[old_path]", positionOldPath)
+                .appendIf("position[width]", positionWidth)
+                .appendIf("position[height]", positionHeight)
+                .appendIf("position[x]", positionX)
+                .appendIf("position[y]", positionY);
 
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
-                GitlabDiscussion.URL;
+                GitlabDiscussion.URL + query.toString();
 
-        return dispatch()
-                .with("body", body)
-                .with("position", position)
-                .with("position[base_sha]", positionBaseSha)
-                .with("position[start_sha]", positionStartSha)
-                .with("position[head_sha]", positionHeadSha)
-                .with("position[position_type]", "image")
-                .with("position[new_path]", positionNewPath)
-                .with("position[old_path]", positionOldPath)
-                .with("position[width]", positionWidth)
-                .with("position[height]", positionHeight)
-                .with("position[x]", positionX)
-                .with("position[y]", positionY)
-                .to(tailUrl, GitlabDiscussion.class);
+        return dispatch().to(tailUrl, GitlabDiscussion.class);
     }
 
     /**
