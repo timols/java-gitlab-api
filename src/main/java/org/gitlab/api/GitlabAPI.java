@@ -2391,7 +2391,7 @@ public class GitlabAPI {
                 .to(tailUrl, GitlabProjectHook.class);
     }
 
-    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents, boolean tagPushEvents, boolean sslVerification, String token) throws IOException {
+    public GitlabProjectHook addProjectHook(Serializable projectId, String url, boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents, boolean tagPushEvents, boolean sslVerification, boolean jobEvents, boolean pipelineEvents, boolean wikiPageEvents, String token) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
 
         return dispatch()
@@ -2402,16 +2402,44 @@ public class GitlabAPI {
                 .with("note_events", noteEvents ? "true" : "false")
                 .with("tag_push_events", tagPushEvents ? "true" : "false")
                 .with("enable_ssl_verification", sslVerification ? "true" : "false")
+                .with("job_events", jobEvents ? "true" : "false")
+                .with("pipeline_events", pipelineEvents ? "true" : "false")
+                .with("wiki_page_events", wikiPageEvents ? "true" : "false")
                 .with("token", token)
                 .to(tailUrl, GitlabProjectHook.class);
     }
 
-    public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url) throws IOException {
-        Query query = new Query()
-                .append("url", url);
+    public GitlabProjectHook addProjectHook(Serializable projectId, String url, GitlabProjectHook hook, String token) throws IOException {
+        return this.addProjectHook(projectId, url, hook.getPushEvents(), hook.getIssueEvents(), hook.isMergeRequestsEvents(),
+            hook.isNoteEvents(), hook.isTagPushEvents(), hook.isSslVerificationEnabled(), hook.isJobEvents(),
+            hook.isPipelineEvents(), hook.isWikiPageEvents(), token);
+    }
 
+    public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url,
+        boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents,
+        boolean tagPushEvents, boolean sslVerification, boolean jobEvents, boolean pipelineEvents,
+        boolean wikiPageEvents, String token) throws IOException {
+        Query query = new Query();
+        query.append("url", url);
+        query.append("push_events", String.valueOf(pushEvents));
+        query.append("issues_events", String.valueOf(issuesEvents));
+        query.append("merge_request_events", String.valueOf(mergeRequestEvents));
+        query.append("note_events", String.valueOf(noteEvents));
+        query.append("tag_push_events", String.valueOf(tagPushEvents));
+        query.append("enable_ssl_verification", String.valueOf(sslVerification));
+        query.append("job_events", String.valueOf(jobEvents));
+        query.append("pipeline_events", String.valueOf(pipelineEvents));
+        query.append("wiki_page_events", String.valueOf(wikiPageEvents));
+        query.append("token", token);
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId + query.toString();
         return retrieve().method(PUT).to(tailUrl, GitlabProjectHook.class);
+    }
+
+    public GitlabProjectHook editProjectHook(GitlabProject project, GitlabProjectHook projectHook, String token) throws IOException {
+        return editProjectHook(project, projectHook.getId(), projectHook.getUrl(), projectHook.getPushEvents(),
+            projectHook.getIssueEvents(), projectHook.isMergeRequestsEvents(), projectHook.isNoteEvents(),
+            projectHook.isTagPushEvents(), projectHook.isSslVerificationEnabled(), projectHook.isJobEvents(),
+            projectHook.isWikiPageEvents(), projectHook.isPipelineEvents(), token);
     }
 
     public void deleteProjectHook(GitlabProjectHook hook) throws IOException {
@@ -3969,7 +3997,7 @@ public class GitlabAPI {
      * @param before If not null, include only events created before a particular date.
      * @param after If not null, include only events created before a
      * particular date.
-     * @param sort If null, uses the server's default, which is "desc"
+     * @param sortOrder If null, uses the server's default, which is "desc"
      */
     public List<GitlabEvent> getEvents(GitlabProject project,
                                        GitlabEvent.ActionType action,
@@ -3990,7 +4018,7 @@ public class GitlabAPI {
      * @param before If not null, include only events created before a particular date.
      * @param after If not null, include only events created before a
      * particular date.
-     * @param sort If null, uses the server's default, which is "desc"
+     * @param sortOrder If null, uses the server's default, which is "desc"
      */
     public List<GitlabEvent> getEvents(GitlabProject project,
                                        GitlabEvent.ActionType action,
