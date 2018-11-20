@@ -3320,6 +3320,19 @@ public class GitlabAPI {
     }
 
     /**
+     * Get a single repository tag in a specific project
+     *
+     * @param project (required) The ID or URL-encoded path of the project
+     * @param tagName (required) The name of the tag
+     * @return the found git tag object
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabTag getTag(GitlabProject project, String tagName) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabTag.URL + "/" + tagName;
+        return retrieve().to(tailUrl, GitlabTag.class);
+    }
+
+    /**
      * Create tag in specific project
      *
      * @param projectId
