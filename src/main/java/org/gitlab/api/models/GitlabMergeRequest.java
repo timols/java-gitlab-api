@@ -251,7 +251,7 @@ public class GitlabMergeRequest {
         this.labels = labels;
     }
 
-    public int getUpvotes() {
+    public Integer getUpvotes() {
         return upvotes;
     }
 
@@ -259,7 +259,7 @@ public class GitlabMergeRequest {
         this.upvotes = upvotes;
     }
 
-    public int getDownvotes() {
+    public Integer getDownvotes() {
         return downvotes;
     }
 
@@ -352,7 +352,7 @@ public class GitlabMergeRequest {
         return shouldRemoveSourceBranch;
     }
 
-    public boolean isForceRemoveSourceBranch() {
+    public Boolean isForceRemoveSourceBranch() {
         return forceRemoveSourceBranch;
     }
 
