@@ -3275,7 +3275,7 @@ public class GitlabAPI {
 
     private String sanitizePath(String branch) {
         try {
-            return URLEncoder.encode(branch, "UTF-8");
+            return URLEncoder.encode(branch, "UTF-8").replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException((e));
         }
