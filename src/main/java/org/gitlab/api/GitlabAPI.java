@@ -1519,7 +1519,7 @@ public class GitlabAPI {
         API_NAMESPACE = version;
     }
 
-  /**
+    /**
      * Cherry picks a commit.
      *
      * @param projectId        The id of the project
