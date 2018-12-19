@@ -36,7 +36,7 @@ public class GitlabAPI {
 
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    private static final String API_NAMESPACE = "/api/v4";
+    private static String API_NAMESPACE = "/api/v4";
     private static final String PARAM_SUDO = "sudo";
     private static final String PARAM_MAX_ITEMS_PER_PAGE = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).toString();
 
@@ -377,7 +377,7 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
-    
+
     /**
      * Create a new ssh key for the authenticated user.
      *
@@ -632,7 +632,7 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabGroup.class);
     }
-	
+
 	/**
      * Creates a Group
      *
@@ -1513,6 +1513,13 @@ public class GitlabAPI {
     }
 
     /**
+     * Set the namespace of gitlab rest api.
+     */
+    public static void setApiNamespace(String version) {
+        API_NAMESPACE = version;
+    }
+
+  /**
      * Cherry picks a commit.
      *
      * @param projectId        The id of the project
