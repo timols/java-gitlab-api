@@ -7,7 +7,7 @@ public class GitlabTag {
     public final static String URL = "/repository/tags";
 
     @JsonProperty("commit")
-    private GitlabBranchCommit commit;
+    private GitlabCommit commit;
 
     @JsonProperty("release")
     private GitlabRelease release;
@@ -18,11 +18,11 @@ public class GitlabTag {
     @JsonProperty("message")
     private String message;
 
-    public GitlabBranchCommit getCommit() {
+    public GitlabCommit getCommit() {
         return commit;
     }
 
-    public void setCommit(GitlabBranchCommit commit) {
+    public void setCommit(GitlabCommit commit) {
         this.commit = commit;
     }
 
