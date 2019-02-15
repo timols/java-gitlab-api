@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class GitlabAPIIT {
     }
 
     @Test
-    public void testAllProjects() {
+    public void testAllProjects() throws IOException {
         assertThat(api.getAllProjects(), is(notNullValue()));
     }
 
@@ -229,7 +230,7 @@ public class GitlabAPIIT {
      * There is at least one namespace for the user
      */
     @Test
-    public void testGetNamespace() {
+    public void testGetNamespace() throws IOException {
         final List<GitlabNamespace> gitlabNamespaces = api.getNamespaces();
         assertThat(gitlabNamespaces, not(nullValue()));
         assertThat(gitlabNamespaces.isEmpty(), is(false));
