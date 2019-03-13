@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.net.*;
 import java.util.*;
@@ -188,7 +189,7 @@ public class GitlabHTTPRequestor {
                 try {
                     url = root.getAPIUrl(tailApiUrl);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new UncheckedIOException(e);
                 }
             }
 
@@ -240,7 +241,7 @@ public class GitlabHTTPRequestor {
                         handleAPIError(e, connection);
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new UncheckedIOException(e);
                 }
             }
 
