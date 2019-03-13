@@ -36,7 +36,8 @@ public class GitlabAPI {
 
     public static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    private static final String API_NAMESPACE = "/api/v4";
+
+    private static final String DEFAULT_API_NAMESPACE = "/api/v4";
     private static final String PARAM_SUDO = "sudo";
     private static final String PARAM_MAX_ITEMS_PER_PAGE = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).toString();
 
@@ -45,6 +46,7 @@ public class GitlabAPI {
     private final String apiToken;
     private final TokenType tokenType;
     private AuthMethod authMethod;
+    private final String apiNamespace;
     private boolean ignoreCertificateErrors = false;
     private Proxy proxy;
     private int defaultTimeout = 0;
@@ -52,16 +54,21 @@ public class GitlabAPI {
     private int connectionTimeout = defaultTimeout;
     private String userAgent = GitlabAPI.class.getCanonicalName() + "/" + System.getProperty("java.version");
 
-    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
+    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method, String apiNamespace) {
         this.hostUrl = hostUrl.endsWith("/") ? hostUrl.replaceAll("/$", "") : hostUrl;
         this.apiToken = apiToken;
         this.tokenType = tokenType;
         this.authMethod = method;
+        this.apiNamespace = apiNamespace;
+    }
+
+    private GitlabAPI(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
+        this(hostUrl, apiToken, tokenType, method, DEFAULT_API_NAMESPACE);
     }
 
     public static GitlabSession connect(String hostUrl, String username, String password) throws IOException {
         String tailUrl = GitlabSession.URL;
-        GitlabAPI api = connect(hostUrl, null, null, null);
+        GitlabAPI api = connect(hostUrl, null, null, (AuthMethod) null);
         return api.dispatch().with("login", username).with("password", password)
                 .to(tailUrl, GitlabSession.class);
     }
@@ -76,6 +83,14 @@ public class GitlabAPI {
 
     public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method) {
         return new GitlabAPI(hostUrl, apiToken, tokenType, method);
+    }
+
+    public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType, String apiNamespace) {
+        return new GitlabAPI(hostUrl, apiToken, tokenType, AuthMethod.HEADER, apiNamespace);
+    }
+
+    public static GitlabAPI connect(String hostUrl, String apiToken, TokenType tokenType, AuthMethod method, String apiNamespace) {
+        return new GitlabAPI(hostUrl, apiToken, tokenType, method, apiNamespace);
     }
 
     public GitlabAPI ignoreCertificateErrors(boolean ignoreCertificateErrors) {
@@ -159,7 +174,7 @@ public class GitlabAPI {
         if (!tailAPIUrl.startsWith("/")) {
             tailAPIUrl = "/" + tailAPIUrl;
         }
-        return new URL(hostUrl + API_NAMESPACE + tailAPIUrl);
+        return new URL(hostUrl + apiNamespace + tailAPIUrl);
     }
 
     public URL getUrl(String tailAPIUrl) throws IOException {
@@ -377,7 +392,7 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabSSHKey.class);
     }
-    
+
     /**
      * Create a new ssh key for the authenticated user.
      *
@@ -632,7 +647,7 @@ public class GitlabAPI {
 
         return dispatch().to(tailUrl, GitlabGroup.class);
     }
-	
+
 	/**
      * Creates a Group
      *
