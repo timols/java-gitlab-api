@@ -87,7 +87,7 @@ public class GitlabMergeRequest {
     private Boolean squash;
 
     @JsonProperty("changes_count")
-    private Integer changesCount;
+    private String changesCount;
 
     @JsonProperty("merged_by")
     private GitlabUser mergedBy;
@@ -360,7 +360,7 @@ public class GitlabMergeRequest {
         return squash;
     }
 
-    public Integer getChangesCount() {
+    public String getChangesCount() {
         return changesCount;
     }
 
