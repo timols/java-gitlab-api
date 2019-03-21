@@ -1995,7 +1995,7 @@ public class GitlabAPI {
 
     public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
                                          String branchOrTag) throws IOException {
-        return getCommits(projectId, null, branchOrTag, null);
+        return getCommits(projectId, pagination, branchOrTag, null);
     }
 
     public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination,
