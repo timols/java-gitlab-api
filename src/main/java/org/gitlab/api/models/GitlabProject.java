@@ -131,6 +131,9 @@ public class GitlabProject {
     @JsonProperty("import_status")
     private String importStatus;
 
+    @JsonProperty("initialize_with_readme")
+    private Boolean initializeWithReadme;
+    
     public Integer getId() {
         return id;
     }
@@ -474,8 +477,16 @@ public class GitlabProject {
     public void setPrintingMergeRequestLinkEnabled(Boolean printingMergeRequestLinkEnabled) {
         this.printingMergeRequestLinkEnabled = printingMergeRequestLinkEnabled;
     }
+    
+    public Boolean isInitializeWithReadme() {
+		return initializeWithReadme;
+	}
 
-    @Override
+	public void setInitializeWithReadme(Boolean initializeWithReadme) {
+		this.initializeWithReadme = initializeWithReadme;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -497,4 +508,6 @@ public class GitlabProject {
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         return result;
     }
+
+
 }
