@@ -977,6 +977,29 @@ public class GitlabAPI {
     }
 
     /**
+     * Get a project's pipeline
+     *
+     * @param project the project
+     * @param pipeline the pipeline
+     * @return The project pipeline
+     */
+    public GitlabPipeline getProjectPipeline(GitlabProject project, GitlabPipeline pipeline) throws IOException {
+        return getProjectPipeline(project.getId(), pipeline.getId());
+    }
+
+    /**
+     * Get a project's pipeline
+     *
+     * @param projectId the project id
+     * @param pipelineId the pipeline id
+     * @return The project pipeline
+     */
+    public GitlabPipeline getProjectPipeline(Integer projectId, Integer pipelineId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.URL + sanitizeId(pipelineId, "pipelineId");
+        return retrieve().to(tailUrl, GitlabPipeline.class);
+    }
+
+    /**
      * Gets a list of a project's jobs in Gitlab
      *
      * @param project the project
