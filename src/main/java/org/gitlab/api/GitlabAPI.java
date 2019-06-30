@@ -995,7 +995,7 @@ public class GitlabAPI {
      * @return The project pipeline
      */
     public GitlabPipeline getProjectPipeline(Integer projectId, Integer pipelineId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.URL + sanitizeId(pipelineId, "pipelineId");
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.URL + "/" + sanitizeId(pipelineId, "pipelineId");
         return retrieve().to(tailUrl, GitlabPipeline.class);
     }
 
