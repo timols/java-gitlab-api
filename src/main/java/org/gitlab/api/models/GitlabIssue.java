@@ -42,7 +42,7 @@ public class GitlabIssue {
     private Integer downVotes;
 
     @JsonProperty("due_date")
-    private LocalDate dueDate;
+    private Date dueDate;
 
     private Boolean confidential;
 
