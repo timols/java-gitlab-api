@@ -9,6 +9,9 @@ import java.time.Instant;
 public class GitlabPipeline {
     public static final String URL = "/pipelines";
 
+    public static final String CREATE_URL = "/pipeline";
+
+
     @JsonProperty("id")
     private Integer id;
 

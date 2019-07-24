@@ -1022,6 +1022,33 @@ public class GitlabAPI {
 
 
     /**
+     * Run pipeline for selected project and branch
+     * @param project project
+     * @param ref branch
+     * @param variables pipeline variables
+     * @return Created pipeline
+     * @throws IOException
+     */
+    public GitlabPipeline runPipeline(GitlabProject project, String ref, List<GitlabBuildVariable> variables) throws IOException {
+        return runPipeline(project.getId(), ref, variables);
+    }
+
+
+    /**
+     * Run pipeline for selected project and branch
+     * @param projectId project's id
+     * @param ref branch
+     * @param variables pipeline variables
+     * @return Created pipeline
+     * @throws IOException
+     */
+    public GitlabPipeline runPipeline(Integer projectId, String ref, List<GitlabBuildVariable> variables) throws IOException {
+        Query query = new Query().appendIf("ref", ref);
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.CREATE_URL + query.toString();
+        return dispatch().with("variables", variables).to(tailUrl, GitlabPipeline.class);
+    }
+
+    /**
      * Gets a list of project's jobs of the given pipeline in Gitlab
      *
      * @param project    the project
