@@ -1339,14 +1339,28 @@ public class GitlabAPI {
     /**
      * @param namespace The namespace of the fork
      * @param projectId ProjectId of the project forked
+     * @param path The path that will be assigned to the resultant project after forking. (Optional)
+     * @param name The name that will be assigned to the resultant project after forking. (Optional)
+     * @return The new Gitlab Project
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabProject createFork(String namespace, Integer projectId, String path, String name) throws IOException {
+        Query query = new Query()
+            .appendIf("namespace", namespace)
+            .appendIf("path", path)
+            .appendIf("name", name);
+        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork" + query.toString();
+        return dispatch().to(tailUrl, GitlabProject.class);
+    }
+
+    /**
+     * @param namespace The namespace of the fork
+     * @param projectId ProjectId of the project forked
      * @return The new Gitlab Project
      * @throws IOException on gitlab api call error
      */
     public GitlabProject createFork(String namespace, Integer projectId) throws IOException {
-        Query query = new Query()
-                .appendIf("namespace", namespace);
-        String tailUrl = GitlabProject.URL + "/" + projectId + "/fork" + query.toString();
-        return dispatch().to(tailUrl, GitlabProject.class);
+        return createFork(namespace, projectId, null, null);
     }
 
     /**
