@@ -1168,7 +1168,7 @@ public class GitlabAPI {
                 .appendIf("repository_storage", project.getRepositoryStorage())
                 .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge())
                 .appendIf("printing_merge_request_link_enabled", project.isPrintingMergeRequestLinkEnabled())
-        		.appendIf("initialize_with_readme",project.isInitializeWithReadme());
+        	.appendIf("initialize_with_readme",project.isInitializeWithReadme());
 
         GitlabNamespace namespace = project.getNamespace();
         if (namespace != null) {
