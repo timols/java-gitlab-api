@@ -14,6 +14,13 @@ public class GitlabBuildVariable {
     public GitlabBuildVariable(String key, String value) {
         this.key = key;
         this.value = value;
+        this.variableType = VariableType.env_var;
+    }
+
+    public GitlabBuildVariable(String key, String value, VariableType variableType) {
+        this.key = key;
+        this.value = value;
+        this.variableType = variableType;
     }
 
     @JsonProperty("key")
@@ -21,6 +28,9 @@ public class GitlabBuildVariable {
 
     @JsonProperty("value")
     private String value;
+
+    @JsonProperty("variable_type")
+    private VariableType variableType;
 
     public String getKey() {
         return key;
@@ -37,4 +47,18 @@ public class GitlabBuildVariable {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public VariableType getVariableType() {
+        return variableType;
+    }
+
+    public void setVariableType(VariableType variableType) {
+        this.variableType = variableType;
+    }
+
+    public enum VariableType {
+        env_var,
+        file
+    }
+
 }
