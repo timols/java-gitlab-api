@@ -56,10 +56,6 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 
 artifacts { archives sourcesJar }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = "4.6"
-}
-
 test {
     useJUnitPlatform {
         includeEngines 'junit-jupiter'
