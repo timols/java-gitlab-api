@@ -479,11 +479,11 @@ public class GitlabProject {
     }
 
     public Boolean isInitializeWithReadme() {
-	    return initializeWithReadme;
+	return initializeWithReadme;
     }
 
     public void setInitializeWithReadme(Boolean initializeWithReadme) {
-		this.initializeWithReadme = initializeWithReadme;
+	this.initializeWithReadme = initializeWithReadme;
     }
 
     @Override
