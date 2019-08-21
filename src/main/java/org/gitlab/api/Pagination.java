@@ -1,48 +1,44 @@
 package org.gitlab.api;
 
 import org.gitlab.api.http.Query;
+import org.gitlab.api.query.PaginationQuery;
 
-import java.io.UnsupportedEncodingException;
+/**
+ * @deprecated Use {@link PaginationQuery#PARAM_PAGE} instead.
+ */
+@Deprecated
+public class Pagination extends PaginationQuery {
 
-public class Pagination {
-    public static final String PARAM_PAGE = "page";
-    public static final String PARAM_PER_PAGE = "per_page";
-    public static final int MAX_ITEMS_PER_PAGE = 100;
-    private final Query paginationQuery = new Query();
+    /**
+     * @deprecated Use {@link PaginationQuery#PARAM_PAGE} instead.
+     */
+    @Deprecated
+    public static final String PARAM_PAGE = PaginationQuery.PARAM_PAGE;
 
-    public void setPage(int page) {
-        try {
-            paginationQuery.append(PARAM_PAGE, String.valueOf(page));
-        } catch (UnsupportedEncodingException ignored) {
-        }
-    }
+    /**
+      @deprecated Use {@link PaginationQuery#PARAM_PER_PAGE} instead.
+     */
+    @Deprecated
+    public static final String PARAM_PER_PAGE = PaginationQuery.PARAM_PER_PAGE;
 
-    public void setPerPage(int perPage) {
-        if (perPage > MAX_ITEMS_PER_PAGE) {
-            throw new IllegalArgumentException("Max value for perPage is " + MAX_ITEMS_PER_PAGE);
-        }
-        try {
-            paginationQuery.append(PARAM_PER_PAGE, String.valueOf(perPage));
-        } catch (UnsupportedEncodingException ignored) {
-        }
-    }
-    
+    /**
+      @deprecated Use {@link PaginationQuery#MAX_ITEMS_PER_PAGE} instead.
+     */
+    @Deprecated
+    public static final int MAX_ITEMS_PER_PAGE = PaginationQuery.MAX_ITEMS_PER_PAGE;
+
     public Pagination withPage(int page) {
         setPage(page);
         return this;
     }
-    
+
     public Pagination withPerPage(int perPage) {
         setPerPage(perPage);
         return this;
     }
 
     public Query asQuery() {
-        return paginationQuery;
+        return this;
     }
 
-    @Override
-    public String toString() {
-        return paginationQuery.toString();
-    }
 }
