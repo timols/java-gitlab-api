@@ -42,6 +42,7 @@ public class GitlabAPI {
 
     private static final String DEFAULT_API_NAMESPACE = "/api/v4";
     private static final String PARAM_SUDO = "sudo";
+    private static final String PARAM_WITH_PROJECTS = "with_projects";
     private static final String PARAM_MAX_ITEMS_PER_PAGE = new Pagination().withPerPage(Pagination.MAX_ITEMS_PER_PAGE).toString();
 
     private final String hostUrl;
@@ -467,8 +468,24 @@ public class GitlabAPI {
         return getGroup(groupId.toString());
     }
 
+    public GitlabGroup getGroupWithoutProjects(Integer groupId) throws IOException {
+        return getGroupWithoutProjects(groupId.toString());
+    }
+
     /**
-     * Get a group by path
+     * Get a group by path.  Don't include the projects.
+     *
+     * @param path Path of the group
+     * @return {@link GitlabGroup} object
+     *
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup getGroupWithoutProjects(String path) throws IOException {
+        return getGroup(path, false);
+    }
+
+    /**
+     * Get a group by path, including its projects.
      *
      * @param path Path of the group
      * @return {@link GitlabGroup} object
@@ -476,8 +493,24 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabGroup getGroup(String path) throws IOException {
+        return getGroup(path, true);
+    }
+
+    /**
+     * Get a group by path
+     *
+     * @param path Path of the group
+     * @param withProjects If true, include the projects
+     * @return {@link GitlabGroup} object
+     *
+     * @throws IOException on gitlab api call error
+     */
+    public GitlabGroup getGroup(String path, boolean withProjects) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + URLEncoder.encode(path, "UTF-8");
-        return retrieve().to(tailUrl, GitlabGroup.class);
+        Query query = new Query()
+	    .append(PARAM_WITH_PROJECTS, "" + withProjects);
+
+        return retrieve().to(tailUrl + query.toString(), GitlabGroup.class);
     }
 
     public List<GitlabGroup> getGroups() throws IOException {
