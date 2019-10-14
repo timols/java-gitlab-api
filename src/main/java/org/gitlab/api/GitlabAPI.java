@@ -2125,13 +2125,9 @@ public class GitlabAPI {
             projectId = mergeRequest.getProjectId();
         }
 
-        Query query = new Query()
-                .append("ref_name", mergeRequest.getSourceBranch());
-
-        query.mergeWith(pagination.asQuery());
-
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
-                "/repository" + GitlabCommit.URL + query.toString();
+                GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
+                GitlabCommit.URL + pagination.toString();
 
         GitlabCommit[] commits = retrieve().to(tailUrl, GitlabCommit[].class);
         return Arrays.asList(commits);
