@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ class InstantDeserializerTest {
         assertEquals(Instant.from(
             ZonedDateTime.of(
                 LocalDate.of(2016, 8, 11),
-                LocalTime.of(11, 28, 34, 85),
+                LocalTime.of(11, 28, 34, (int) TimeUnit.MILLISECONDS.toNanos(85)),
                 ZoneOffset.UTC
             )
         ), instant);
