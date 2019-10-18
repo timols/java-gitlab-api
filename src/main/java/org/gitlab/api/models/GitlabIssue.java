@@ -47,7 +47,7 @@ public class GitlabIssue {
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonProperty("due_date")
-    private LocalDate dueDate;
+    private Date dueDate;
 
     private Boolean confidential;
 
@@ -174,11 +174,11 @@ public class GitlabIssue {
         this.downVotes = downVotes;
     }
 
-    public LocalDate getDueDate() {
+    public Date getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 
