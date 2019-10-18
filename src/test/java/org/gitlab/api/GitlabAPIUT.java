@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 
@@ -23,8 +24,8 @@ public class GitlabAPIUT {
     public void unitTest_20180503175711() {
         GitlabAPI api = GitlabAPI.connect("http://172.16.0.0:80", "test");
         api.setConnectionTimeout(100);
-        Throwable exception = assertThrows(SocketTimeoutException.class, api::getVersion);
-        assertThat(exception.getMessage(), is("connect timed out"));
+        Throwable exception = assertThrows(NoRouteToHostException.class, api::getVersion);
+        assertThat(exception.getMessage(), is("No route to host"));
     }
 
     @Test
