@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "org.gitlab"
-version = "4.0.1-SNAPSHOT"
+version = "4.1.2-SNAPSHOT"
 
 repositories {
     mavenLocal()
