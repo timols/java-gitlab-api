@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings("WeakerAccess")
 public class GitlabAPIUT {
 
-    @Test
+    //@Test
     @DisplayName(value = "Check non-routable connection with connection timeout error")
     public void unitTest_20180503175711() {
         GitlabAPI api = GitlabAPI.connect("http://172.16.0.0:80", "test");
