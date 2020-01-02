@@ -134,6 +134,9 @@ public class GitlabProject {
     @JsonProperty("initialize_with_readme")
     private Boolean initializeWithReadme;
 
+    @JsonProperty("merge_method")
+    private String mergeMethod;
+
     public Integer getId() {
         return id;
     }
@@ -485,8 +488,15 @@ public class GitlabProject {
     public void setInitializeWithReadme(Boolean initializeWithReadme) {
 	this.initializeWithReadme = initializeWithReadme;
     }
+	public String getMergeMethod() {
+		return mergeMethod;
+	}
 
-    @Override
+	public void setMergeMethod(String mergeMethod) {
+		this.mergeMethod = mergeMethod;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
