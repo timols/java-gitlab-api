@@ -1,9 +1,9 @@
 package org.gitlab.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GitlabMergeRequest {
     public static final String URL = "/merge_requests";
@@ -20,6 +20,7 @@ public class GitlabMergeRequest {
     private boolean merged;
     private GitlabUser author;
     private GitlabUser assignee;
+    private List<GitlabUser> assignees;
     private GitlabMilestone milestone;
 
     private String[] labels;
@@ -221,6 +222,14 @@ public class GitlabMergeRequest {
 
     public void setAssignee(GitlabUser assignee) {
         this.assignee = assignee;
+    }
+
+    public List<GitlabUser> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<GitlabUser> assignees) {
+        this.assignees = assignees;
     }
 
     public String getState() {
