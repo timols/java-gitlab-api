@@ -1087,6 +1087,18 @@ public class GitlabAPI {
     }
 
     /**
+     * Get the first page of project's pipelines in Gitlab.
+     *
+     * @param projectId the project id
+     * @return A list of project pipelines
+     */
+    public List<GitlabPipeline> getFirstProjectPipelinePage(Integer projectId, PipelinesQuery pipelinesQuery) {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabPipeline.URL + pipelinesQuery;
+        return retrieve().getFirstPage(tailUrl, GitlabPipeline[].class);
+    }
+
+
+    /**
      * Gets a list of a project's jobs in Gitlab
      *
      * @param project the project
