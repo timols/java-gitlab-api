@@ -2523,14 +2523,12 @@ public class GitlabAPI {
 
     public List<GitlabProjectHook> getProjectHooks(Serializable projectId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabProjectHook.URL;
-        GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
-        return Arrays.asList(hooks);
+        return retrieve().getAll(tailUrl, GitlabProjectHook[].class);
     }
 
     public List<GitlabProjectHook> getProjectHooks(GitlabProject project) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL;
-        GitlabProjectHook[] hooks = retrieve().to(tailUrl, GitlabProjectHook[].class);
-        return Arrays.asList(hooks);
+        return retrieve().getAll(tailUrl, GitlabProjectHook[].class);
     }
 
     public GitlabProjectHook getProjectHook(GitlabProject project, String hookId) throws IOException {
