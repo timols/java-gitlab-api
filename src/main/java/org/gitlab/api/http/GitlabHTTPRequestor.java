@@ -173,6 +173,17 @@ public class GitlabHTTPRequestor {
         return results;
     }
 
+    public <T> List<T> getFirstPage(final String tailUrl, final Class<T[]> type) {
+        Iterator<T[]> iterator = asIterator(tailUrl, type);
+        if (iterator.hasNext()) {
+            T[] requests = iterator.next();
+            if (requests.length > 0) {
+                return Arrays.asList(requests);
+            }
+        }
+        return new ArrayList<>();
+    }
+
     public <T> Iterator<T> asIterator(final String tailApiUrl, final Class<T> type) {
         method(GET); // Ensure we only use iterators for GET requests
 
