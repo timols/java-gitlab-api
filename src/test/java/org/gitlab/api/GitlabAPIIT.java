@@ -269,13 +269,18 @@ public class GitlabAPIIT {
                 false,
                 false);
 
+<<<<<<< HEAD
+=======
+        String namespace = api.getNamespaces().get(0).getPath();
+>>>>>>> upstream/master
 
         GitlabProject project = api.createUserProject(gitUser.getId(), projectName);
-        GitlabProject fork = api.createFork(api.getNamespaces().get(0).getPath(), project);
+        GitlabProject fork = api.createFork(namespace, project);
 
         assertNotNull(fork);
 
         assertEquals(project.getId(), fork.getForkedFrom().getId());
+        assertEquals(project.getNamespace(), namespace);
 
         api.deleteProject(project.getId());
         api.deleteProject(fork.getId());

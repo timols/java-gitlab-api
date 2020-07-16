@@ -2,8 +2,12 @@ package org.gitlab.api.models;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GitlabIssue {
 
     public enum Action {
@@ -29,6 +33,30 @@ public class GitlabIssue {
     private GitlabUser assignee;
     private GitlabUser author;
 
+<<<<<<< HEAD
+=======
+    @JsonProperty("user_notes_count")
+    private Integer userNotesCount;
+
+    @JsonProperty("upvotes")
+    private Integer upVotes;
+
+    @JsonProperty("downvotes")
+    private Integer downVotes;
+
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonProperty("due_date")
+    private LocalDate dueDate;
+
+    private Boolean confidential;
+
+    @JsonProperty("discussion_locked")
+    private Boolean discussionLocked;
+
+    @JsonProperty("time_stats")
+    private GitlabIssueTimeStats timeStats;
+
+>>>>>>> upstream/master
     private String state;
 
     @JsonProperty("updated_at")

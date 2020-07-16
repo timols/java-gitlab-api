@@ -125,8 +125,14 @@ public class GitlabProject {
     @JsonProperty("forked_from_project")
     private GitlabProject forkedFrom;
 
-    @JsonProperty("is_printing_merge_request_link_enabled")
+    @JsonProperty("printing_merge_request_link_enabled")
     private Boolean printingMergeRequestLinkEnabled;
+
+    @JsonProperty("import_status")
+    private String importStatus;
+
+    @JsonProperty("initialize_with_readme")
+    private Boolean initializeWithReadme;
 
     public Integer getId() {
         return id;
@@ -470,6 +476,14 @@ public class GitlabProject {
 
     public void setPrintingMergeRequestLinkEnabled(Boolean printingMergeRequestLinkEnabled) {
         this.printingMergeRequestLinkEnabled = printingMergeRequestLinkEnabled;
+    }
+
+    public Boolean isInitializeWithReadme() {
+	return initializeWithReadme;
+    }
+
+    public void setInitializeWithReadme(Boolean initializeWithReadme) {
+	this.initializeWithReadme = initializeWithReadme;
     }
 
     @Override

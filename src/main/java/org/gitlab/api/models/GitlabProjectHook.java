@@ -25,12 +25,24 @@ public class GitlabProjectHook {
 
     @JsonProperty("tag_push_events")
     private boolean tagPushEvents;
-    
+
     @JsonProperty("created_at")
     private Date createdAt;
 
     @JsonProperty("enable_ssl_verification")
     private boolean sslVerificationEnabled;
+
+    @JsonProperty("note_events")
+    private boolean noteEvents;
+
+    @JsonProperty("job_events")
+    private boolean jobEvents;
+
+    @JsonProperty("pipeline_events")
+    private boolean pipelineEvents;
+
+    @JsonProperty("wiki_page_events")
+    private boolean wikiPageEvents;
 
     public String getId() {
         return id;
@@ -80,15 +92,14 @@ public class GitlabProjectHook {
         this.mergeRequestsEvents = mergeRequestsEvents;
     }
 
-    
     public boolean isTagPushEvents() {
     	return tagPushEvents;
     }
-    
+
     public void setTagPushEvents(boolean tagPushEvents) {
     	this.tagPushEvents = tagPushEvents;
     }
-    
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -105,4 +116,19 @@ public class GitlabProjectHook {
         this.sslVerificationEnabled = sslVerificationEnabled;
     }
 
+    public boolean isNoteEvents() { return noteEvents; }
+
+    public void setNoteEvents(boolean noteEvents) { this.noteEvents = noteEvents; }
+
+    public boolean isJobEvents() { return jobEvents; }
+
+    public void setJobEvents(boolean jobEvents) { this.jobEvents = jobEvents; }
+
+    public boolean isPipelineEvents() { return pipelineEvents; }
+
+    public void setPipelineEvents(boolean pipelineEvents) { this.pipelineEvents = pipelineEvents; }
+
+    public boolean isWikiPageEvents() { return wikiPageEvents; }
+
+    public void setWikiPageEvents(boolean wikiPageEvents) { this.wikiPageEvents = wikiPageEvents; }
 }

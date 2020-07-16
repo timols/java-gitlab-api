@@ -3,7 +3,7 @@ sudo: required
 services:
   - docker
 jdk:
-- oraclejdk8
+- openjdk8
 install:
 - ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip
 script:
