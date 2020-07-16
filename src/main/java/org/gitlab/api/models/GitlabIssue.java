@@ -1,6 +1,8 @@
 package org.gitlab.api.models;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,11 +32,10 @@ public class GitlabIssue {
     private String[] labels;
     private GitlabMilestone milestone;
 
+    private List<GitlabUser> assignees;
     private GitlabUser assignee;
     private GitlabUser author;
 
-<<<<<<< HEAD
-=======
     @JsonProperty("user_notes_count")
     private Integer userNotesCount;
 
@@ -56,7 +57,6 @@ public class GitlabIssue {
     @JsonProperty("time_stats")
     private GitlabIssueTimeStats timeStats;
 
->>>>>>> upstream/master
     private String state;
 
     @JsonProperty("updated_at")
@@ -64,6 +64,12 @@ public class GitlabIssue {
 
     @JsonProperty("created_at")
     private Date createdAt;
+
+    @JsonProperty("closed_at")
+    private Date closedAt;
+
+    @JsonProperty("web_url")
+    private String webUrl;
 
     public int getId() {
         return id;
@@ -121,6 +127,13 @@ public class GitlabIssue {
         this.milestone = milestone;
     }
 
+    public List<GitlabUser> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<GitlabUser> assignees) {
+        this.assignees = assignees;
+    }
     public GitlabUser getAssignee() {
         return assignee;
     }
@@ -135,6 +148,62 @@ public class GitlabIssue {
 
     public void setAuthor(GitlabUser author) {
         this.author = author;
+    }
+
+    public Integer getUserNotesCount() {
+        return userNotesCount;
+    }
+
+    public void setUserNotesCount(Integer userNotesCount) {
+        this.userNotesCount = userNotesCount;
+    }
+
+    public Integer getUpVotes() {
+        return upVotes;
+    }
+
+    public void setUpVotes(Integer upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public Integer getDownVotes() {
+        return downVotes;
+    }
+
+    public void setDownVotes(Integer downVotes) {
+        this.downVotes = downVotes;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Boolean getConfidential() {
+        return confidential;
+    }
+
+    public void setConfidential(Boolean confidential) {
+        this.confidential = confidential;
+    }
+
+    public Boolean getDiscussionLocked() {
+        return discussionLocked;
+    }
+
+    public void setDiscussionLocked(Boolean discussionLocked) {
+        this.discussionLocked = discussionLocked;
+    }
+
+    public GitlabIssueTimeStats getTimeStats() {
+        return timeStats;
+    }
+
+    public void setTimeStats(GitlabIssueTimeStats timeStats) {
+        this.timeStats = timeStats;
     }
 
     public String getState() {

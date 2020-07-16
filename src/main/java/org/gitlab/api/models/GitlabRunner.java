@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 public class GitlabRunner {
+    public static final String URL = "/runners";
+
     public enum RunnerScope {
         SPECIFIC("specific"),
         SHARED("shared"),
@@ -54,7 +56,10 @@ public class GitlabRunner {
     private String architecture;
     @JsonProperty("projects")
     private List<GitlabProject> projects;
-
+    @JsonProperty("online")
+    private Boolean online;
+    @JsonProperty("status")
+    private String status;
 
     public Integer getId() {
         return this.id;
@@ -161,4 +166,19 @@ public class GitlabRunner {
         this.architecture = architecture;
     }
 
+    public Boolean getOnline() {
+        return this.online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
