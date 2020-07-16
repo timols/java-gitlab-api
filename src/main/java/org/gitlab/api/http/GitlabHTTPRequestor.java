@@ -159,18 +159,22 @@ public class GitlabHTTPRequestor {
         }
     }
 
-    public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
-        List<T> results = new ArrayList<>();
-        Iterator<T[]> iterator = asIterator(tailUrl, type);
+    public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) throws IOException {
+        try {
+            List<T> results = new ArrayList<>();
+            Iterator<T[]> iterator = asIterator(tailUrl, type);
 
-        while (iterator.hasNext()) {
-            T[] requests = iterator.next();
+            while (iterator.hasNext()) {
+                T[] requests = iterator.next();
 
-            if (requests.length > 0) {
-                results.addAll(Arrays.asList(requests));
+                if (requests.length > 0) {
+                    results.addAll(Arrays.asList(requests));
+                }
             }
+            return results;
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
-        return results;
     }
 
     public <T> Iterator<T> asIterator(final String tailApiUrl, final Class<T> type) {
