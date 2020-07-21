@@ -232,11 +232,21 @@ public class GitlabHTTPRequestor {
                 }
 
                 try {
+
                     HttpURLConnection connection = setupConnection(url);
+                    String totalPages = connection.getHeaderField("X-Total-Pages");
+                    String currentPage = connection.getHeaderField("X-Page");
+
                     try {
                         next = parse(connection, type, null);
                         assert next != null;
-                        findNextUrl();
+                        
+                        if(totalPages != null && totalPages.equals(currentPage)) {
+                            url = null;
+                        } else {
+                            findNextUrl();
+                        }
+                        
                     } catch (IOException e) {
                         handleAPIError(e, connection);
                     }
