@@ -238,13 +238,15 @@ public class GitlabHTTPRequestor {
                     String currentPage = connection.getHeaderField("X-Page");
 
                     try {
-
-                        if(totalPages == null || !totalPages.equals(currentPage)) {
-                            next = parse(connection, type, null);
-                            assert next != null;
+                        next = parse(connection, type, null);
+                        assert next != null;
+                        
+                        if(totalPages != null && totalPages.equals(currentPage)) {
+                            url = null;
+                        } else {
                             findNextUrl();
                         }
-
+                        
                     } catch (IOException e) {
                         handleAPIError(e, connection);
                     }
