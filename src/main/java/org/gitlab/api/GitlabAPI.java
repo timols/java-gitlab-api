@@ -4252,4 +4252,18 @@ public class GitlabAPI {
 
         return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabEvent[].class));
     }
+    
+    /**
+     * Judge a group is exist or not
+     *
+     * @param path path of a group
+     */
+    public boolean isGroupNotExists(String path) throws IOException {
+        String tailUrl = GitlabGroup.URL;
+        Query query = new Query()
+                .append("search", path);
+        List<GitlabGroup> gitlabGroupList = retrieve().getAll(tailUrl + query.toString(), GitlabGroup[].class);
+        return gitlabGroupList.isEmpty();
+    }
+	
 }
