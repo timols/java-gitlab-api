@@ -1009,6 +1009,21 @@ public class GitlabAPI {
         return retrieve().getAll(tailUrl, GitlabNamespace[].class);
     }
 
+     /**
+     * Get a list of the namespaces of the authenticated user based on the search criteria.
+     * If the user is an administrator, a list of all namespaces in the GitLab instance is shown.
+     *
+     * @param search param to search
+     * @return A list of gitlab namespace
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabNamespace> getNamespaces(String search) throws IOException {
+        Query query = new Query()
+                .appendIf("search", search);
+        String tailUrl = GitlabNamespace.URL + query.toString();
+        return retrieve().getAll(tailUrl, GitlabNamespace[].class);
+    }	
+
     /**
      * Uploads a file to a project
      *
