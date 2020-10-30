@@ -16,6 +16,7 @@ import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.*;
@@ -43,6 +44,7 @@ public class GitlabHTTPRequestor {
     private final GitlabAPI root;
 
     private Method method = GET; // Default to GET requests
+    private Map<String, String> headers = new HashMap<>();
     private Map<String, Object> data = new HashMap<>();
     private Map<String, File> attachments = new HashMap<>();
 
@@ -86,8 +88,8 @@ public class GitlabHTTPRequestor {
      * Sets the HTTP Form Post parameters for the request
      * Has a fluent api for method chaining
      *
-     * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param key   Form parameter Key
+     * @param value Form parameter Value
      * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
@@ -96,13 +98,27 @@ public class GitlabHTTPRequestor {
         }
         return this;
     }
-    
+
+    /**
+     * Sets the Http header
+     *
+     * @param key   header name
+     * @param value header value
+     * @return this
+     */
+    public GitlabHTTPRequestor withHeader(String key, String value) {
+        if (value != null && key != null) {
+            headers.put(key, value);
+        }
+        return this;
+    }
+
     /**
      * Sets the HTTP Form Post parameters for the request
      * Has a fluent api for method chaining
      *
-     * @param key       Form parameter Key
-     * @param file      File data
+     * @param key  Form parameter Key
+     * @param file File data
      * @return this
      */
     public GitlabHTTPRequestor withAttachment(String key, File file) {
@@ -132,13 +148,29 @@ public class GitlabHTTPRequestor {
      * @throws java.io.IOException on gitlab api error
      */
     public <T> T to(String tailAPIUrl, Class<T> type, T instance) throws IOException {
+        return doRequest(root.getAPIUrl(tailAPIUrl), type, instance);
+    }
+
+    /**
+     * do connection
+     *
+     * @param url      url connecting to
+     * @param type     type of response to be deserialized
+     * @param instance The instance to update from the response
+     * @param <T>      The return type of the method
+     * @return An object of type T
+     * @throws IOException on gitlab api error
+     */
+    private <T> T doRequest(URL url, Class<T> type, T instance) throws IOException {
         HttpURLConnection connection = null;
         try {
-            connection = setupConnection(root.getAPIUrl(tailAPIUrl));
+            connection = setupConnection(url);
+            // add for oauth2
+            writeHeader(connection);
             if (hasAttachments()) {
                 submitAttachments(connection);
             } else if (hasOutput()) {
-                 submitData(connection);
+                submitData(connection);
             } else if (PUT.equals(method)) {
                 // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
                 connection.setDoOutput(true);
@@ -158,6 +190,13 @@ public class GitlabHTTPRequestor {
             }
         }
     }
+
+    private void writeHeader(HttpURLConnection connection) {
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            connection.setRequestProperty(header.getKey(), header.getValue());
+        }
+    }
+
 
     public <T> List<T> getAll(final String tailUrl, final Class<T[]> type) {
         List<T> results = new ArrayList<>();
@@ -301,17 +340,30 @@ public class GitlabHTTPRequestor {
             writer.append("--").append(boundary).append("--").append(CRLF).flush();
         }
     }
-    
+
     private void submitData(HttpURLConnection connection) throws IOException {
         connection.setDoOutput(true);
+        // add for oauth2 request
+        String contentType = headers.get("Content-Type");
+        if ("application/x-www-form-urlencoded; charset=utf-8".equals(contentType)) {
+            String formData = parseFormData(data);
+            connection.getOutputStream().write(formData.getBytes());
+            return;
+        }
         connection.setRequestProperty("Content-Type", "application/json");
         GitlabAPI.MAPPER.writeValue(connection.getOutputStream(), data);
+    }
+
+    private String parseFormData(Map<String, Object> data) {
+        List<String> kv = data.entrySet().stream()
+                .map(d -> String.format("%s=%s", d.getKey(), d.getValue())).collect(Collectors.toList());
+        return String.join("&", kv);
     }
 
     private boolean hasAttachments() {
         return !attachments.isEmpty();
     }
-    
+
     private boolean hasOutput() {
         return method.equals(POST) || method.equals(PUT) && !data.isEmpty();
     }
@@ -363,7 +415,7 @@ public class GitlabHTTPRequestor {
             }
             reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
             String json = IOUtils.toString(reader);
-            if (type != null && type == String.class) {
+            if (type == String.class) {
                 return type.cast(json);
             }
             if (type != null && type != Void.class) {
@@ -440,6 +492,7 @@ public class GitlabHTTPRequestor {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             // Added per https://github.com/timols/java-gitlab-api/issues/44
             HttpsURLConnection.setDefaultHostnameVerifier(nullVerifier);
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 }
