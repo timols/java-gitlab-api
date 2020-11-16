@@ -2532,7 +2532,11 @@ public class GitlabAPI {
     }
 
     public GitlabProjectHook getProjectHook(GitlabProject project, String hookId) throws IOException {
-        String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
+        return getProjectHook(project.getId(), hookId);
+    }
+
+    public GitlabProjectHook getProjectHook(Serializable projectId, String hookId) throws IOException {
+        String tailUrl = GitlabProject.URL + "/" + projectId + GitlabProjectHook.URL + "/" + hookId;
         return retrieve().to(tailUrl, GitlabProjectHook.class);
     }
 
