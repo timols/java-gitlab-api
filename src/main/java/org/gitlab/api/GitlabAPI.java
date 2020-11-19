@@ -1862,7 +1862,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion getDiscussion(GitlabMergeRequest mergeRequest,
-            int discussionId) throws IOException {
+            String discussionId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -2031,7 +2031,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion resolveDiscussion(GitlabMergeRequest mergeRequest,
-            int discussionId, boolean resolved) throws IOException {
+            String discussionId, boolean resolved) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -2051,7 +2051,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabNote addDiscussionNote(GitlabMergeRequest mergeRequest,
-            int discussionId, String body) throws IOException {
+            String discussionId, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId +
@@ -2071,7 +2071,7 @@ public class GitlabAPI {
      * @return The modified note object.
      * @throws IOException on a GitLab api call error
      */
-    public GitlabNote modifyDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId,
+    public GitlabNote modifyDiscussionNote(GitlabMergeRequest mergeRequest, String discussionId,
             int noteId, String body, Boolean resolved) throws IOException {
         boolean bodyHasValue = false;
         if (body != null && !body.isEmpty()) {
@@ -2100,7 +2100,7 @@ public class GitlabAPI {
      * @return The deleted note object.
      * @throws IOException on a GitLab api call error
      */
-    public void deleteDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId, int noteId) throws IOException {
+    public void deleteDiscussionNote(GitlabMergeRequest mergeRequest, String discussionId, int noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId +

@@ -20,6 +20,7 @@ public class GitlabMergeRequest {
     private boolean merged;
     private GitlabUser author;
     private GitlabUser assignee;
+    private List<GitlabUser> assignees;
     private GitlabMilestone milestone;
 
     private String[] labels;
@@ -221,6 +222,14 @@ public class GitlabMergeRequest {
 
     public void setAssignee(GitlabUser assignee) {
         this.assignee = assignee;
+    }
+
+    public List<GitlabUser> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(final List<GitlabUser> assignees) {
+        this.assignees = assignees;
     }
 
     public String getState() {
