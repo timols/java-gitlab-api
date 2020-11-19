@@ -52,7 +52,7 @@ public class GitlabDiscussion {
 	 * @return The notes contained in this discussion.
 	 */
 	public List<GitlabNote> getNotes() {
-		return Collections.unmodifiableList(notes);
+		return notes;
 	}
 
 	/**
