@@ -15,6 +15,7 @@ public class GitlabNote {
     private boolean system;
     private boolean upvote;
     private boolean downvote;
+    private GitlabNotePosition position;
 
     @JsonProperty("created_at")
     private Date createdAt;
@@ -81,5 +82,13 @@ public class GitlabNote {
 
     public void setDownvote(boolean downvote) {
         this.downvote = downvote;
+    }
+
+    public GitlabNotePosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(final GitlabNotePosition position) {
+        this.position = position;
     }
 }
