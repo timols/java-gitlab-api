@@ -20,6 +20,8 @@ public class GitlabMergeRequest {
     private boolean merged;
     private GitlabUser author;
     private GitlabUser assignee;
+    private List<GitlabUser> assignees;
+    private List<GitlabUser> reviewers;
     private GitlabMilestone milestone;
 
     private String[] labels;
@@ -285,6 +287,22 @@ public class GitlabMergeRequest {
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+    
+    public List<GitlabUser> getReviewers() {
+        return reviewers;
+    }
+
+    public void setReviewers(List<GitlabUser> reviewers) {
+        this.reviewers = reviewers;
+    }
+
+    public List<GitlabUser> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(List<GitlabUser> assignees) {
+        this.assignees = assignees;
     }
 
     public void setCreatedAt(Date createdAt) {
