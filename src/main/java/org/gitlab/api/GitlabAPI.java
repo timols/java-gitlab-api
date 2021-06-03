@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.http.Query;
 import org.gitlab.api.models.*;
+import org.gitlab.api.query.CommitsQuery;
 import org.gitlab.api.query.PaginationQuery;
 import org.gitlab.api.query.PipelinesQuery;
 import org.gitlab.api.query.ProjectsQuery;
@@ -253,7 +254,7 @@ public class GitlabAPI {
      * @param can_create_group     Can Create Group
      * @param skip_confirmation    Skip Confirmation
      * @param external             External
-     * @return                     A GitlabUser
+     * @return A GitlabUser
      * @throws IOException on gitlab api call error
      * @see <a href="http://doc.gitlab.com/ce/api/users.html">http://doc.gitlab.com/ce/api/users.html</a>
      */
@@ -508,7 +509,7 @@ public class GitlabAPI {
     public GitlabGroup getGroup(String path, boolean withProjects) throws IOException {
         String tailUrl = GitlabGroup.URL + "/" + URLEncoder.encode(path, "UTF-8");
         Query query = new Query()
-	    .append(PARAM_WITH_PROJECTS, "" + withProjects);
+                .append(PARAM_WITH_PROJECTS, "" + withProjects);
 
         return retrieve().to(tailUrl + query.toString(), GitlabGroup.class);
     }
@@ -684,7 +685,7 @@ public class GitlabAPI {
         return dispatch().to(tailUrl, GitlabGroup.class);
     }
 
-	/**
+    /**
      * Creates a Group
      *
      * @param group The gitlab Group object
@@ -1305,7 +1306,7 @@ public class GitlabAPI {
                 .appendIf("repository_storage", project.getRepositoryStorage())
                 .appendIf("approvals_before_merge", project.getApprovalsBeforeMerge())
                 .appendIf("printing_merge_request_link_enabled", project.isPrintingMergeRequestLinkEnabled())
-		.appendIf("initialize_with_readme",project.isInitializeWithReadme());
+                .appendIf("initialize_with_readme", project.isInitializeWithReadme());
 
         GitlabNamespace namespace = project.getNamespace();
         if (namespace != null) {
@@ -1461,9 +1462,9 @@ public class GitlabAPI {
      */
     public GitlabProject createFork(String namespace, Integer projectId, String path, String name) throws IOException {
         Query query = new Query()
-            .appendIf("namespace", namespace)
-            .appendIf("path", path)
-            .appendIf("name", name);
+                .appendIf("namespace", namespace)
+                .appendIf("path", path)
+                .appendIf("name", name);
         String tailUrl = GitlabProject.URL + "/" + projectId + "/fork" + query.toString();
         return dispatch().to(tailUrl, GitlabProject.class);
     }
@@ -1658,8 +1659,8 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
                 GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.URL;
         return dispatch()
-            .with("approvals_required", count)
-            .to(tailUrl, GitlabMergeRequestApprovals.class);
+                .with("approvals_required", count)
+                .to(tailUrl, GitlabMergeRequestApprovals.class);
     }
 
     /**
@@ -1674,9 +1675,9 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(mr.getProjectId()) +
                 GitlabMergeRequest.URL + "/" + mr.getIid() + GitlabMergeRequestApprovals.APPROVERS_URL;
         return put()
-            .with("approver_ids", userApproverIds)
-            .with("approver_group_ids", groupApproverIds)
-            .to(tailUrl, GitlabMergeRequestApprovals.class);
+                .with("approver_ids", userApproverIds)
+                .with("approver_group_ids", groupApproverIds)
+                .to(tailUrl, GitlabMergeRequestApprovals.class);
     }
 
     /**
@@ -1720,21 +1721,21 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabMergeRequest getMergeRequestChanges(Serializable projectId,
-            Integer mergeRequestIid) throws IOException {
+                                                     Integer mergeRequestIid) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
                 GitlabMergeRequest.URL + "/" + mergeRequestIid + "/changes";
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
     public GitlabMergeRequest getMergeRequest(Serializable projectId,
-            Integer mergeRequestIid) throws IOException {
+                                              Integer mergeRequestIid) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
                 GitlabMergeRequest.URL + "/" + mergeRequestIid;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
     public GitlabMergeRequest getMergeRequest(GitlabProject project,
-            Integer mergeRequestIid) throws IOException {
+                                              Integer mergeRequestIid) throws IOException {
         return getMergeRequest(project.getId(), mergeRequestIid);
     }
 
@@ -1826,7 +1827,7 @@ public class GitlabAPI {
      * @throws IOException on gitlab api call error
      */
     public GitlabNote getNote(GitlabMergeRequest mergeRequest,
-            Integer noteId) throws IOException {
+                              Integer noteId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabNote.URL + "/" + noteId;
@@ -1862,7 +1863,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion getDiscussion(GitlabMergeRequest mergeRequest,
-            int discussionId) throws IOException {
+                                          int discussionId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -1900,8 +1901,8 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion createDiscussion(GitlabMergeRequest mergeRequest,
-            String body, String positionBaseSha, String positionStartSha,
-            String positionHeadSha) throws IOException {
+                                             String body, String positionBaseSha, String positionStartSha,
+                                             String positionHeadSha) throws IOException {
         return createTextDiscussion(mergeRequest, body, null,
                 positionBaseSha, positionStartSha, positionHeadSha,
                 null, null, null, null);
@@ -1926,9 +1927,9 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion createTextDiscussion(GitlabMergeRequest mergeRequest,
-            String body, String position, String positionBaseSha, String positionStartSha,
-            String positionHeadSha, String positionNewPath, Integer positionNewLine,
-            String positionOldPath, Integer positionOldLine) throws IOException {
+                                                 String body, String position, String positionBaseSha, String positionStartSha,
+                                                 String positionHeadSha, String positionNewPath, Integer positionNewLine,
+                                                 String positionOldPath, Integer positionOldLine) throws IOException {
         checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
         Query query = new Query()
                 .append("body", body)
@@ -1975,7 +1976,7 @@ public class GitlabAPI {
             String positionHeadSha, String positionNewPath, String positionOldPath,
             Integer positionWidth, Integer positionHeight, Integer positionX,
             Integer positionY
-        ) throws IOException {
+    ) throws IOException {
         checkRequiredCreateDiscussionArguments(body, positionBaseSha, positionStartSha, positionHeadSha);
         Query query = new Query()
                 .append("body", body)
@@ -2008,7 +2009,7 @@ public class GitlabAPI {
      * @param positionHeadSha   The SHA referencing HEAD of this merge request
      */
     private void checkRequiredCreateDiscussionArguments(String body,
-            String positionBaseSha, String positionStartSha, String positionHeadSha) {
+                                                        String positionBaseSha, String positionStartSha, String positionHeadSha) {
         if (body == null || body.isEmpty()) {
             throw new IllegalArgumentException("Missing required argument 'body'!");
         } else if (positionBaseSha == null || positionBaseSha.isEmpty()) {
@@ -2031,7 +2032,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabDiscussion resolveDiscussion(GitlabMergeRequest mergeRequest,
-            int discussionId, boolean resolved) throws IOException {
+                                              int discussionId, boolean resolved) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId;
@@ -2051,7 +2052,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabNote addDiscussionNote(GitlabMergeRequest mergeRequest,
-            int discussionId, String body) throws IOException {
+                                        int discussionId, String body) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + mergeRequest.getProjectId() +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
                 GitlabDiscussion.URL + "/" + discussionId +
@@ -2072,7 +2073,7 @@ public class GitlabAPI {
      * @throws IOException on a GitLab api call error
      */
     public GitlabNote modifyDiscussionNote(GitlabMergeRequest mergeRequest, int discussionId,
-            int noteId, String body, Boolean resolved) throws IOException {
+                                           int noteId, String body, Boolean resolved) throws IOException {
         boolean bodyHasValue = false;
         if (body != null && !body.isEmpty()) {
             bodyHasValue = true;
@@ -2134,7 +2135,7 @@ public class GitlabAPI {
     }
 
     public List<GitlabCommit> getLastCommits(Serializable projectId) throws IOException {
-        return getCommits(projectId, null, null);
+        return getLastCommits(projectId, null);
     }
 
     public List<GitlabCommit> getLastCommits(Serializable projectId, String branchOrTag) throws IOException {
@@ -2165,9 +2166,20 @@ public class GitlabAPI {
         return Arrays.asList(commits);
     }
 
+    public List<GitlabCommit> getCommits(Serializable projectId, Pagination pagination, CommitsQuery commitsQuery) throws IOException {
+        if (pagination != null) {
+            commitsQuery.mergeWith(pagination.asQuery());
+        }
+
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
+                "/repository" + GitlabCommit.URL + commitsQuery.toString();
+        return retrieve().getAll(tailUrl, GitlabCommit[].class);
+    }
+
+
     // gets all commits for a project
     public List<GitlabCommit> getAllCommits(Serializable projectId) throws IOException {
-        return getAllCommits(projectId, null, null);
+        return getAllCommits(projectId, null);
     }
 
     // gets all commits for a project
@@ -2572,14 +2584,14 @@ public class GitlabAPI {
 
     public GitlabProjectHook addProjectHook(Serializable projectId, String url, GitlabProjectHook hook, String token) throws IOException {
         return this.addProjectHook(projectId, url, hook.getPushEvents(), hook.getIssueEvents(), hook.isMergeRequestsEvents(),
-            hook.isNoteEvents(), hook.isTagPushEvents(), hook.isSslVerificationEnabled(), hook.isJobEvents(),
-            hook.isPipelineEvents(), hook.isWikiPageEvents(), token);
+                hook.isNoteEvents(), hook.isTagPushEvents(), hook.isSslVerificationEnabled(), hook.isJobEvents(),
+                hook.isPipelineEvents(), hook.isWikiPageEvents(), token);
     }
 
     public GitlabProjectHook editProjectHook(GitlabProject project, String hookId, String url,
-        boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents,
-        boolean tagPushEvents, boolean sslVerification, boolean jobEvents, boolean pipelineEvents,
-        boolean wikiPageEvents, String token) throws IOException {
+                                             boolean pushEvents, boolean issuesEvents, boolean mergeRequestEvents, boolean noteEvents,
+                                             boolean tagPushEvents, boolean sslVerification, boolean jobEvents, boolean pipelineEvents,
+                                             boolean wikiPageEvents, String token) throws IOException {
         Query query = new Query();
         query.append("url", url);
         query.append("push_events", String.valueOf(pushEvents));
@@ -2598,9 +2610,9 @@ public class GitlabAPI {
 
     public GitlabProjectHook editProjectHook(GitlabProject project, GitlabProjectHook projectHook, String token) throws IOException {
         return editProjectHook(project, projectHook.getId(), projectHook.getUrl(), projectHook.getPushEvents(),
-            projectHook.getIssueEvents(), projectHook.isMergeRequestsEvents(), projectHook.isNoteEvents(),
-            projectHook.isTagPushEvents(), projectHook.isSslVerificationEnabled(), projectHook.isJobEvents(),
-            projectHook.isWikiPageEvents(), projectHook.isPipelineEvents(), token);
+                projectHook.getIssueEvents(), projectHook.isMergeRequestsEvents(), projectHook.isNoteEvents(),
+                projectHook.isTagPushEvents(), projectHook.isSslVerificationEnabled(), projectHook.isJobEvents(),
+                projectHook.isWikiPageEvents(), projectHook.isPipelineEvents(), token);
     }
 
     public void deleteProjectHook(GitlabProjectHook hook) throws IOException {
@@ -4166,9 +4178,9 @@ public class GitlabAPI {
                                        GitlabDate before,
                                        GitlabDate after,
                                        SortOrder sortOrder)
-        throws IOException {
+            throws IOException {
         return getEvents(project, action, targetType, before,
-                         after, sortOrder, new Pagination());
+                after, sortOrder, new Pagination());
     }
 
     /**
@@ -4188,9 +4200,9 @@ public class GitlabAPI {
                                        GitlabDate after,
                                        SortOrder sortOrder,
                                        Pagination pagination)
-        throws IOException {
+            throws IOException {
         return getProjectEvents(project.getId(), action, targetType, before,
-                                after, sortOrder, pagination);
+                after, sortOrder, pagination);
     }
 
     /**
@@ -4209,9 +4221,9 @@ public class GitlabAPI {
                                               GitlabDate before,
                                               GitlabDate after,
                                               SortOrder sort)
-        throws IOException {
+            throws IOException {
         return getProjectEvents(projectId, action, targetType, before,
-                                after, sort, new Pagination());
+                after, sort, new Pagination());
     }
 
     /**
@@ -4231,7 +4243,7 @@ public class GitlabAPI {
                                               GitlabDate after,
                                               SortOrder sort,
                                               Pagination pagination)
-        throws IOException {
+            throws IOException {
 
         final Query query = new Query();
         query.appendIf("action", action);
@@ -4245,10 +4257,10 @@ public class GitlabAPI {
         }
 
         StringBuilder tailUrl = new StringBuilder(GitlabProject.URL)
-            .append("/")
-            .append(sanitizeProjectId(projectId))
-            .append(GitlabEvent.URL)
-            .append(query.toString());
+                .append("/")
+                .append(sanitizeProjectId(projectId))
+                .append(GitlabEvent.URL)
+                .append(query.toString());
 
         return Arrays.asList(retrieve().method(GET).to(tailUrl.toString(), GitlabEvent[].class));
     }
