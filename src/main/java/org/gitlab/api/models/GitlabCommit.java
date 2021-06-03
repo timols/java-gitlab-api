@@ -34,6 +34,9 @@ public class GitlabCommit {
     @JsonProperty("parent_ids")
     private List<String> parentIds;
 
+    @JsonProperty("stats")
+    private GitlabCommitStats stats;
+
     @JsonProperty("last_pipeline")
     private GitlabPipeline lastPipeline;
 
@@ -115,6 +118,14 @@ public class GitlabCommit {
 
     public void setAuthoredDate(Date authoredDate) {
         this.authoredDate = authoredDate;
+    }
+
+    public GitlabCommitStats getStats() {
+        return stats;
+    }
+
+    public void setStats(GitlabCommitStats stats) {
+        this.stats = stats;
     }
 
     @Override
