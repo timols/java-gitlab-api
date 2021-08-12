@@ -1,7 +1,7 @@
 package org.gitlab.api.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-
+// added MinimalAccess level 5 - for git 13.x and beyond 
 public enum GitlabAccessLevel {
     Guest(10),
     Reporter(20),
