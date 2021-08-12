@@ -7,6 +7,7 @@ public enum GitlabAccessLevel {
     Reporter(20),
     Developer(30),
     Master(40),
+    MinimalAccess(5),
     Owner(50);
 
     public final int accessValue;
