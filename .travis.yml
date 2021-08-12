@@ -9,6 +9,6 @@ install:
 - eval $(gpg-agent --daemon)
 - gpg --batch --gen-key gpg.key
 -  gpg --list-keys
-- ./mvnw -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip -Darguments=-Dgpg.passphrase=abc
+- ./mvnw  -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip -Darguments=-Dgpg.passphrase=abc
 script:
 - ./mvnw  -V -Pdocker-gitlab verify -Darguments=-Dgpg.passphrase=abc
