@@ -5,6 +5,6 @@ services:
 jdk:
 - openjdk8
 install:
-- ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip
+- ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip -Dgpg.passphrase=thephrase
 script:
 - ./mvnw -B -V -Pdocker-gitlab verify
