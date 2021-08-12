@@ -234,7 +234,9 @@
 							<goal>sign</goal>
 						</goals>
 						<configuration>
-
+							<gpgArguments>
+					         		<arg>--pinentry-mode=loopback</arg>
+							</gpgArguments>
 						</configuration>
 					</execution>
 				</executions>
