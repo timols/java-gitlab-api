@@ -6,19 +6,7 @@ jdk:
 - openjdk8
 install:
 - export GNUPGHOME="$(mktemp -d)"
--  echo " Key-Type: DSA " > foo
--  echo  " Key-Length: 1024" >> foo
--  echo  " Subkey-Type: ELG-E" >> foo
--  echo  " Subkey-Length: 1024" >> foo
--  echo  " Name-Real: Joe Tester" >> foo
--  echo  " Name-Comment: with  passphrase" >> foo
--  echo  " Name-Email: joe@foo.bar" >> foo
--  echo  "Passphrase: abc" >> foo
--  echo  " Key-Length: 1024" >> foo
--  echo  " Key-Length: 1024" >> foo
--  echo  " Key-Length: 1024" >> foo
--  echo  " Key-Length: 1024" >> foo
-- gpg --batch --generate-key foo
+- gpg --gen-key
 -  gpg --list-keys
 - ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip -Darguments=-Dgpg.passphrase=thephrase
 script:
