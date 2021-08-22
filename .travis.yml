@@ -5,6 +5,10 @@ services:
 jdk:
 - openjdk8
 install:
-- ./mvnw -B -q -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip
+- export GNUPGHOME="$(mktemp -d)"
+- eval $(gpg-agent --daemon)
+- gpg --batch --gen-key gpg.key
+-  gpg --list-keys
+- ./mvnw  -Pdocker-gitlab dependency:go-offline verify -DskipTests -Ddocker.skip -Dgpg.passphrase=abc
 script:
-- ./mvnw -B -V -Pdocker-gitlab verify
+- ./mvnw  -V -Pdocker-gitlab verify -Darguments=-Dgpg.passphrase=abc
