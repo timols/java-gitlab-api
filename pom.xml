@@ -75,7 +75,7 @@
 		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
 		<!-- wait three minutes for gitlab to start -->
 		<docker-maven-plugin.timeOut>180000</docker-maven-plugin.timeOut>
-		<log4j.version>2.11.0</log4j.version>
+		<log4j.version>2.16.0</log4j.version>
 		<junit.jupiter.version>5.2.0</junit.jupiter.version>
 	</properties>
 
