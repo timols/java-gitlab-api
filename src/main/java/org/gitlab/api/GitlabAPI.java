@@ -19,11 +19,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Collection;
+import java.util.*;
 
 import static org.gitlab.api.http.Method.*;
 
@@ -1812,8 +1808,9 @@ public class GitlabAPI {
         GitlabHTTPRequestor requestor = retrieve().method(PUT);
         requestor.with("id", projectId);
         requestor.with("merge_request_iid", mergeRequestIid);
-        if (mergeCommitMessage != null)
+        if (mergeCommitMessage != null) {
             requestor.with("merge_commit_message", mergeCommitMessage);
+        }
         return requestor.to(tailUrl, GitlabMergeRequest.class);
     }
 
@@ -2612,7 +2609,10 @@ public class GitlabAPI {
         String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectHook.URL + "/" + hookId;
         retrieve().method(DELETE).to(tailUrl, Void.class);
     }
-
+    public List<GitlabIssue> getIssues(String assigneeId){
+        String tailUrl = GitlabIssue.URL+"?assigneeId="+assigneeId+"&scope=all";
+        return this.retrieve().getAll(tailUrl, GitlabIssue[].class);
+    }
     public List<GitlabIssue> getIssues(GitlabProject project) {
         return getIssues(project.getId());
     }

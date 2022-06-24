@@ -1,7 +1,17 @@
 package org.gitlab.api;
 
+/**
+ * User Token Type
+ * @author Chi Vinh Le
+ */
 public enum TokenType {
+    /**
+     * User private token
+     */
     PRIVATE_TOKEN("private_token", "PRIVATE-TOKEN", "%s"),
+    /**
+     * User access token
+     */
     ACCESS_TOKEN("access_token", "Authorization", "Bearer %s");
 
     private final String tokenParamName;
