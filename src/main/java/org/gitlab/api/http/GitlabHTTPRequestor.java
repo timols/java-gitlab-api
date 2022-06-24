@@ -1,34 +1,22 @@
 package org.gitlab.api.http;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
-import java.net.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import javax.net.ssl.*;
-
 import org.apache.commons.io.IOUtils;
 import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.GitlabAPIException;
 import org.gitlab.api.TokenType;
 
-import static org.gitlab.api.http.Method.GET;
-import static org.gitlab.api.http.Method.POST;
-import static org.gitlab.api.http.Method.PUT;
+import javax.net.ssl.*;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+import static org.gitlab.api.http.Method.*;
 
 /**
  * Gitlab HTTP Requestor
@@ -86,8 +74,8 @@ public class GitlabHTTPRequestor {
      * Sets the HTTP Form Post parameters for the request
      * Has a fluent api for method chaining
      *
-     * @param key       Form parameter Key
-     * @param value     Form parameter Value
+     * @param key   Form parameter Key
+     * @param value Form parameter Value
      * @return this
      */
     public GitlabHTTPRequestor with(String key, Object value) {
@@ -96,13 +84,13 @@ public class GitlabHTTPRequestor {
         }
         return this;
     }
-    
+
     /**
      * Sets the HTTP Form Post parameters for the request
      * Has a fluent api for method chaining
      *
-     * @param key       Form parameter Key
-     * @param file      File data
+     * @param key  Form parameter Key
+     * @param file File data
      * @return this
      */
     public GitlabHTTPRequestor withAttachment(String key, File file) {
@@ -138,7 +126,7 @@ public class GitlabHTTPRequestor {
             if (hasAttachments()) {
                 submitAttachments(connection);
             } else if (hasOutput()) {
-                 submitData(connection);
+                submitData(connection);
             } else if (PUT.equals(method)) {
                 // PUT requires Content-Length: 0 even when there is no body (eg: API for protecting a branch)
                 connection.setDoOutput(true);
@@ -301,7 +289,7 @@ public class GitlabHTTPRequestor {
             writer.append("--").append(boundary).append("--").append(CRLF).flush();
         }
     }
-    
+
     private void submitData(HttpURLConnection connection) throws IOException {
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/json");
@@ -311,7 +299,7 @@ public class GitlabHTTPRequestor {
     private boolean hasAttachments() {
         return !attachments.isEmpty();
     }
-    
+
     private boolean hasOutput() {
         return method.equals(POST) || method.equals(PUT) && !data.isEmpty();
     }
@@ -361,13 +349,17 @@ public class GitlabHTTPRequestor {
             if (byte[].class == type) {
                 return type.cast(IOUtils.toByteArray(wrapStream(connection, connection.getInputStream())));
             }
-            reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), "UTF-8");
+            reader = new InputStreamReader(wrapStream(connection, connection.getInputStream()), StandardCharsets.UTF_8);
             String json = IOUtils.toString(reader);
             if (type != null && type == String.class) {
                 return type.cast(json);
             }
             if (type != null && type != Void.class) {
-                return GitlabAPI.MAPPER.readValue(json, type);
+                try {
+                    return GitlabAPI.MAPPER.readValue(json, type);
+                } catch (Exception e) {
+                    throw new IOException("Json Parse Failed,JSON String:" + json);
+                }
             } else if (instance != null) {
                 return GitlabAPI.MAPPER.readerForUpdating(instance).readValue(json);
             } else {
@@ -440,6 +432,7 @@ public class GitlabHTTPRequestor {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             // Added per https://github.com/timols/java-gitlab-api/issues/44
             HttpsURLConnection.setDefaultHostnameVerifier(nullVerifier);
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 }

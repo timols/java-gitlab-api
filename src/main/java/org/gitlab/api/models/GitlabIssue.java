@@ -1,13 +1,13 @@
 package org.gitlab.api.models;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitlabIssue {
@@ -70,6 +70,9 @@ public class GitlabIssue {
 
     @JsonProperty("web_url")
     private String webUrl;
+
+    @JsonProperty("moved_to_id")
+    private String movedToId;
 
     public int getId() {
         return id;
@@ -134,6 +137,7 @@ public class GitlabIssue {
     public void setAssignees(List<GitlabUser> assignees) {
         this.assignees = assignees;
     }
+
     public GitlabUser getAssignee() {
         return assignee;
     }
@@ -230,4 +234,27 @@ public class GitlabIssue {
         this.createdAt = createdAt;
     }
 
+    public Date getClosedAt() {
+        return closedAt;
+    }
+
+    public void setClosedAt(Date closedAt) {
+        this.closedAt = closedAt;
+    }
+
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
+    }
+
+    public String getMovedToId() {
+        return movedToId;
+    }
+
+    public void setMovedToId(String movedToId) {
+        this.movedToId = movedToId;
+    }
 }
