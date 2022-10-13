@@ -2120,10 +2120,7 @@ public class GitlabAPI {
     }
 
     public List<GitlabCommit> getCommits(GitlabMergeRequest mergeRequest, Pagination pagination) throws IOException {
-        Integer projectId = mergeRequest.getSourceProjectId();
-        if (projectId == null) {
-            projectId = mergeRequest.getProjectId();
-        }
+        Integer projectId = mergeRequest.getProjectId();
 
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) +
                 GitlabMergeRequest.URL + "/" + mergeRequest.getIid() +
